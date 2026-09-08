@@ -192,9 +192,9 @@ The pieces that matter for every session:
 | `src/budget/ledger.ts` | Spend Guard: reserve, settle, release, hold. |
 | `src/perflo/client.ts` | Typed Perflo HTTP client. Never retries a pay call blind. |
 | `src/perflo/errors.ts` | `ledgerActionFor` / `ledgerActionForError`. Branch on `code` and status, never on message. |
-| `src/research/` | Planner, agent loop, tools, capability map, orchestrator. Mostly stubs until M3-M5. |
+| `src/research/` | Planner, agent loop, tools, capability map, orchestrator. Tools and the capability map ship in M3; planner/agent/orchestrator stay stubs until M5. |
 | `src/identity/` | Matcher. Stub until M4. |
-| `src/evidence/` | Source store, extractors, report assembler. Stubs until M3/M6. |
+| `src/evidence/` | Source store and extractors ship in M3; report assembler stays a stub until M6. |
 | `src/api/` | Hono routes and Zod schemas. `/health` ships; `POST /research` is M6. |
 | `test/fake-perflo.ts` | In-process Perflo for tests. Covers every documented pay outcome. |
 | `test/fixtures/` | Recorded responses for fixture mode. Fill in M7. |
@@ -206,8 +206,8 @@ Current status is also in README.
 
 - M1 Foundation: done (`money.ts`, config, SQLite, `/health`).
 - M2 Perflo client and Spend Guard: done, including hold-on-unrecognized-5xx.
-- M3 Capabilities and tool layer: next.
-- M4 Identity matcher.
+- M3 Capabilities and tool layer: done (capability map, contract cache, tools, evidence store, extractors).
+- M4 Identity matcher: next.
 - M5 Agent loop and orchestrator.
   Also write `jobs.spent_micro` at job end, and record succeeded/failed on settle instead of the constant `SETTLED`.
 - M6 Report assembler and `POST /research`.
