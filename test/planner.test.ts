@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { parseMoney } from "../src/budget/money.js";
-import { plan } from "../src/research/planner.js";
+import { defaultDeadlineMs, plan } from "../src/research/planner.js";
 
 describe("plan", () => {
   it("maps a cap under $0.50 to basic tools and a 10 percent reserve", () => {
@@ -45,5 +45,11 @@ describe("plan", () => {
 
   it("ceils the reserve to the next micro-dollar", () => {
     expect(plan(1_000_001n, 5_000, 0).reserveMicro).toBe(100_001n);
+  });
+
+  it("defaults the deadline to 60s, or 90s for deep", () => {
+    expect(defaultDeadlineMs(parseMoney("1.50"))).toBe(60_000);
+    expect(defaultDeadlineMs(parseMoney("2.00"))).toBe(60_000);
+    expect(defaultDeadlineMs(parseMoney("2.01"))).toBe(90_000);
   });
 });

@@ -20,6 +20,11 @@ export function tierForCap(capMicro: Micro): Tier {
   return "deep";
 }
 
+/** Wall-clock default when the request and operator config omit deadlineMs. */
+export function defaultDeadlineMs(capMicro: Micro): number {
+  return tierForCap(capMicro) === "deep" ? 90_000 : 60_000;
+}
+
 export function plan(capMicro: Micro, deadlineMs: number, now: number = Date.now()): Plan {
   if (deadlineMs <= 0) throw new RangeError(`deadline must be positive: ${deadlineMs}`);
   const tier = tierForCap(capMicro);

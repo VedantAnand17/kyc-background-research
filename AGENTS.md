@@ -194,8 +194,8 @@ The pieces that matter for every session:
 | `src/perflo/errors.ts` | `ledgerActionFor` / `ledgerActionForError`. Branch on `code` and status, never on message. |
 | `src/research/` | Planner, agent loop, tools, capability map, orchestrator. Tools and the capability map ship in M3; planner, agent, and orchestrator ship in M5. |
 | `src/identity/` | Matcher. Shipped in M4. |
-| `src/evidence/` | Source store and extractors ship in M3; report assembler stays a stub until M6. |
-| `src/api/` | Hono routes and Zod schemas. `/health` ships; `POST /research` is M6. |
+| `src/evidence/` | Source store and extractors ship in M3; report assembler ships in M6. |
+| `src/api/` | Hono routes and Zod schemas. `/health` ships; `POST /research` and `GET /docs` ship in M6. |
 | `test/fake-perflo.ts` | In-process Perflo for tests. Covers every documented pay outcome. |
 | `test/fixtures/` | Recorded responses for fixture mode. Fill in M7. |
 
@@ -209,7 +209,7 @@ Current status is also in README.
 - M3 Capabilities and tool layer: done (capability map, contract cache, tools, evidence store, extractors).
 - M4 Identity matcher: done.
 - M5 Agent loop and orchestrator: done, including `jobs.spent_micro` at job end and settle outcome in `perflo_code`.
-- M6 Report assembler and `POST /research`.
+- M6 Report assembler and `POST /research`: done, including section-5.4 invariants, `GET /docs`, and skipped-screen honesty.
 - M7 Live verification and README.
 
 ## Maintaining this file

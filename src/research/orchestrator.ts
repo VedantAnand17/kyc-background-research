@@ -9,11 +9,22 @@ import type { Db } from "../db/sqlite.js";
 import type { Logger } from "../logger.js";
 import type { PerfloClient } from "../perflo/client.js";
 import type { ResearchAgent, AgentContext, RiskClassification, RiskHit } from "./agent.js";
+import { assembleReport, type CostCall, type Warning } from "../evidence/report.js";
+import { PerfloError } from "../perflo/errors.js";
 import { candidatesFromSources } from "./candidates.js";
-import { plan } from "./planner.js";
+import { defaultDeadlineMs, plan } from "./planner.js";
 import { adverseMediaQuery } from "./prompts.js";
-import { buildRunReport, type CostCall, type Warning } from "./run-report.js";
 import { createTools, type ResearchTools, type ToolOutcome } from "./tools.js";
+
+export class ResearchUnavailableError extends Error {
+  constructor(
+    readonly code: string,
+    message: string,
+  ) {
+    super(message);
+    this.name = "ResearchUnavailableError";
+  }
+}
 
 const SYNTHESIS_MS = 8_000;
 const DRAIN_MS = 5_000;
@@ -122,9 +133,17 @@ async function reconcileHeld(db: Db, jobId: string, guard: SpendGuard, client: P
 }
 
 export async function runResearch(req: ResearchRequest, deps: OrchestratorDeps): Promise<ResearchReport> {
+  try {
+    await deps.client.getBalance();
+  } catch (err) {
+    const code = err instanceof PerfloError ? err.code : "NETWORK_ERROR";
+    const message = err instanceof Error ? err.message : "Perflo is unreachable.";
+    throw new ResearchUnavailableError(code, message);
+  }
+
   const started = deps.now ?? Date.now();
   const capMicro = parseMoney(req.maxBudget.amount);
-  const deadlineMs = req.options?.deadlineMs ?? deps.deadlineMs ?? 45_000;
+  const deadlineMs = req.options?.deadlineMs ?? deps.deadlineMs ?? defaultDeadlineMs(capMicro);
   const planned = plan(capMicro, deadlineMs, started);
   const requestId = `req_${randomUUID()}`;
   const warnings: Warning[] = [];
@@ -232,57 +251,60 @@ export async function runResearch(req: ResearchRequest, deps: OrchestratorDeps):
     });
   }
 
-  if (!skipResearch && !adverseOnly) {
-    await runPhase("enrich", () => deps.agent.enrich(ctx()));
-    evidence = candidatesFromSources(store.forJob());
-    identity = decideIdentity(subjectOf(req), evidence);
-  }
-
   let classifications: RiskClassification[] = [];
   let watchlistScreened = false;
   let watchlistHits = false;
 
-  if (!skipResearch) {
-    await runPhase("screen", async () => {
-      const fullName = `${req.firstName} ${req.lastName}`;
-      const query = adverseMediaQuery(fullName);
-      if (tools.search_news) await tools.search_news.execute({ query });
-      if (tools.search_web) await tools.search_web.execute({ query });
-      if (tools.screen_watchlist) {
-        const result = await tools.screen_watchlist.execute({
-          fullName,
-          dateOfBirth: req.dateOfBirth,
-          country: req.address?.country,
+  const screenPhase = async (): Promise<void> => {
+    const fullName = `${req.firstName} ${req.lastName}`;
+    const query = adverseMediaQuery(fullName);
+    if (tools.search_news) await tools.search_news.execute({ query });
+    if (tools.search_web) await tools.search_web.execute({ query });
+    if (tools.screen_watchlist) {
+      const result = await tools.screen_watchlist.execute({
+        fullName,
+        dateOfBirth: req.dateOfBirth,
+        country: req.address?.country,
+      });
+      if (result.outcome === "unavailable") {
+        warnings.push({
+          code: "pep_not_screened",
+          message: "PEP screening not available: no payable watchlist vendor in the Perflo catalog at run time.",
         });
-        if (result.outcome === "unavailable") {
-          warnings.push({
-            code: "pep_not_screened",
-            message: "PEP screening not available: no payable watchlist vendor in the Perflo catalog at run time.",
-          });
-          warnings.push({
-            code: "sanctions_not_screened",
-            message:
-              "Sanctions screening not available: no payable watchlist vendor in the Perflo catalog at run time.",
-          });
-        } else if (result.outcome === "ok" && result.sourceId) {
-          watchlistScreened = true;
-          const source = store.byId(result.sourceId);
-          const facts = source?.extracted as { facts?: { hits?: unknown[] } } | undefined;
-          watchlistHits = (facts?.facts?.hits?.length ?? 0) > 0;
-        }
+        warnings.push({
+          code: "sanctions_not_screened",
+          message:
+            "Sanctions screening not available: no payable watchlist vendor in the Perflo catalog at run time.",
+        });
+      } else if (result.outcome === "ok" && result.sourceId) {
+        watchlistScreened = true;
+        const source = store.byId(result.sourceId);
+        const facts = source?.extracted as { facts?: { hits?: unknown[] } } | undefined;
+        watchlistHits = (facts?.facts?.hits?.length ?? 0) > 0;
       }
-      const hits: RiskHit[] = [];
-      for (const source of store.forJob()) {
-        if (source.status !== "succeeded") continue;
-        if (source.capability !== "search_news" && source.capability !== "search_web") continue;
-        const facts = source.extracted as { facts?: { articles?: Array<{ title?: string }>; results?: Array<{ title?: string }> } };
-        const items = facts.facts?.articles ?? facts.facts?.results ?? [];
-        for (const item of items) {
-          if (item.title) hits.push({ sourceId: source.id, title: item.title });
-        }
+    }
+    const hits: RiskHit[] = [];
+    for (const source of store.forJob()) {
+      if (source.status !== "succeeded") continue;
+      if (source.capability !== "search_news" && source.capability !== "search_web") continue;
+      const facts = source.extracted as {
+        facts?: { articles?: Array<{ title?: string }>; results?: Array<{ title?: string }> };
+      };
+      const items = facts.facts?.articles ?? facts.facts?.results ?? [];
+      for (const item of items) {
+        if (item.title) hits.push({ sourceId: source.id, title: item.title });
       }
-      classifications = [...(await Promise.resolve(deps.agent.classifyRisk(hits)))];
-    });
+    }
+    classifications = [...(await Promise.resolve(deps.agent.classifyRisk(hits)))];
+  };
+
+  if (!skipResearch && !adverseOnly) {
+    currentPhase = "enrich";
+    await Promise.all([runPhase("enrich", () => deps.agent.enrich(ctx())), runPhase("screen", screenPhase)]);
+    evidence = candidatesFromSources(store.forJob());
+    identity = decideIdentity(subjectOf(req), evidence);
+  } else if (!skipResearch) {
+    await runPhase("screen", screenPhase);
   }
 
   if (deadlineHit) {
@@ -310,22 +332,21 @@ export async function runResearch(req: ResearchRequest, deps: OrchestratorDeps):
     reputationalSummaries: {} as Record<string, string>,
     rationale: "narrative unavailable",
   };
-  if (!controller.signal.aborted) {
-    const notes = store
-      .forJob()
-      .map((s) => `${s.id} ${s.capability} ${s.status}`)
-      .join("\n");
-    for (let attempt = 0; attempt < 2; attempt++) {
-      try {
-        narrative = await deps.agent.narrate({ ...ctx(), evidenceNotes: notes });
-        break;
-      } catch {
-        if (attempt === 1) {
-          warnings.push({
-            code: "narrative_unavailable",
-            message: "Narrative pass failed after two retries; summaries use the fallback string.",
-          });
-        }
+  const notes = store
+    .forJob()
+    .map((s) => `${s.id} ${s.capability} ${s.status}`)
+    .join("\n");
+  const synthesis = AbortSignal.timeout(SYNTHESIS_MS);
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      narrative = await deps.agent.narrate({ ...ctx(), signal: synthesis, evidenceNotes: notes });
+      break;
+    } catch {
+      if (attempt === 1) {
+        warnings.push({
+          code: "narrative_unavailable",
+          message: "Narrative pass failed after two retries; summaries use the fallback string.",
+        });
       }
     }
   }
@@ -350,7 +371,7 @@ export async function runResearch(req: ResearchRequest, deps: OrchestratorDeps):
     });
   }
 
-  const report = buildRunReport({
+  const report = assembleReport({
     requestId,
     request: req,
     tier: planned.tier,
@@ -368,6 +389,8 @@ export async function runResearch(req: ResearchRequest, deps: OrchestratorDeps):
     classifications,
     watchlistScreened,
     watchlistHits,
+    screenRan: phases.screen !== undefined,
+    ledgerSpentMicro: guard.snapshot().spentMicro,
   });
 
   const spent = guard.snapshot().spentMicro;

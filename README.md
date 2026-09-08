@@ -18,14 +18,17 @@ One line: one search in, one honest costed file out, never overspend.
 
 ## Status
 
-M1 foundation, M2 (Perflo client + Spend Guard), M3 (capabilities and tool layer), M4 (identity matcher), and M5 (agent loop and orchestrator) are implemented.
+M1 foundation through M6 (report assembler and `POST /research`) are implemented.
 The reservation ledger refuses a paid call that would breach the cap, including under concurrent reservations, and persists every transition to SQLite.
 The typed Perflo client covers every section-10 endpoint and error code against `test/fake-perflo.ts`.
 The tool layer maps each capability to a vendor, quotes the live contract, reserves, pays, and stores a Source.
 A repeat call is served from that store at zero charge.
 The matcher scores each Candidate against the Subject with the section-8 weights, labels it, and selects a Primary candidate only when it is confirmed or a probable lead of at least 0.15.
 The orchestrator runs the five phases, honors the deadline, and returns a schema-valid report in fixture-style tests for basic, standard, deep, deadline-hit, budget-exhausted, and ambiguous identity.
-M6 (report assembler and `POST /research`) and M7 remain stubs tagged `TODO(Mn)`.
+`POST /research` returns that report over HTTP.
+`GET /docs` renders the OpenAPI explorer.
+A skipped risk screen marks every category `not_screened` with warnings and forces overall risk `unknown`.
+M7 (live verification and README polish) remains.
 
 ## Run
 
@@ -34,7 +37,7 @@ Requires Node 22 and pnpm 11.
 ```bash
 pnpm install
 cp .env.example .env      # fill in keys, or set FIXTURE_MODE=true to run without money
-pnpm dev                  # http://localhost:3000/health and /openapi.json
+pnpm dev                  # http://localhost:3000/health, /docs, /openapi.json, POST /research
 pnpm test
 pnpm check                # typecheck
 ```

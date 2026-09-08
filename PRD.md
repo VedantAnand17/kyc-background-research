@@ -1,6 +1,6 @@
 # PRD: Budget-capped KYC and background-research API
 
-Status: approved design; M1 through M5 implemented.
+Status: approved design; M1 through M6 implemented.
 Owner: Vedant.
 Source brief: [original-assignment.md](original-assignment.md).
 Scope split: [requirements.md](requirements.md).
@@ -80,7 +80,7 @@ Unknown fields are rejected.
   "dateOfBirth": "1991-04-12",
   "address": { "line1": "12 Marina Rd", "city": "Lagos", "region": "Lagos", "country": "NG" },
   "maxBudget": { "amount": "1.50", "currency": "USD" },
-  "options": { "deadlineMs": 45000 }
+  "options": { "deadlineMs": 60000 }
 }
 ```
 
@@ -91,7 +91,7 @@ Field rules:
 - `address`: optional; every subfield optional; `country` is ISO 3166-1 alpha-2 when present.
 - `maxBudget.amount`: required, decimal string matching `^\d+(\.\d{1,6})?$`, greater than zero, at most `1000.000000`.
 - `maxBudget.currency`: required, MUST be `USD` in this release.
-- `options.deadlineMs`: optional, 5000 to 120000, default from config (45000).
+- `options.deadlineMs`: optional, 5000 to 120000, default 60000 for basic and standard, 90000 for deep, or `RESEARCH_DEADLINE_MS` when that variable is set.
 
 Responses:
 
@@ -218,12 +218,14 @@ If still ambiguous, `identity.status = "ambiguous"`, phases 3 and 4 run only adv
 ### 6.4 Phase 3: Enrich (agent, parallel)
 
 The agent may issue several tool calls in one turn; the tool layer runs them concurrently with a concurrency limit of 4.
+The enrich prompt states that the primary candidate is already resolved and `find_people` must not be called again.
 Each tool result returned to the model is a compact summary of at most 1,500 characters plus the `sourceId`, the charged amount, and the remaining budget.
 Raw vendor payloads are stored in SQLite and never enter the model context.
 The agent stops enriching when it judges the file complete, when every allowed tool has been used for the primary candidate, or when remaining headroom is below the cheapest live quote among the allowed tools.
 
 ### 6.5 Phase 4: Screen risk (agent, parallel)
 
+This phase does not depend on enrich results and MUST run concurrently with phase 3 when both run.
 Two things always happen here regardless of tier:
 
 - `search_news` and, when allowed, `search_web` are called with adverse-media queries built by code from a fixed template list, for example `"<full name>" fraud OR scam OR arrested OR indicted OR lawsuit OR sanctions`.
@@ -244,6 +246,8 @@ The final object is validated against the report schema.
 
 The orchestrator holds an `AbortSignal` derived from `deadlineAt` minus a synthesis allowance of 8 seconds.
 When it fires: tool calls not yet started are dropped, in-flight calls are awaited for up to 5 more seconds, then phase 5 runs with whatever exists.
+The narrative pass still runs inside the 8 second synthesis allowance; it does not inherit the aborted tool-phase signal.
+If the screen phase never started, every risk category is `not_screened` with a warning and `risk.overall.level` is `unknown`.
 `timing.deadlineHit` is true and a warning names the phase that was cut.
 After the response is sent, any in-flight call that was abandoned is reconciled against `GET /v1/transactions` so the ledger row never stays a phantom reservation.
 
@@ -415,7 +419,7 @@ Missing required values fail startup with a message naming the variable.
 | `LLM_MODEL` | no | `@cf/zai-org/glm-5.3` | model name |
 | `LLM_API_KEY` | yes | | provider key; for Cloudflare, an API token with Workers AI read |
 | `LLM_BASE_URL` | when `openai-compatible` | | endpoint |
-| `RESEARCH_DEADLINE_MS` | no | `45000` | default deadline |
+| `RESEARCH_DEADLINE_MS` | no | unset: `60000` basic/standard, `90000` deep | operator override for the default deadline |
 | `TOOL_CONCURRENCY` | no | `4` | parallel paid calls |
 | `VENDOR_TIMEOUT_MS` | no | `15000` | per paid call |
 | `DATABASE_PATH` | no | `./data/research.db` | SQLite file |

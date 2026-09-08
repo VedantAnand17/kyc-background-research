@@ -3,6 +3,7 @@ import {
   adverseMediaQuery,
   agentSystemPrompt,
   disambiguationPrompt,
+  enrichUserPrompt,
   narrativePrompt,
 } from "../src/research/prompts.js";
 
@@ -45,5 +46,11 @@ describe("prompts", () => {
     expect(adverseMediaQuery("Ada Okonkwo")).toBe(
       '"Ada Okonkwo" fraud OR scam OR arrested OR indicted OR lawsuit OR sanctions',
     );
+  });
+
+  it("tells enrich not to call find_people again", () => {
+    const text = enrichUserPrompt();
+    expect(text).toMatch(/already resolved/i);
+    expect(text).toMatch(/do not call find_people/i);
   });
 });
