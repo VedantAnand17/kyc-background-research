@@ -1,6 +1,6 @@
 // Capability map: tool -> ordered vendor preference. PRD.md section 9, ADR-0003.
 // The LLM never sees these slugs. Listed prices are design-time reference only; the live contract
-// from GET /v1/vendors/{slug} is authoritative and is cached for one hour (TODO(M3) in tools.ts).
+// from GET /v1/vendors/{slug} is authoritative and is cached for one hour in tools.ts.
 
 export type Tier = "basic" | "standard" | "deep";
 
@@ -108,4 +108,20 @@ export const CAPABILITIES: readonly CapabilityEntry[] = [
 export function toolsForTier(tier: Tier): readonly CapabilityEntry[] {
   const rank = TIER_ORDER.indexOf(tier);
   return CAPABILITIES.filter((c) => TIER_ORDER.indexOf(c.tier) <= rank);
+}
+
+export function capabilityOf(tool: ToolName): CapabilityEntry {
+  const row = CAPABILITIES.find((c) => c.tool === tool);
+  if (!row) throw new Error(`unknown tool: ${tool}`);
+  return row;
+}
+
+/** Preference order, narrowed by social network when the tool is get_social_profile. */
+export function preferredVendors(tool: ToolName, args: Record<string, unknown>): readonly string[] {
+  const entry = capabilityOf(tool);
+  if (tool !== "get_social_profile") return entry.vendors;
+  const network = args.network;
+  if (network === "x") return entry.vendors.filter((slug) => slug.includes("twitter"));
+  if (network === "instagram") return entry.vendors.filter((slug) => slug.includes("instagram"));
+  return entry.vendors;
 }

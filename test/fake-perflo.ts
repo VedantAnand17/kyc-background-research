@@ -3,7 +3,7 @@
 import { createServer } from "node:http";
 import { getRequestListener } from "@hono/node-server";
 import { Hono } from "hono";
-import type { PayResult, PerfloMoney, Transaction, VendorContract, VendorSearchResult } from "../src/perflo/types.js";
+import type { PayResult, PerfloMoney, Transaction, VendorContract, VendorField, VendorSearchResult } from "../src/perflo/types.js";
 
 export type FakePayScenario =
   | "succeeded"
@@ -33,24 +33,50 @@ export interface FakePerflo {
   readonly baseUrl: string;
   readonly payCalls: FakePayCall[];
   setScenario(slug: string, scenario: FakePayScenario): void;
+  setContract(slug: string, patch: Partial<VendorContract>): void;
+  setPayable(slug: string, payable: boolean): void;
+  setSearchResults(query: string, results: VendorSearchResult[]): void;
   close(): Promise<void>;
 }
 
 const MONEY: PerfloMoney = { amount: "0.025200", currency: "USD" };
 
-function contract(slug: string): VendorContract {
+function fieldsFor(slug: string): { fields: VendorField[] } {
+  const body = (name: string, required = false) => ({ name, in: "body" as const, required, type: "string" });
+  if (slug.includes("minerva") || slug.includes("fullenrich-people") || slug.includes("pdl") || slug.includes("skip-trace")) {
+    return { fields: [body("fullName", true), body("locationHint"), body("company"), body("location"), body("city"), body("region"), body("profileUrl")] };
+  }
+  if (slug.includes("linkedin") || slug.includes("harvest") || slug.includes("apimaestro")) {
+    return { fields: [body("profileUrl"), body("fullName"), body("company")] };
+  }
+  if (slug.includes("twitter") || slug.includes("instagram")) {
+    return { fields: [body("handleOrName", true), body("network")] };
+  }
+  if (slug.includes("edgar") || slug.includes("filing")) {
+    return { fields: [body("fullName", true)] };
+  }
+  if (slug.includes("firecrawl") || slug.includes("scrape")) {
+    return { fields: [body("url", true)] };
+  }
+  if (slug.includes("watchlist") || slug.includes("sanction") || slug.includes("pep")) {
+    return { fields: [body("fullName", true), body("dateOfBirth"), body("country")] };
+  }
+  return { fields: [body("query", true)] };
+}
+
+function contract(slug: string, patches: Map<string, Partial<VendorContract>>, payable: Map<string, boolean>): VendorContract {
+  const patch = patches.get(slug);
+  const input = patch?.input ?? fieldsFor(slug);
   return {
-    slug,
-    name: `Fake ${slug}`,
-    description: "In-process fake vendor.",
-    capability: "web_search",
-    price: MONEY,
-    maxChargePerCall: MONEY,
-    pricingUnit: "call",
-    payable: true,
-    input: {
-      fields: [{ name: "query", in: "body", required: true, type: "string" }],
-    },
+    slug: patch?.slug ?? slug,
+    name: patch?.name ?? `Fake ${slug}`,
+    description: patch?.description ?? "In-process fake vendor.",
+    capability: patch?.capability ?? "web_search",
+    price: patch?.price ?? MONEY,
+    maxChargePerCall: patch?.maxChargePerCall ?? MONEY,
+    pricingUnit: patch?.pricingUnit ?? "call",
+    payable: patch?.payable ?? payable.get(slug) ?? true,
+    input,
   };
 }
 
@@ -111,6 +137,9 @@ function scenarioOf(slug: string, overrides: Map<string, FakePayScenario>): Fake
 
 export async function startFakePerflo(): Promise<FakePerflo> {
   const scenarios = new Map<string, FakePayScenario>();
+  const contractPatches = new Map<string, Partial<VendorContract>>();
+  const payableBySlug = new Map<string, boolean>();
+  const searchByQuery = new Map<string, VendorSearchResult[]>();
   const payCalls: FakePayCall[] = [];
   const idempotency = new Map<string, { status: number; body: unknown; headers?: Record<string, string> }>();
   const transactions = new Map<string, Transaction>();
@@ -124,12 +153,16 @@ export async function startFakePerflo(): Promise<FakePerflo> {
     if (scenarioOf(slug, scenarios) === "VENDOR_NOT_FOUND") {
       return fail(c, 404, "VENDOR_NOT_FOUND");
     }
-    return c.json({ data: contract(slug), meta: { requestId: "fake-req" } });
+    return c.json({ data: contract(slug, contractPatches, payableBySlug), meta: { requestId: "fake-req" } });
   });
 
   app.post("/v1/search", async (c) => {
     if (!c.req.header("Authorization")?.startsWith("Bearer ")) return fail(c, 401, "UNAUTHENTICATED");
-    return c.json({ data: [searchRow("demo-vendor")], meta: { requestId: "fake-req", total: 1 } });
+    const body = (await c.req.json().catch(() => ({}))) as { query?: unknown };
+    const query = typeof body.query === "string" ? body.query : "";
+    const override = searchByQuery.get(query);
+    const data = override ?? [searchRow("demo-vendor")];
+    return c.json({ data, meta: { requestId: "fake-req", total: data.length } });
   });
 
   app.get("/v1/balance", (c) => {
@@ -252,6 +285,15 @@ export async function startFakePerflo(): Promise<FakePerflo> {
     payCalls,
     setScenario(slug, scenario) {
       scenarios.set(slug, scenario);
+    },
+    setContract(slug, patch) {
+      contractPatches.set(slug, patch);
+    },
+    setPayable(slug, payable) {
+      payableBySlug.set(slug, payable);
+    },
+    setSearchResults(query, results) {
+      searchByQuery.set(query, results);
     },
     close() {
       for (const t of hangTimers) clearTimeout(t);
