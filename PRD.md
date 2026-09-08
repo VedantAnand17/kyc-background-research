@@ -377,9 +377,14 @@ Error code handling, matched on `error.code` never on message text:
 ## 11. LLM integration
 
 Use the Vercel AI SDK so the provider is an environment choice.
-`LLM_PROVIDER` is `openai`, `anthropic`, or `openai-compatible` with `LLM_BASE_URL`; `LLM_MODEL` names the model.
+The default is Cloudflare Workers AI through its OpenAI-compatible endpoint with `@cf/zai-org/glm-5.3`, chosen on live evidence in [ADR-0006](docs/adr/0006-cloudflare-workers-ai-glm-5-3.md).
+`LLM_PROVIDER` is `cloudflare` (base URL derived from `CLOUDFLARE_ACCOUNT_ID`), `openai`, or `openai-compatible` with `LLM_BASE_URL`; `LLM_MODEL` names the model.
+Use the `@ai-sdk/openai-compatible` provider for `cloudflare` and `openai-compatible`, and `@ai-sdk/openai` for `openai`.
+Every LLM call sets `maxOutputTokens` explicitly: 1500 for agent steps, 1200 for the narrative pass.
+Reasoning models on Workers AI otherwise spend the default budget on thinking and return an empty completion.
 The agent loop uses tool calling with a step limit of 12.
 The narrative pass uses structured output against a Zod schema containing only the narrative fields.
+The documented fallback model is `@cf/openai/gpt-oss-120b` with `reasoning_effort: low`; it is faster and cheaper but embellished facts in testing, so it is not the default.
 System prompts live in `src/research/prompts.ts` as plain template strings and MUST state: the subject, the tier, the remaining budget in dollars, the list of allowed tools, and the rule that the model never invents facts not present in tool results.
 The model never receives raw vendor payloads.
 
@@ -403,9 +408,10 @@ Missing required values fail startup with a message naming the variable.
 |---|---|---|---|
 | `PERFLO_AGENT_KEY` | yes in live mode | | Perflo agent key, `perflo_live_…` or `perflo_test_…` |
 | `PERFLO_BASE_URL` | no | `https://pay-per-use-api.perflo.ai` | override for tests |
-| `LLM_PROVIDER` | yes | | `openai`, `anthropic`, `openai-compatible` |
-| `LLM_MODEL` | yes | | model name |
-| `LLM_API_KEY` | yes | | provider key |
+| `LLM_PROVIDER` | no | `cloudflare` | `cloudflare`, `openai`, `openai-compatible` |
+| `CLOUDFLARE_ACCOUNT_ID` | when `cloudflare` | | 32-hex account id; base URL is derived from it |
+| `LLM_MODEL` | no | `@cf/zai-org/glm-5.3` | model name |
+| `LLM_API_KEY` | yes | | provider key; for Cloudflare, an API token with Workers AI read |
 | `LLM_BASE_URL` | when `openai-compatible` | | endpoint |
 | `RESEARCH_DEADLINE_MS` | no | `45000` | default deadline |
 | `TOOL_CONCURRENCY` | no | `4` | parallel paid calls |

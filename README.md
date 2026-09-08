@@ -34,7 +34,8 @@ pnpm check                # typecheck
 ```
 
 Fixture mode (`FIXTURE_MODE=true`) serves recorded vendor responses from `test/fixtures/` and spends nothing.
-Live mode needs a Perflo agent key and an LLM key; see `.env.example` and PRD section 13.
+Live mode needs a Perflo agent key plus a Cloudflare account id and an API token with Workers AI read; the default model is `@cf/zai-org/glm-5.3` (ADR-0006).
+See `.env.example` and PRD section 13.
 
 ## Layout
 
