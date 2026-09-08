@@ -237,6 +237,22 @@ export function createTools(ctx: ToolContext): ResearchTools {
   const limit = new Limit(ctx.concurrency ?? 4);
   let exhausted = false;
 
+  async function cheapestAllowedQuote(): Promise<Micro | null> {
+    let cheapest: Micro | null = null;
+    for (const name of ctx.allowedTools) {
+      if (name === "finish") continue;
+      const pick = await selectVendor(name, {}, ctx.client, cache, 1n << 60n);
+      if (pick.status !== "selected") continue;
+      if (cheapest === null || pick.quote < cheapest) cheapest = pick.quote;
+    }
+    return cheapest;
+  }
+
+  async function markGlobalIfTight(headroom: Micro): Promise<void> {
+    const cheapest = await cheapestAllowedQuote();
+    if (cheapest === null || headroom < cheapest) exhausted = true;
+  }
+
   const invoke = async (name: Exclude<ToolName, "finish">, args: Record<string, unknown>): Promise<ToolOutcome> => {
     if (!ctx.allowedTools.includes(name)) {
       return { outcome: "unavailable", reason: `${name} is not allowed by the tier` };
@@ -260,8 +276,9 @@ export function createTools(ctx: ToolContext): ResearchTools {
       if (exhausted) return { outcome: "budget_exhausted", remaining: remainingOf(ctx.guard) };
       const selected = await selectVendor(name, args, ctx.client, cache, ctx.guard.snapshot().headroomMicro);
       if (selected.status === "unaffordable") {
-        exhausted = true;
-        return { outcome: "budget_exhausted", remaining: remainingOf(ctx.guard) };
+        const headroom = ctx.guard.snapshot().headroomMicro;
+        await markGlobalIfTight(headroom);
+        return { outcome: "budget_exhausted", remaining: formatMoney(headroom) };
       }
       if (selected.status === "none") {
         const reason =
@@ -277,7 +294,7 @@ export function createTools(ctx: ToolContext): ResearchTools {
         amountMicro: selected.quote,
       });
       if (!reserved.ok) {
-        exhausted = true;
+        await markGlobalIfTight(reserved.headroomMicro);
         return { outcome: "budget_exhausted", remaining: formatMoney(reserved.headroomMicro) };
       }
 
