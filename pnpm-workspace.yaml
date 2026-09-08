@@ -1,0 +1,8 @@
+# Single-package repo. This file exists only to hold pnpm settings.
+packages:
+  - "."
+
+# pnpm blocks install scripts by default. These two need theirs (native sqlite, esbuild binary).
+allowBuilds:
+  better-sqlite3: true
+  esbuild: true
