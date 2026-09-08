@@ -130,6 +130,28 @@ describe("orchestrator (fixture mode)", () => {
     expect(report.warnings.some((w) => w.code === "deadline_hit")).toBe(true);
     expect(report.costs.total.amount).toMatch(/^\d+\.\d{6}$/);
     expect(parseMoney(report.costs.total.amount)).toBeLessThanOrEqual(parseMoney("1.50"));
+    expect(report.risk.overall.rationale).not.toBe("narrative unavailable");
+    expect(report.warnings.some((w) => w.code === "narrative_unavailable")).toBe(false);
+  });
+
+  it("a skipped screen marks every risk category not_screened and overall unknown", async () => {
+    const { server, deps } = await harness();
+    server.setPayOutput("stableenrich-minerva-resolve", { people: [] });
+    const report = await runResearch(request("1.50"), deps);
+    expect(report.identity.status).toBe("not_found");
+    expect(report.risk.pep.status).toBe("not_screened");
+    expect(report.risk.sanctions.status).toBe("not_screened");
+    expect(report.risk.fraud.status).toBe("not_screened");
+    expect(report.risk.reputational.status).toBe("not_screened");
+    expect(report.risk.overall.level).toBe("unknown");
+    expect(report.warnings.map((w) => w.code)).toEqual(
+      expect.arrayContaining([
+        "pep_not_screened",
+        "sanctions_not_screened",
+        "fraud_not_screened",
+        "reputational_not_screened",
+      ]),
+    );
   });
 
   it("budget exhausted mid-enrich finishes with warnings and total <= cap", async () => {

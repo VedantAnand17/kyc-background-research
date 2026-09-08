@@ -54,7 +54,13 @@ export function resolveUserPrompt(): string {
 }
 
 export function enrichUserPrompt(): string {
-  return "Enrich the primary candidate with the allowed tools. Prefer several calls in one turn. Call finish when done.";
+  return [
+    "The primary candidate is already resolved.",
+    "Do not call find_people again.",
+    "Enrich the primary candidate with the allowed tools.",
+    "Prefer several calls in one turn.",
+    "Call finish when done.",
+  ].join(" ");
 }
 
 export function riskClassifyPrompt(hits: string): string {

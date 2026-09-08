@@ -172,6 +172,7 @@ export function createAgent(config: Config): ResearchAgent {
         system: narrativePrompt(factsOf(ctx)),
         prompt: ctx.evidenceNotes,
         maxOutputTokens: 1200,
+        abortSignal: ctx.signal,
         ...(providerOptions ? { providerOptions } : {}),
       });
       const candidateSummaries: Record<string, string> = {};
