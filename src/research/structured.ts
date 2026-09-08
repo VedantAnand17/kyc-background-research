@@ -24,6 +24,19 @@ export function extractJsonObject(text: string): unknown {
   return JSON.parse(stripped.slice(start, end + 1));
 }
 
+/**
+ * `fetch` that gives every model request its own LLM_REQUEST_TIMEOUT_MS bound on top of the caller's signal.
+ * glm-5.3 on Workers AI occasionally stalls a connection without answering (observed 2026-09-08: one such
+ * request ate a 120 s research deadline); a bounded request fails fast and lets the phase's own retry run.
+ */
+export function llmFetch(config: Config, base: typeof fetch = fetch): typeof fetch {
+  return (input, init) => {
+    const signals = [AbortSignal.timeout(config.LLM_REQUEST_TIMEOUT_MS)];
+    if (init?.signal) signals.push(init.signal);
+    return base(input, { ...init, signal: AbortSignal.any(signals) });
+  };
+}
+
 export function chatCompletionsUrl(config: Config): string {
   if (config.LLM_PROVIDER === "openai") return "https://api.openai.com/v1/chat/completions";
   const base = llmBaseUrl(config);
@@ -92,7 +105,7 @@ export function structuredRequestBody(
 }
 
 export async function generateStructured<T>(schema: z.ZodType<T>, input: StructuredInput): Promise<T> {
-  const response = await (input.fetchImpl ?? fetch)(chatCompletionsUrl(input.config), {
+  const response = await llmFetch(input.config, input.fetchImpl)(chatCompletionsUrl(input.config), {
     method: "POST",
     headers: {
       authorization: `Bearer ${input.config.LLM_API_KEY}`,

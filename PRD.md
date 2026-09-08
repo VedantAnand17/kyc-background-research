@@ -91,7 +91,7 @@ Field rules:
 - `address`: optional; every subfield optional; `country` is ISO 3166-1 alpha-2 when present.
 - `maxBudget.amount`: required, decimal string matching `^\d+(\.\d{1,6})?$`, greater than zero, at most `1000.000000`.
 - `maxBudget.currency`: required, MUST be `USD` in this release.
-- `options.deadlineMs`: optional, 5000 to 120000, default 45000 for every tier, or `RESEARCH_DEADLINE_MS` when that variable is set.
+- `options.deadlineMs`: optional, 5000 to 120000; default 90000 for basic and 120000 for standard and deep (measured Apify actor runs take up to 30 s and Perflo settlement 9 to 11 s), or `RESEARCH_DEADLINE_MS` when that variable is set.
 
 Responses:
 
@@ -244,10 +244,11 @@ The final object is validated against the report schema.
 
 ### 6.7 Deadline behavior
 
-The orchestrator holds an `AbortSignal` derived from `deadlineAt` minus a synthesis allowance of 15 seconds.
+The orchestrator holds an `AbortSignal` derived from `deadlineAt` minus a synthesis allowance: 15 seconds on basic, 25 on standard, 30 on deep.
 When it fires: tool calls not yet started are dropped, in-flight calls are awaited for up to 5 more seconds, then phase 5 runs with whatever exists.
-The narrative pass still runs inside the 15 second synthesis allowance; it does not inherit the aborted tool-phase signal.
-Each narrative attempt gets a fresh timeout for the time still left in that allowance.
+The narrative pass still runs inside that synthesis allowance; it does not inherit the aborted tool-phase signal.
+Each of its two attempts gets a fresh timeout of at most 15 seconds, bounded by the time still left, so a request that stalls on the richer tiers leaves room for a second attempt (a funded deep run on 2026-09-08 lost its narrative to one such stall).
+Independently, every model HTTP request is capped at `LLM_REQUEST_TIMEOUT_MS` (default 30 seconds) so a hung connection in any phase fails fast rather than running to the deadline.
 If the screen phase never started, every risk category is `not_screened` with a warning and `risk.overall.level` is `unknown`.
 `timing.deadlineHit` is true and a warning names the phase that was cut.
 After the response is sent, any in-flight call that was abandoned is reconciled against `GET /v1/transactions` so the ledger row never stays a phantom reservation.
@@ -433,9 +434,10 @@ Missing required values fail startup with a message naming the variable.
 | `LLM_LOOP_MODEL` | no | `LLM_MODEL` | tool-loop override |
 | `LLM_API_KEY` | yes | | provider key; for Cloudflare, an API token with Workers AI read |
 | `LLM_BASE_URL` | when `openai-compatible` | | endpoint |
-| `RESEARCH_DEADLINE_MS` | no | unset: `45000` for every tier | operator override for the default deadline |
+| `RESEARCH_DEADLINE_MS` | no | unset: `90000` basic, `120000` standard and deep | operator override for the default deadline |
+| `LLM_REQUEST_TIMEOUT_MS` | no | `30000` | cap on one model HTTP request; a stalled connection fails fast instead of consuming the deadline |
 | `TOOL_CONCURRENCY` | no | `4` | parallel paid calls |
-| `VENDOR_TIMEOUT_MS` | no | `15000` | per paid call |
+| `VENDOR_TIMEOUT_MS` | no | `45000` | per paid call, including polling of a running vendor task |
 | `DATABASE_PATH` | no | `./data/research.db` | SQLite file |
 | `FIXTURE_MODE` | no | `false` | serve recorded vendor responses, spend nothing |
 | `PORT` | no | `3000` | listen port |

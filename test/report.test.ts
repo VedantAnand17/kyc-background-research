@@ -132,6 +132,28 @@ describe("report invariants", () => {
     }
   });
 
+  it("a hit keeps the classifier's per-article summary when its source yielded several articles", () => {
+    // One news lookup returned a Lagos article about the primary and a Houston namesake. The narrative
+    // summarises the whole source, so borrowing it would attach the namesake to the primary's hit.
+    const report = assembleReport(
+      input({
+        sources: [source("s1", "find_people"), source("n1", "search_news"), source("w1", "screen_watchlist")],
+        narrative: {
+          candidateSummaries: { c1: "Product lead at Paystack, Lagos" },
+          reputationalSummaries: { n1: "Named product lead at Paystack; a Houston namesake was fined in a Shell probe.", w1: "Clean watchlist screen." },
+          rationale: "Low risk.",
+        },
+        classifications: [
+          { sourceId: "n1", aboutPrimary: true, severity: "low", summary: "Paystack names Ada Okonkwo product lead.", title: "Paystack names Ada Okonkwo product lead" },
+          { sourceId: "n1", aboutPrimary: false, severity: "low", summary: "Houston namesake fined.", title: "Ada Okonkwo of Houston fined in Shell expense probe" },
+          { sourceId: "w1", aboutPrimary: true, severity: "low", summary: "No watchlist matches." },
+        ],
+      }),
+    );
+    const summaries = report.risk.reputational.hits.map((hit) => hit.summary);
+    expect(summaries).toEqual(["Paystack names Ada Okonkwo product lead.", "Clean watchlist screen."]);
+  });
+
   it("profile is empty when identity is ambiguous or not_found, with a warning", () => {
     const report = assembleReport(
       input({

@@ -68,11 +68,13 @@ describe.skipIf(!creds)("live glm-5.3 against fake Perflo", () => {
       expect(houstonAttachedToPrimary(report)).toBe(false);
       expectValidCosts(report, amount);
 
+      // Count settled pays by tool from the report: find_people and search_web share the Exa slug, so
+      // attributing server.payCalls by slug would count a web search as a second find_people.
+      expect(report.costs.calls.length).toBe(server.payCalls.length);
       const paysByTool = new Map<string, number>();
-      for (const call of server.payCalls) {
-        const tool = CAPABILITIES.find((row) => row.vendors.includes(call.slug))?.tool;
-        if (!tool || !PERSON_TOOLS.has(tool)) continue;
-        paysByTool.set(tool, (paysByTool.get(tool) ?? 0) + 1);
+      for (const call of report.costs.calls) {
+        if (!PERSON_TOOLS.has(call.capability)) continue;
+        paysByTool.set(call.capability, (paysByTool.get(call.capability) ?? 0) + 1);
       }
       for (const [tool, count] of paysByTool) {
         expect(count, tool).toBe(1);

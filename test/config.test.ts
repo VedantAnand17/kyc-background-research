@@ -35,6 +35,7 @@ describe("loop model", () => {
       LLM_BASE_URL: "http://127.0.0.1:9",
     });
     expect(config.RESEARCH_DEADLINE_MS).toBe(90_000);
+    expect(config.LLM_REQUEST_TIMEOUT_MS).toBe(30_000);
   });
 
   it("reuses LLM_MODEL for the loop on non-Cloudflare providers", () => {

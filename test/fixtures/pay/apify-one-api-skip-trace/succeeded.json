@@ -1,0 +1,96 @@
+{
+  "runId": "run_res_69e9d564-bc72-4a2f-895a-f233523e5f6c",
+  "transactionId": "509137ae-9a67-4e73-bc1b-68b1bc467268",
+  "slug": "apify-one-api-skip-trace",
+  "status": "succeeded",
+  "terminal": true,
+  "charged": {
+    "amount": "0.0091",
+    "currency": "USD"
+  },
+  "charges": [
+    {
+      "step": "buy",
+      "slug": "apify-one-api-skip-trace",
+      "amount": {
+        "amount": "0.0091",
+        "currency": "USD"
+      },
+      "transactionId": "509137ae-9a67-4e73-bc1b-68b1bc467268"
+    }
+  ],
+  "chargeIsFinal": true,
+  "chargedTo": "credit",
+  "subAccount": "kyc-research",
+  "remaining": {
+    "amount": "12.7652",
+    "currency": "USD"
+  },
+  "subAccountRemaining": {
+    "amount": "6.1748",
+    "currency": "USD"
+  },
+  "createdAt": "2026-09-08T17:53:54.330Z",
+  "endedAt": "2026-09-08T17:54:21.333Z",
+  "settlement": {
+    "status": "not_required",
+    "flow": "authorization",
+    "chain": "base",
+    "txHash": null,
+    "explorer": null
+  },
+  "upstream": {
+    "httpStatus": 200
+  },
+  "output": [
+    {
+      "Search Option": "Name+CityStateZip Search",
+      "Input Given": "Marc Benioff; San Francisco, California",
+      "First Name": "Person Not Found",
+      "Last Name": "We could not find any records for that search criteria",
+      "Age": "",
+      "Born": "",
+      "Lives in": "",
+      "Street Address": "[redacted]",
+      "Address Locality": "",
+      "Address Region": "",
+      "Postal Code": "[redacted]",
+      "County Name": "",
+      "Current Address Date Range": "",
+      "Email-1": "[redacted]",
+      "Email-2": "[redacted]",
+      "Email-3": "[redacted]",
+      "Email-4": "[redacted]",
+      "Email-5": "[redacted]",
+      "Phone-1": "[redacted]",
+      "Phone-1 Type": "",
+      "Phone-1 Last Reported": "",
+      "Phone-1 First Reported": "",
+      "Phone-1 Provider": "",
+      "Phone-2": "[redacted]",
+      "Phone-2 Type": "",
+      "Phone-2 Last Reported": "",
+      "Phone-2 First Reported": "",
+      "Phone-2 Provider": "",
+      "Phone-3": "[redacted]",
+      "Phone-3 Type": "",
+      "Phone-3 Last Reported": "",
+      "Phone-3 First Reported": "",
+      "Phone-3 Provider": "",
+      "Phone-4": "[redacted]",
+      "Phone-4 Type": "",
+      "Phone-4 Last Reported": "",
+      "Phone-4 First Reported": "",
+      "Phone-4 Provider": "",
+      "Phone-5": "[redacted]",
+      "Phone-5 Type": "",
+      "Phone-5 Last Reported": "",
+      "Phone-5 First Reported": "",
+      "Phone-5 Provider": "",
+      "Previous Addresses": "",
+      "Relatives": "",
+      "Associates": "",
+      "Person Link": ""
+    }
+  ]
+}

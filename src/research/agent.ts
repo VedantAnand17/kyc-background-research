@@ -17,7 +17,7 @@ import { llmBaseUrl, loopModelName, type Config } from "../config.js";
 import { createLogger } from "../logger.js";
 import type { ResearchTools } from "./tools.js";
 import type { ToolName } from "./capabilities.js";
-import { generateStructured, jsonSchemaOf, structuredReasoningEffort } from "./structured.js";
+import { generateStructured, jsonSchemaOf, llmFetch, structuredReasoningEffort } from "./structured.js";
 import {
   agentSystemPrompt,
   describeSubject,
@@ -100,7 +100,7 @@ function factsOf(ctx: AgentContext): PromptFacts {
 
 function languageModel(config: Config, modelName = config.LLM_MODEL) {
   if (config.LLM_PROVIDER === "openai") {
-    return createOpenAI({ apiKey: config.LLM_API_KEY })(modelName);
+    return createOpenAI({ apiKey: config.LLM_API_KEY, fetch: llmFetch(config) })(modelName);
   }
   const baseURL = llmBaseUrl(config);
   if (!baseURL) throw new Error("LLM_BASE_URL is required for this provider");
@@ -108,6 +108,7 @@ function languageModel(config: Config, modelName = config.LLM_MODEL) {
     name: config.LLM_PROVIDER,
     baseURL,
     apiKey: config.LLM_API_KEY,
+    fetch: llmFetch(config),
   })(modelName);
 }
 

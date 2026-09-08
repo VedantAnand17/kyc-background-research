@@ -17,6 +17,7 @@ import type { ResearchAgent, AgentContext, ClassificationResult, RiskClassificat
 import { assembleReport, type CostCall, type Warning } from "../evidence/report.js";
 import { PerfloError } from "../perflo/errors.js";
 import { candidatesFromSources } from "./candidates.js";
+import type { Tier } from "./capabilities.js";
 import { defaultDeadlineMs, plan } from "./planner.js";
 import { adverseMediaQuery, describeSubject } from "./prompts.js";
 import { createTools, debitedMicro, type ResearchTools, type ToolOutcome } from "./tools.js";
@@ -32,10 +33,16 @@ export class ResearchUnavailableError extends Error {
 }
 
 /**
- * Wall-clock reserved for the narrative pass. Constrained json_schema on glm-5.3 measured 5.8 s on basic;
- * deep-tier notes with eight sources overran 12 s (2026-09-08 live run), so 15 s matches the live report target.
+ * Wall-clock reserved for the narrative pass, per tier. Constrained json_schema on glm-5.3 measured 5.8 s on
+ * basic and 7.4 s on a live deep run, but a single request can stall: a funded deep run on 2026-09-08 got no
+ * answer inside 15 s and shipped "narrative unavailable". The richer tiers therefore reserve room for two
+ * attempts of at most NARRATIVE_ATTEMPT_MS each; basic keeps the 15 s live report target.
  */
-export const SYNTHESIS_MS = 15_000;
+const SYNTHESIS_MS: Readonly<Record<Tier, number>> = { basic: 15_000, standard: 25_000, deep: 30_000 };
+export const NARRATIVE_ATTEMPT_MS = 15_000;
+export function synthesisMs(tier: Tier): number {
+  return SYNTHESIS_MS[tier] ?? NARRATIVE_ATTEMPT_MS;
+}
 const DRAIN_MS = 5_000;
 
 export interface OrchestratorDeps {
@@ -265,7 +272,7 @@ export async function runResearch(req: ResearchRequest, deps: OrchestratorDeps):
   });
   const store = createEvidenceStore(deps.db, requestId);
   const controller = new AbortController();
-  const abortAt = planned.deadlineAt - SYNTHESIS_MS;
+  const abortAt = planned.deadlineAt - synthesisMs(planned.tier);
 
   const fireDeadline = (): void => {
     if (deadlineHit) return;
@@ -478,14 +485,14 @@ export async function runResearch(req: ResearchRequest, deps: OrchestratorDeps):
       return `${s.id} ${s.capability} ${s.status}${summary ? `: ${summary}` : ""}`;
     }),
   ].join("\n");
-  const reportBudgetEnds = Date.now() + SYNTHESIS_MS;
+  const reportBudgetEnds = Date.now() + synthesisMs(planned.tier);
   for (let attempt = 0; attempt < 2; attempt++) {
     const remaining = reportBudgetEnds - Date.now();
     if (remaining < 3_000) break;
     try {
       narrative = await deps.agent.narrate({
         ...ctx(),
-        signal: AbortSignal.timeout(remaining),
+        signal: AbortSignal.timeout(Math.min(remaining, NARRATIVE_ATTEMPT_MS)),
         evidenceNotes: notes,
       });
       break;

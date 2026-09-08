@@ -4,7 +4,7 @@ import { openDatabase, type Db } from "../src/db/sqlite.js";
 import { createLogger } from "../src/logger.js";
 import { createPerfloClient } from "../src/perflo/client.js";
 import type { ResearchRequest } from "../src/api/schemas.js";
-import { runResearch } from "../src/research/orchestrator.js";
+import { NARRATIVE_ATTEMPT_MS, runResearch, synthesisMs } from "../src/research/orchestrator.js";
 import { startFakePerflo, type FakePerflo } from "./fake-perflo.js";
 import { createScriptedAgent } from "./scripted-agent.js";
 
@@ -121,6 +121,36 @@ describe("orchestrator (fixture mode)", () => {
     expect(report.identity.status).toBe("confirmed");
     expect(report.sources.some((s) => s.capability === "search_filings")).toBe(true);
     expectValidCosts(report, "3.00");
+  });
+
+  it("standard and deep reserve room for two narrative attempts; basic keeps the 15 s report target", () => {
+    expect(synthesisMs("basic")).toBe(15_000);
+    // The loop skips an attempt with under 3 s left, so a first attempt that stalls for the whole cap must
+    // still leave at least that much for the second one.
+    for (const tier of ["standard", "deep"] as const) {
+      expect(synthesisMs(tier)).toBeGreaterThanOrEqual(NARRATIVE_ATTEMPT_MS + 3_000);
+    }
+  });
+
+  it("a narrative request that times out once is retried within the report window", async () => {
+    const { deps } = await harness();
+    const agent = createScriptedAgent();
+    let attempts = 0;
+    const report = await runResearch(request("1.50"), {
+      ...deps,
+      agent: {
+        ...agent,
+        narrate: async (ctx) => {
+          attempts += 1;
+          expect(ctx.signal).toBeInstanceOf(AbortSignal);
+          if (attempts === 1) throw new DOMException("The operation was aborted due to timeout", "TimeoutError");
+          return agent.narrate(ctx);
+        },
+      },
+    });
+    expect(attempts).toBe(2);
+    expect(report.risk.overall.rationale).not.toBe("narrative unavailable");
+    expect(report.warnings.some((w) => w.code === "narrative_unavailable")).toBe(false);
   });
 
   it("deadline hit cuts phases and still produces a report with timing.deadlineHit", async () => {

@@ -5,6 +5,7 @@ import {
   chatCompletionsUrl,
   extractJsonObject,
   generateStructured,
+  llmFetch,
   structuredRequestBody,
 } from "../src/research/structured.js";
 
@@ -93,6 +94,43 @@ describe("structured output request", () => {
         fetchImpl,
       }),
     ).rejects.toThrow(/empty model content/i);
+  });
+});
+
+describe("llmFetch", () => {
+  it("cuts a stalled model request at LLM_REQUEST_TIMEOUT_MS instead of waiting for the research deadline", async () => {
+    const stalling = loadConfig({
+      LLM_API_KEY: "test-key",
+      FIXTURE_MODE: "true",
+      LLM_PROVIDER: "cloudflare",
+      CLOUDFLARE_ACCOUNT_ID: "d5addfff98319ee236259e234106087d",
+      LLM_REQUEST_TIMEOUT_MS: "1000",
+    });
+    // A connection that never answers, but honours abort like undici does.
+    const hung = vi.fn<typeof fetch>(
+      (_url, init) =>
+        new Promise<Response>((_resolve, reject) => {
+          init?.signal?.addEventListener("abort", () => reject(init.signal!.reason));
+        }),
+    );
+    const started = Date.now();
+    await expect(llmFetch(stalling, hung)("https://example.test/v1/chat/completions", { method: "POST" })).rejects.toMatchObject({
+      name: "TimeoutError",
+    });
+    expect(Date.now() - started).toBeLessThan(5_000);
+  });
+
+  it("still aborts on the caller's own signal", async () => {
+    const hung = vi.fn<typeof fetch>(
+      (_url, init) =>
+        new Promise<Response>((_resolve, reject) => {
+          init?.signal?.addEventListener("abort", () => reject(init.signal!.reason));
+        }),
+    );
+    const controller = new AbortController();
+    const pending = llmFetch(config, hung)("https://example.test/v1/chat/completions", { signal: controller.signal });
+    controller.abort(new Error("phase over"));
+    await expect(pending).rejects.toThrow("phase over");
   });
 });
 
