@@ -62,12 +62,17 @@ export interface PayResult {
   readonly upstream?: { readonly httpStatus?: number };
 }
 
+/** GET /v1/transactions and GET /v1/transactions/{id}. amount is signed: negative leaves the account. */
 export interface Transaction {
   readonly id: string;
-  readonly vendorSlug: string | null;
+  readonly kind: string;
   readonly status: string;
-  readonly amount: string;
-  readonly createdAt: string | number;
+  readonly ledgerState: "pending" | "posted" | "voided";
+  readonly terminal?: boolean;
+  readonly slug: string | null;
+  readonly capability?: string;
+  readonly amount: PerfloMoney;
+  readonly createdAt: string;
 }
 
 /** Every error code PRD.md section 10 gives a behavior. Match on code, never on message. */

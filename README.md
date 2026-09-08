@@ -17,9 +17,10 @@ One line: one search in, one honest costed file out, never overspend.
 
 ## Status
 
-Scaffold only.
-The foundation (`money.ts`, config, database schema, `GET /health`, OpenAPI document) runs.
-Everything else is a stub tagged `TODO(Mn)` pointing at its PRD section and milestone.
+M1 foundation and M2 (Perflo client + Spend Guard) are implemented.
+The reservation ledger refuses a paid call that would breach the cap, including under concurrent reservations, and persists every transition to SQLite.
+The typed Perflo client covers every section-10 endpoint and error code against `test/fake-perflo.ts`.
+Later milestones remain stubs tagged `TODO(Mn)`.
 
 ## Run
 
