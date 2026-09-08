@@ -33,7 +33,8 @@ export interface SpendGuard {
   reserve(req: ReservationRequest): ReserveResult;
   settle(id: ReservationId, chargedMicro: Micro, transactionId: string | null, perfloCode?: string): void;
   release(id: ReservationId, perfloCode: string): void;
-  hold(id: ReservationId, perfloCode: string): void;
+  /** `transactionId` may be a Perflo run id (`run_…`) when the vendor task was still running at timeout. */
+  hold(id: ReservationId, perfloCode: string, transactionId?: string | null): void;
   /** Resolve a held reservation once GET /v1/transactions answers. */
   resolveHold(id: ReservationId, outcome: { readonly chargedMicro: Micro; readonly transactionId: string } | null): void;
   /** Release the planner's 10 percent disambiguation hold so later phases can spend it. */
@@ -157,12 +158,12 @@ export function createSpendGuard(opts: LedgerOptions): SpendGuard {
     updateRow.run("released", null, null, perfloCode, nowIso(), id, jobId);
   });
 
-  const holdTx = db.transaction((id: ReservationId, perfloCode: string): void => {
+  const holdTx = db.transaction((id: ReservationId, perfloCode: string, transactionId: string | null): void => {
     const row = loadRow(id);
     if (row.state !== "reserved") {
       throw new Error(`cannot hold reservation ${id} in state ${row.state}`);
     }
-    updateRow.run("held", null, null, perfloCode, nowIso(), id, jobId);
+    updateRow.run("held", null, transactionId, perfloCode, nowIso(), id, jobId);
   });
 
   return {
@@ -175,8 +176,8 @@ export function createSpendGuard(opts: LedgerOptions): SpendGuard {
     release(id, perfloCode) {
       releaseTx(id, perfloCode);
     },
-    hold(id, perfloCode) {
-      holdTx(id, perfloCode);
+    hold(id, perfloCode, transactionId = null) {
+      holdTx(id, perfloCode, transactionId);
     },
     resolveHold(id, outcome) {
       if (outcome === null) releaseTx(id, "UNRECONCILED");

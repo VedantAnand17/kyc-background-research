@@ -271,6 +271,9 @@ Per request, the ledger tracks `capMicro`, `reservedMicro`, `spentMicro`.
   The check and update are one synchronous step under a per-request mutex, so concurrent reservations cannot both pass on the same headroom.
 - `settle(reservationId, chargedMicro)`: `reservedMicro -= amount; spentMicro += chargedMicro`.
   Called for every `200` from the pay route, including `status: "failed"`, because Perflo charges for a vendor that answered and failed.
+  `chargedMicro` is what Perflo debited, not always the `charged` field: a successful pay whose `settlement.status` is `not_required` (the per-item Apify actors) posts the whole authorization, so it settles at the reserved quote.
+  Verified 2026-09-08: `GET /v1/key` `spent` equals the sum of posted transaction amounts, which carry the cap (`-0.05`) while the pay response meters `0.0065`.
+  A `finalized` settlement debits exactly `charged`, and a failed run is voided.
 - `release(reservationId)`: `reservedMicro -= amount`.
   Called for every refusal that Perflo documents as free.
 - `hold(reservationId)`: leaves the reservation in place until a transaction lookup resolves it, used after a timeout or a `500`.
@@ -362,7 +365,7 @@ Endpoints used:
 - `POST /v1/search` for runtime discovery of `web_search` and watchlist vendors.
 - `POST /v1/pay/{slug}` for every paid call, always with `Idempotency-Key` (a fresh UUID stored on the ledger row) and `maxCharge`.
 - `GET /v1/transactions/{id}` and `GET /v1/transactions` for reconciliation after a timeout or a `500`.
-- `GET /v1/balance` once at startup to fail fast on a bad key.
+- `GET /v1/key` once per request before the first lookup to fail fast on a bad key; it returns the agent key's own envelope. `GET /v1/balance` is account-key only and answers `ACCOUNT_KEY_REQUIRED` to an agent key.
 
 Error code handling, matched on `error.code` never on message text:
 
@@ -477,7 +480,8 @@ Required before the must-have release is considered done:
 - `live-model.test.ts` (`pnpm test:live`, skipped without Workers AI credentials): real `@cf/zai-org/glm-5.3` against the fake Perflo server for basic, standard, and deep.
   Asserts narrative present, `deadlineHit` false, total within cap, each person-tool paid once, the Houston article excluded from the Lagos candidate, and per-phase timings under the section-15 targets.
 - `logger.test.ts`: keys and `Authorization` headers never reach the log line.
-- `fixture-mode.test.ts`: `POST /research` with `FIXTURE_MODE=true` and no network, skipped until M7 records vendor fixtures.
+- `fixture-mode.test.ts`: `POST /research` with `FIXTURE_MODE=true` and no network, served from the fixtures M7 recorded.
+- `live-paid.test.ts` (`pnpm test:paid`, skipped without a funded Perflo agent key and Workers AI credentials): the M7 gate below; it spends real money and is never part of `pnpm test`.
 - CI on a clean clone: `pnpm install --frozen-lockfile && pnpm test && pnpm check && docker build`.
 - `pnpm test:perf` samples five live runs per tier and prints p50 per phase.
   Raise the default deadline only from that evidence.
@@ -485,8 +489,8 @@ Required before the must-have release is considered done:
 Do not spend real Perflo money until those gates are green.
 
 Fixture mode is a first-class feature, not a test hack: `FIXTURE_MODE=true` makes the Perflo client serve recorded responses from `test/fixtures/` so the interviewer can run the whole flow without a funded account.
-Those recordings are M7 work.
-Until then, `FIXTURE_MODE=true` at runtime has no recorded vendor payloads; tests inject the in-process fake server instead.
+M7 recorded them on 2026-09-08 from the funded runs, scrubbed of contact details; `pnpm test:paid` records any fixture path that is still missing.
+Unit tests still inject the in-process fake server so they can script failures the recordings do not contain.
 
 ## 17. Documentation deliverables
 
@@ -538,6 +542,8 @@ A milestone is accepted when its criteria pass in CI and the README section it t
 - Run against a funded Perflo account with three real subjects at three tiers; record the fixtures from those runs.
 - README complete.
 - Accept: live totals equal ledger totals equal Perflo's `GET /v1/transactions` for the run; no run exceeds its cap.
+- Done 2026-09-08 (`pnpm test:paid`, 5 of 5): basic $0.10, standard about $0.17, deep about $0.50 against a `kyc-research` sub-account capped at $10 per hour; a $0.05 cap refuses without spending, and a nonexistent person returns `not_found`.
+  Each run's ledger equalled the posted Perflo transactions once settlement followed the debit rule in section 7, including a run whose vendor task was still running at report time.
 
 ## 19. Working rules for agents building this
 

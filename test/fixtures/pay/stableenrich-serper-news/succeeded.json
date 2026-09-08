@@ -1,0 +1,149 @@
+{
+  "runId": "run_res_7f43a2ed-5b0a-4a4a-b830-c4caccab9b6c",
+  "transactionId": "8de30514-a49b-4561-85b3-249b7df75bf8",
+  "slug": "stableenrich-serper-news",
+  "status": "succeeded",
+  "terminal": true,
+  "charged": {
+    "amount": "0.04",
+    "currency": "USD"
+  },
+  "charges": [
+    {
+      "step": "buy",
+      "slug": "stableenrich-serper-news",
+      "amount": {
+        "amount": "0.04",
+        "currency": "USD"
+      },
+      "transactionId": "8de30514-a49b-4561-85b3-249b7df75bf8"
+    }
+  ],
+  "chargeIsFinal": true,
+  "chargedTo": "credit",
+  "subAccount": "kyc-research",
+  "remaining": {
+    "amount": "14.1076",
+    "currency": "USD"
+  },
+  "subAccountRemaining": {
+    "amount": "9.0208",
+    "currency": "USD"
+  },
+  "createdAt": "2026-09-08T16:03:56.698Z",
+  "endedAt": "2026-09-08T16:04:05.591Z",
+  "settlement": {
+    "status": "finalized",
+    "flow": "authorization",
+    "chain": "tempo",
+    "txHash": "0xf6f002ff310d4f56b36f60e216b7f05da566a9b98c7b9b46fd7ce661f7aafab3",
+    "explorer": null
+  },
+  "upstream": {
+    "httpStatus": 200
+  },
+  "output": {
+    "searchParameters": {
+      "q": "\"Sundar Pichai\" fraud OR scam OR arrested OR indicted OR lawsuit OR sanctions",
+      "hl": "en",
+      "type": "news",
+      "num": 10,
+      "page": 1,
+      "allowSuggested": true,
+      "engine": "google"
+    },
+    "news": [
+      {
+        "title": "Google C.E.O. Testifies in Ozy Media Founder’s Fraud Trial (Published 2024)",
+        "link": "https://www.nytimes.com/2024/06/14/business/media/google-ceo-ozy-fraud-trial.html",
+        "snippet": "Sundar Pichai, the chief executive of Google, said he never discussed a potential acquisition of the digital media start-up.",
+        "date": "26 months ago",
+        "source": "The New York Times",
+        "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrMTBEg2CJk54SfILbHqTf43CNpKNqeDtfvAJuYasEgiHXaq-PM50Qb7MQtw&s",
+        "position": 1
+      },
+      {
+        "title": "Lawsuit alleges Google’s Gemini guided man to consider ‘mass casualty’ event before suicide",
+        "link": "https://www.orlandosentinel.com/2026/03/04/google-ai-death-lawsuit/",
+        "snippet": "By MATT O'BRIEN. A new lawsuit against Google alleges that the company's artificial intelligence chatbot Gemini guided 36-year-old Jonathan...",
+        "date": "6 months ago",
+        "source": "Orlando Sentinel",
+        "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS_7JRfe85TpzvclzyP5RujPh5jBsZ-oSIFDzgx519o18Xe4yVjXpZqcX5xDg&s",
+        "position": 2
+      },
+      {
+        "title": "YouTube to pay $24.5 million to settle President Donald Trump lawsuit",
+        "link": "https://abc7.com/post/youtube-pay-245-million-settle-president-donald-trump-lawsuit/17906003/",
+        "snippet": "YouTube agreed to pay $24.5 million to settle a lawsuit filed by President Donald Trump after he was suspended by social media platforms.",
+        "date": "11 months ago",
+        "source": "ABC7 Los Angeles",
+        "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRL0kc2CJBN44tX9Srz7o4WsLXHBXO4MuDC10abT2SUZQ93uQsGYJYiUrFzAg&s",
+        "position": 3
+      },
+      {
+        "title": "Google CEO denies offering to buy a startup for $600 million that later went up in flames",
+        "link": "https://fortune.com/2024/06/14/google-ceo-denies-offering-to-buy-ozy/",
+        "snippet": "Google CEO Sundar Pichai testified briefly Friday at the federal financial conspiracy trial surrounding buzz-to-bust startup Ozy Media,...",
+        "date": "26 months ago",
+        "source": "Fortune",
+        "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTGQ9ZgtE9O6lYfi2141H9yDQsJMIM-Fp3q1ru2SByLsB1Njwtb0Vr_2lNUWA&s",
+        "position": 4
+      },
+      {
+        "title": "Why a new court ruling against Google’s AI Overviews could have far-reaching effects",
+        "link": "https://indianexpress.com/article/technology/artificial-intelligence/why-court-ruling-google-ai-overviews-far-reaching-effects-10734974/",
+        "snippet": "A German court's decision in a lawsuit against Google could influence the answer to pressing legal questions in the AI era,...",
+        "date": "2 months ago",
+        "source": "The Indian Express",
+        "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQc-uPjZc71PhOktb-_6mVano07wCDGKJ7ciB1slN3_wbuAj_3FUaJvCt0x3g&s",
+        "position": 5
+      },
+      {
+        "title": "Google CEO Sundar Pichai takes the witness stand in $600 million financial fraud case",
+        "link": "https://timesofindia.indiatimes.com/technology/tech-news/google-ceo-sundar-pichai-takes-the-witness-stand-in-600-million-financial-fraud-case/articleshow/111006118.cms",
+        "snippet": "TECH NEWS : Google CEO Sundar Pichai testified at the fraud trial of Ozy Media co-founder Carlos Watson, denying any intention of acquiring...",
+        "date": "26 months ago",
+        "source": "The Times of India",
+        "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQAi63KTWc0VV12DH5xDPHNu9yD6fT5Eq5PBD9iW6SGtrFSROvTkg4mkvT8Fg&s",
+        "position": 6
+      },
+      {
+        "title": "Alphabet CEO Pichai can be questioned in privacy lawsuit, judge rules",
+        "link": "https://www.reuters.com/technology/alphabet-ceo-pichai-can-be-questioned-privacy-lawsuit-judge-rules-2021-12-28/",
+        "snippet": "Plaintiffs who accused Alphabet Inc's Google of unlawfully tracking their internet use while on \"Incognito\" browsing mode can question Chief...",
+        "date": "56 months ago",
+        "source": "Reuters",
+        "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnkMpE_ZU5ACPQ3rXMVd3Gq4jK-Q-Q8dOeEe4LfM5fbhOnAhkZizIIwGJ1BQ&s",
+        "position": 7
+      },
+      {
+        "title": "Fact Check: Viral Video Clip of Sundar Pichai Promoting Investment Platform is a Deepfake",
+        "link": "https://www.vishvasnews.com/english/scam/fact-check-viral-video-clip-of-sundar-pichai-promoting-investment-platform-is-a-deepfake/",
+        "snippet": "The video of Sundar Pichai, CEO of Alphabet Inc., which is going viral with the claim of promoting a fake and fictitious investment platform...",
+        "date": "24 months ago",
+        "source": "Vishvas News Fact Check Hindi",
+        "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRHZfRzIGqD2zXxRJEG9FwvLsgTw4ON6O8M1qBnMNuGhyf3PT-wtO1EVylcCw&s",
+        "position": 8
+      },
+      {
+        "title": "Google CEO Sundar Pichai stands firm in defense of company amid lawsuit",
+        "link": "https://interestingengineering.com/culture/ceo-sundar-pichai-defends-google",
+        "snippet": "Google CEO Sundar Pichai testified yesterday in the antitrust lawsuit brought on by the US government against the company.",
+        "date": "34 months ago",
+        "source": "Interesting Engineering",
+        "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRVKTnE3uovIHnyC0cEV9OlENf-z8z265btZ9u5tA6Nq_A3AwvPZ3E4q40rgg&s",
+        "position": 9
+      },
+      {
+        "title": "‘I’m glad it’s over.’ Google CEO thanks Trump for antitrust 'resolution'",
+        "link": "https://www.cnbc.com/2025/09/04/google-ceo-thanks-trump-for-antitrust-resolution.html",
+        "snippet": "President Donald Trump congratulated Google CEO Sundar Pichai on “big day” following antitrust ruling.",
+        "date": "12 months ago",
+        "source": "CNBC",
+        "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQBCbYeWi7ivXzmkiEvAnrE6yL6R4hhNexgmt-qP0eEs38y78H2a-GtwUD6rg&s",
+        "position": 10
+      }
+    ],
+    "credits": 1
+  }
+}

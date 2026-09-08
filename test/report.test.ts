@@ -62,7 +62,7 @@ function source(id: string, capability: string, extras: Partial<SourceRecord> = 
     id,
     jobId: "req_1",
     ledgerId: `led_${id}`,
-    vendor: "stableenrich-minerva-resolve",
+    vendor: "stableenrich-exa-search",
     capability,
     purpose: "resolve candidates",
     candidateId: "c1",
@@ -78,7 +78,7 @@ function input(over: Partial<AssembleReportInput> = {}): AssembleReportInput {
   const calls = over.calls ?? [
     {
       sourceId: "s1",
-      vendor: "stableenrich-minerva-resolve",
+      vendor: "stableenrich-exa-search",
       capability: "find_people",
       status: "succeeded" as const,
       chargedMicro: parseMoney("0.025200"),

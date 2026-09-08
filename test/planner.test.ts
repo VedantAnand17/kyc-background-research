@@ -47,9 +47,9 @@ describe("plan", () => {
     expect(plan(1_000_001n, 5_000, 0).reserveMicro).toBe(100_001n);
   });
 
-  it("defaults the deadline to 45s for every tier", () => {
-    expect(defaultDeadlineMs(parseMoney("0.30"))).toBe(45_000);
-    expect(defaultDeadlineMs(parseMoney("1.50"))).toBe(45_000);
-    expect(defaultDeadlineMs(parseMoney("2.01"))).toBe(45_000);
+  it("defaults the deadline by tier: 90s basic, 120s standard and deep", () => {
+    expect(defaultDeadlineMs(parseMoney("0.30"))).toBe(90_000);
+    expect(defaultDeadlineMs(parseMoney("1.50"))).toBe(120_000);
+    expect(defaultDeadlineMs(parseMoney("2.01"))).toBe(120_000);
   });
 });

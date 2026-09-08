@@ -1,0 +1,5170 @@
+{
+  "runId": "run_res_de022fa6-ad82-4f09-895b-3da31e4cdbc2",
+  "transactionId": "b7627bf7-9660-451a-aff4-8ff054cbc57e",
+  "slug": "paysponge-edgar-search",
+  "status": "succeeded",
+  "terminal": true,
+  "charged": {
+    "amount": "0.008",
+    "currency": "USD"
+  },
+  "charges": [
+    {
+      "step": "buy",
+      "slug": "paysponge-edgar-search",
+      "amount": {
+        "amount": "0.008",
+        "currency": "USD"
+      },
+      "transactionId": "b7627bf7-9660-451a-aff4-8ff054cbc57e"
+    }
+  ],
+  "chargeIsFinal": true,
+  "chargedTo": "credit",
+  "subAccount": "kyc-research",
+  "remaining": {
+    "amount": "12.9417",
+    "currency": "USD"
+  },
+  "subAccountRemaining": {
+    "amount": "6.9128",
+    "currency": "USD"
+  },
+  "createdAt": "2026-09-08T16:40:25.127Z",
+  "endedAt": "2026-09-08T16:40:36.050Z",
+  "settlement": {
+    "status": "finalized",
+    "flow": "authorization",
+    "chain": "tempo",
+    "txHash": "0x5eebe96f8f56acb64228d9b4486a47e4abbfb8d563a3de59e2334ee7620ef579",
+    "explorer": null
+  },
+  "upstream": {
+    "httpStatus": 200
+  },
+  "output": {
+    "success": true,
+    "data": {
+      "took": 154,
+      "timed_out": false,
+      "_shards": {
+        "total": 50,
+        "successful": 50,
+        "skipped": 0,
+        "failed": 0
+      },
+      "hits": {
+        "total": {
+          "value": 10000,
+          "relation": "gte"
+        },
+        "max_score": 27.293234,
+        "hits": [
+          {
+            "_index": "edgar_file",
+            "_id": "0001628280-25-043416:primary_doc.xml",
+            "_score": 27.293234,
+            "_source": {
+              "ciks": [
+                "0001108524",
+                "0001294693"
+              ],
+              "period_ending": null,
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)",
+                "Benioff Marc  (CIK 0001294693)"
+              ],
+              "xsl": "xsl144X01",
+              "sequence": 1,
+              "root_forms": [
+                "144"
+              ],
+              "file_date": "2025-10-01",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "144",
+              "adsh": "0001628280-25-043416",
+              "film_num": [
+                "251364787"
+              ],
+              "biz_locations": [
+                "San Francisco, CA",
+                ""
+              ],
+              "file_type": "144",
+              "file_description": null,
+              "inc_states": [
+                "DE",
+                ""
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001971857-23-000275:primary_doc.xml",
+            "_score": 26.773863,
+            "_source": {
+              "ciks": [
+                "0001108524",
+                "0001294693"
+              ],
+              "period_ending": null,
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)",
+                "Benioff Marc  (CIK 0001294693)"
+              ],
+              "xsl": "xsl144X01",
+              "sequence": 1,
+              "root_forms": [
+                "144"
+              ],
+              "file_date": "2023-06-14",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "144",
+              "adsh": "0001971857-23-000275",
+              "film_num": [
+                "231015090"
+              ],
+              "biz_locations": [
+                "San Francisco, CA",
+                ""
+              ],
+              "file_type": "144",
+              "file_description": null,
+              "inc_states": [
+                "DE",
+                ""
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001971857-23-000388:primary_doc.xml",
+            "_score": 26.447252,
+            "_source": {
+              "ciks": [
+                "0001108524",
+                "0001294693"
+              ],
+              "period_ending": null,
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)",
+                "Benioff Marc  (CIK 0001294693)"
+              ],
+              "xsl": "xsl144X01",
+              "sequence": 1,
+              "root_forms": [
+                "144"
+              ],
+              "file_date": "2023-07-13",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "144",
+              "adsh": "0001971857-23-000388",
+              "film_num": [
+                "231087345"
+              ],
+              "biz_locations": [
+                "San Francisco, CA",
+                ""
+              ],
+              "file_type": "144",
+              "file_description": null,
+              "inc_states": [
+                "DE",
+                ""
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001193125-16-611336:d204402dex992.htm",
+            "_score": 26.044333,
+            "_source": {
+              "ciks": [
+                "0001301031",
+                "0001108524"
+              ],
+              "period_ending": null,
+              "file_num": [
+                "005-87005"
+              ],
+              "display_names": [
+                "Demandware Inc  (CIK 0001301031)",
+                "SALESFORCE COM INC  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": null,
+              "sequence": 3,
+              "root_forms": [
+                "SC TO-C"
+              ],
+              "file_date": "2016-06-02",
+              "biz_states": [
+                "MA",
+                "CA"
+              ],
+              "sics": [
+                "7371",
+                "7372"
+              ],
+              "form": "SC TO-C",
+              "adsh": "0001193125-16-611336",
+              "film_num": [
+                "161693446"
+              ],
+              "biz_locations": [
+                "Burlington, MA",
+                "San Francisco, CA"
+              ],
+              "file_type": "EX-99.2",
+              "file_description": "EX-99.2",
+              "inc_states": [
+                "DE",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001193125-20-309560:d43065d425.htm",
+            "_score": 25.921673,
+            "_source": {
+              "ciks": [
+                "0001764925",
+                "0001108524"
+              ],
+              "period_ending": null,
+              "file_num": [
+                "001-38926"
+              ],
+              "display_names": [
+                "Slack Technologies, Inc.  (CIK 0001764925)",
+                "SALESFORCE.COM, INC.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": null,
+              "sequence": 1,
+              "root_forms": [
+                "425"
+              ],
+              "file_date": "2020-12-03",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372",
+                "7372"
+              ],
+              "form": "425",
+              "adsh": "0001193125-20-309560",
+              "film_num": [
+                "201367225"
+              ],
+              "biz_locations": [
+                "San Francisco, CA",
+                "San Francisco, CA"
+              ],
+              "file_type": "425",
+              "file_description": "425",
+              "inc_states": [
+                "DE",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001193125-20-309674:d63036d425.htm",
+            "_score": 25.831879,
+            "_source": {
+              "ciks": [
+                "0001764925"
+              ],
+              "period_ending": null,
+              "file_num": [
+                "001-38926"
+              ],
+              "display_names": [
+                "Slack Technologies, Inc.  (CIK 0001764925)"
+              ],
+              "xsl": null,
+              "sequence": 1,
+              "root_forms": [
+                "425"
+              ],
+              "file_date": "2020-12-03",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "425",
+              "adsh": "0001193125-20-309674",
+              "film_num": [
+                "201367814"
+              ],
+              "biz_locations": [
+                "San Francisco, CA"
+              ],
+              "file_type": "425",
+              "file_description": "425",
+              "inc_states": [
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001096906-24-001289:nlpc_px14a6g.htm",
+            "_score": 25.352776,
+            "_source": {
+              "ciks": [
+                "0001108524",
+                "0001958085"
+              ],
+              "period_ending": null,
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)",
+                "National Legal & Policy Center  (CIK 0001958085)"
+              ],
+              "xsl": null,
+              "sequence": 1,
+              "root_forms": [
+                "PX14A6G"
+              ],
+              "file_date": "2024-06-03",
+              "biz_states": [
+                "CA",
+                "VA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "PX14A6G",
+              "adsh": "0001096906-24-001289",
+              "film_num": [
+                "241012921"
+              ],
+              "biz_locations": [
+                "San Francisco, CA",
+                "Falls Church, VA"
+              ],
+              "file_type": "PX14A6G",
+              "file_description": "NATIONAL LEGAL AND POLICY CENTER - PX14A6G",
+              "inc_states": [
+                "DE",
+                "DC"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001193125-12-038897:d293140dsc13ga.htm",
+            "_score": 25.081806,
+            "_source": {
+              "ciks": [
+                "0001108524",
+                "0001294693"
+              ],
+              "period_ending": null,
+              "file_num": [
+                "005-79926"
+              ],
+              "display_names": [
+                "SALESFORCE COM INC  (CRM)  (CIK 0001108524)",
+                "Benioff Marc  (CIK 0001294693)"
+              ],
+              "xsl": null,
+              "sequence": 1,
+              "root_forms": [
+                "SC 13G"
+              ],
+              "file_date": "2012-02-03",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "SC 13G/A",
+              "adsh": "0001193125-12-038897",
+              "film_num": [
+                "12570354"
+              ],
+              "biz_locations": [
+                "San Francisco, CA",
+                ""
+              ],
+              "file_type": "SC 13G/A",
+              "file_description": "SCHEDULE 13G AMENDMENT NO. 7",
+              "inc_states": [
+                "DE",
+                ""
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001193125-05-024564:dsc13g.htm",
+            "_score": 24.968079,
+            "_source": {
+              "ciks": [
+                "0001108524",
+                "0001294693"
+              ],
+              "period_ending": null,
+              "file_num": [
+                "005-79926"
+              ],
+              "display_names": [
+                "SALESFORCE COM INC  (CRM)  (CIK 0001108524)",
+                "Benioff Marc  (CIK 0001294693)"
+              ],
+              "xsl": null,
+              "sequence": 1,
+              "root_forms": [
+                "SC 13G"
+              ],
+              "file_date": "2005-02-10",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "SC 13G",
+              "adsh": "0001193125-05-024564",
+              "film_num": [
+                "05591517"
+              ],
+              "biz_locations": [
+                "San Francisco, CA"
+              ],
+              "file_type": "SC 13G",
+              "file_description": "SCHEDULE 13G",
+              "inc_states": [
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001193125-13-235664:d511576dex321.htm",
+            "_score": 24.960644,
+            "_source": {
+              "ciks": [
+                "0001108524"
+              ],
+              "period_ending": "2013-04-30",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "SALESFORCE COM INC  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": null,
+              "sequence": 4,
+              "root_forms": [
+                "10-Q"
+              ],
+              "file_date": "2013-05-24",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "10-Q",
+              "adsh": "0001193125-13-235664",
+              "film_num": [
+                "13872141"
+              ],
+              "biz_locations": [
+                "San Francisco, CA"
+              ],
+              "file_type": "EX-32.1",
+              "file_description": "EX-32.1",
+              "inc_states": [
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0002002698-23-000197:primary_doc.xml",
+            "_score": 24.926674,
+            "_source": {
+              "ciks": [
+                "0001108524",
+                "0001294693"
+              ],
+              "period_ending": null,
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)",
+                "Benioff Marc  (CIK 0001294693)"
+              ],
+              "xsl": "xsl144X01",
+              "sequence": 1,
+              "root_forms": [
+                "144"
+              ],
+              "file_date": "2023-12-28",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "144",
+              "adsh": "0002002698-23-000197",
+              "film_num": [
+                "231522857"
+              ],
+              "biz_locations": [
+                "San Francisco, CA",
+                ""
+              ],
+              "file_type": "144",
+              "file_description": null,
+              "inc_states": [
+                "DE",
+                ""
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001193125-16-609250:d127507dsctoc.htm",
+            "_score": 24.915123,
+            "_source": {
+              "ciks": [
+                "0001301031",
+                "0001108524"
+              ],
+              "period_ending": null,
+              "file_num": [
+                "005-87005"
+              ],
+              "display_names": [
+                "Demandware Inc  (CIK 0001301031)",
+                "SALESFORCE COM INC  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": null,
+              "sequence": 1,
+              "root_forms": [
+                "SC TO-C"
+              ],
+              "file_date": "2016-06-01",
+              "biz_states": [
+                "MA",
+                "CA"
+              ],
+              "sics": [
+                "7371",
+                "7372"
+              ],
+              "form": "SC TO-C",
+              "adsh": "0001193125-16-609250",
+              "film_num": [
+                "161687958"
+              ],
+              "biz_locations": [
+                "Burlington, MA",
+                "San Francisco, CA"
+              ],
+              "file_type": "SC TO-C",
+              "file_description": "SC TO-C",
+              "inc_states": [
+                "DE",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001193125-11-020386:dsc13ga.htm",
+            "_score": 24.87999,
+            "_source": {
+              "ciks": [
+                "0001108524",
+                "0001294693"
+              ],
+              "period_ending": null,
+              "file_num": [
+                "005-79926"
+              ],
+              "display_names": [
+                "SALESFORCE COM INC  (CRM)  (CIK 0001108524)",
+                "Benioff Marc  (CIK 0001294693)"
+              ],
+              "xsl": null,
+              "sequence": 1,
+              "root_forms": [
+                "SC 13G"
+              ],
+              "file_date": "2011-02-01",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "SC 13G/A",
+              "adsh": "0001193125-11-020386",
+              "film_num": [
+                "11563785"
+              ],
+              "biz_locations": [
+                "San Francisco, CA",
+                ""
+              ],
+              "file_type": "SC 13G/A",
+              "file_description": "SCHEDULE 13G AMENDMENT NO. 6",
+              "inc_states": [
+                "DE",
+                ""
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001193125-13-046316:d482220dsc13ga.htm",
+            "_score": 24.877167,
+            "_source": {
+              "ciks": [
+                "0001108524",
+                "0001294693"
+              ],
+              "period_ending": null,
+              "file_num": [
+                "005-79926"
+              ],
+              "display_names": [
+                "SALESFORCE COM INC  (CRM)  (CIK 0001108524)",
+                "Benioff Marc  (CIK 0001294693)"
+              ],
+              "xsl": null,
+              "sequence": 1,
+              "root_forms": [
+                "SC 13G"
+              ],
+              "file_date": "2013-02-08",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "SC 13G/A",
+              "adsh": "0001193125-13-046316",
+              "film_num": [
+                "13587677"
+              ],
+              "biz_locations": [
+                "San Francisco, CA",
+                ""
+              ],
+              "file_type": "SC 13G/A",
+              "file_description": "SCHEDULE 13G  AMENDMENT NO. 8",
+              "inc_states": [
+                "DE",
+                ""
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001193125-05-229314:dex321.htm",
+            "_score": 24.857428,
+            "_source": {
+              "ciks": [
+                "0001108524"
+              ],
+              "period_ending": "2005-10-31",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "SALESFORCE COM INC  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": null,
+              "sequence": 4,
+              "root_forms": [
+                "10-Q"
+              ],
+              "file_date": "2005-11-18",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "10-Q",
+              "adsh": "0001193125-05-229314",
+              "film_num": [
+                "051214924"
+              ],
+              "biz_locations": [
+                "San Francisco, CA"
+              ],
+              "file_type": "EX-32.1",
+              "file_description": "CERTIFICATION OF CHIEF EXECUTIVE OFFICER AND CHIEF FINANCIAL OFFICER",
+              "inc_states": [
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-23-028249:form4.xml",
+            "_score": 24.841232,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2023-11-22",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X05",
+              "schema_version": "X0508",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2023-11-24",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-23-028249",
+              "film_num": [
+                "231436991"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001193125-10-023418:dsc13ga.htm",
+            "_score": 24.838367,
+            "_source": {
+              "ciks": [
+                "0001108524",
+                "0001294693"
+              ],
+              "period_ending": null,
+              "file_num": [
+                "005-79926"
+              ],
+              "display_names": [
+                "SALESFORCE COM INC  (CRM)  (CIK 0001108524)",
+                "Benioff Marc  (CIK 0001294693)"
+              ],
+              "xsl": null,
+              "sequence": 1,
+              "root_forms": [
+                "SC 13G"
+              ],
+              "file_date": "2010-02-05",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "SC 13G/A",
+              "adsh": "0001193125-10-023418",
+              "film_num": [
+                "10577953"
+              ],
+              "biz_locations": [
+                "San Francisco, CA",
+                ""
+              ],
+              "file_type": "SC 13G/A",
+              "file_description": "SCHEDULE 13G AMENDMENT NO. 5",
+              "inc_states": [
+                "DE",
+                ""
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0002002698-24-000061:primary_doc.xml",
+            "_score": 24.82843,
+            "_source": {
+              "ciks": [
+                "0001108524",
+                "0001294693"
+              ],
+              "period_ending": null,
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)",
+                "Benioff Marc  (CIK 0001294693)"
+              ],
+              "xsl": "xsl144X01",
+              "sequence": 1,
+              "root_forms": [
+                "144"
+              ],
+              "file_date": "2024-04-01",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "144",
+              "adsh": "0002002698-24-000061",
+              "film_num": [
+                "24809187"
+              ],
+              "biz_locations": [
+                "San Francisco, CA",
+                ""
+              ],
+              "file_type": "144",
+              "file_description": null,
+              "inc_states": [
+                "DE",
+                ""
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001193125-08-029423:dsc13ga.htm",
+            "_score": 24.815447,
+            "_source": {
+              "ciks": [
+                "0001108524",
+                "0001294693"
+              ],
+              "period_ending": null,
+              "file_num": [
+                "005-79926"
+              ],
+              "display_names": [
+                "SALESFORCE COM INC  (CRM)  (CIK 0001108524)",
+                "Benioff Marc  (CIK 0001294693)"
+              ],
+              "xsl": null,
+              "sequence": 1,
+              "root_forms": [
+                "SC 13G"
+              ],
+              "file_date": "2008-02-13",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "SC 13G/A",
+              "adsh": "0001193125-08-029423",
+              "film_num": [
+                "08605928"
+              ],
+              "biz_locations": [
+                "San Francisco, CA"
+              ],
+              "file_type": "SC 13G/A",
+              "file_description": "SCHEDULE 13G AMENDMENT NO. 3",
+              "inc_states": [
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001193125-07-031840:dsc13ga.htm",
+            "_score": 24.812916,
+            "_source": {
+              "ciks": [
+                "0001108524",
+                "0001294693"
+              ],
+              "period_ending": null,
+              "file_num": [
+                "005-79926"
+              ],
+              "display_names": [
+                "SALESFORCE COM INC  (CRM)  (CIK 0001108524)",
+                "Benioff Marc  (CIK 0001294693)"
+              ],
+              "xsl": null,
+              "sequence": 1,
+              "root_forms": [
+                "SC 13G"
+              ],
+              "file_date": "2007-02-14",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "SC 13G/A",
+              "adsh": "0001193125-07-031840",
+              "film_num": [
+                "07620662"
+              ],
+              "biz_locations": [
+                "San Francisco, CA"
+              ],
+              "file_type": "SC 13G/A",
+              "file_description": "SCHEDULE 13G AMENDMENT NO. 2",
+              "inc_states": [
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001193125-06-238445:dex321.htm",
+            "_score": 24.799217,
+            "_source": {
+              "ciks": [
+                "0001108524"
+              ],
+              "period_ending": "2006-10-31",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "SALESFORCE COM INC  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": null,
+              "sequence": 4,
+              "root_forms": [
+                "10-Q"
+              ],
+              "file_date": "2006-11-17",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "10-Q",
+              "adsh": "0001193125-06-238445",
+              "film_num": [
+                "061227678"
+              ],
+              "biz_locations": [
+                "San Francisco, CA"
+              ],
+              "file_type": "EX-32.1",
+              "file_description": "CERTIFICATION OF CEO AND CFO PURSUANT TO SECTION 906",
+              "inc_states": [
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001108524-21-000047:ex321-soxcertsq2fy22.htm",
+            "_score": 24.793053,
+            "_source": {
+              "ciks": [
+                "0001108524"
+              ],
+              "period_ending": "2021-07-31",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "SALESFORCE.COM, INC.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": null,
+              "sequence": 4,
+              "root_forms": [
+                "10-Q"
+              ],
+              "file_date": "2021-08-27",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "10-Q",
+              "adsh": "0001108524-21-000047",
+              "film_num": [
+                "211214172"
+              ],
+              "biz_locations": [
+                "San Francisco, CA"
+              ],
+              "file_type": "EX-32.1",
+              "file_description": "EX-32.1",
+              "inc_states": [
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-24-030081:form4.xml",
+            "_score": 24.774103,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2024-12-24",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X05",
+              "schema_version": "X0508",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2024-12-26",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-24-030081",
+              "film_num": [
+                "241581713"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001108524-20-000041:ex321-soxcertsq2fy21.htm",
+            "_score": 24.770477,
+            "_source": {
+              "ciks": [
+                "0001108524"
+              ],
+              "period_ending": "2020-07-31",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "SALESFORCE.COM, INC.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": null,
+              "sequence": 4,
+              "root_forms": [
+                "10-Q"
+              ],
+              "file_date": "2020-08-28",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "10-Q",
+              "adsh": "0001108524-20-000041",
+              "film_num": [
+                "201144893"
+              ],
+              "biz_locations": [
+                "San Francisco, CA"
+              ],
+              "file_type": "EX-32.1",
+              "file_description": "EX-32.1",
+              "inc_states": [
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001108524-24-000005:ex321-soxcertsq4fy24.htm",
+            "_score": 24.764374,
+            "_source": {
+              "ciks": [
+                "0001108524"
+              ],
+              "period_ending": "2024-01-31",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": null,
+              "sequence": 7,
+              "root_forms": [
+                "10-K"
+              ],
+              "file_date": "2024-03-06",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "10-K",
+              "adsh": "0001108524-24-000005",
+              "film_num": [
+                "24726424"
+              ],
+              "biz_locations": [
+                "San Francisco, CA"
+              ],
+              "file_type": "EX-32.1",
+              "file_description": "EX-32.1",
+              "inc_states": [
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-24-005211:form4.xml",
+            "_score": 24.739092,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2024-02-14",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X05",
+              "schema_version": "X0508",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2024-02-15",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-24-005211",
+              "film_num": [
+                "24645100"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-23-021187:form4.xml",
+            "_score": 24.735977,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2023-07-21",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X05",
+              "schema_version": "X0508",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2023-07-24",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-23-021187",
+              "film_num": [
+                "231105280"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-24-016157:form4.xml",
+            "_score": 24.730019,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2024-05-20",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X05",
+              "schema_version": "X0508",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2024-05-21",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-24-016157",
+              "film_num": [
+                "24970779"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-24-002342:form4.xml",
+            "_score": 24.730019,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2024-01-25",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X05",
+              "schema_version": "X0508",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2024-01-26",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-24-002342",
+              "film_num": [
+                "24569339"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0000000000-06-043088:filename1.pdf",
+            "_score": 24.729378,
+            "_source": {
+              "ciks": [
+                "0001108524"
+              ],
+              "period_ending": null,
+              "file_num": [],
+              "display_names": [
+                "SALESFORCE COM INC  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": null,
+              "sequence": 1,
+              "root_forms": [
+                "UPLOAD"
+              ],
+              "file_date": "2006-09-07",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "UPLOAD",
+              "adsh": "0000000000-06-043088",
+              "film_num": [],
+              "biz_locations": [
+                "San Francisco, CA"
+              ],
+              "file_type": "LETTER",
+              "file_description": null,
+              "inc_states": [
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-23-021007:form4.xml",
+            "_score": 24.72846,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2023-07-18",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X05",
+              "schema_version": "X0508",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2023-07-19",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-23-021007",
+              "film_num": [
+                "231097012"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-23-028304:form4.xml",
+            "_score": 24.726221,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2023-11-24",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X05",
+              "schema_version": "X0508",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2023-11-27",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-23-028304",
+              "film_num": [
+                "231440832"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001193125-10-268895:dex321.htm",
+            "_score": 24.722372,
+            "_source": {
+              "ciks": [
+                "0001108524"
+              ],
+              "period_ending": "2010-10-31",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "SALESFORCE COM INC  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": null,
+              "sequence": 4,
+              "root_forms": [
+                "10-Q"
+              ],
+              "file_date": "2010-11-24",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "10-Q",
+              "adsh": "0001193125-10-268895",
+              "film_num": [
+                "101215589"
+              ],
+              "biz_locations": [
+                "San Francisco, CA"
+              ],
+              "file_type": "EX-32.1",
+              "file_description": "CERTIFICATION OF CEO AND CFO PURSUANT TO SECTION 906",
+              "inc_states": [
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001193125-13-354101:d548588dex321.htm",
+            "_score": 24.71563,
+            "_source": {
+              "ciks": [
+                "0001108524"
+              ],
+              "period_ending": "2013-07-31",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "SALESFORCE COM INC  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": null,
+              "sequence": 4,
+              "root_forms": [
+                "10-Q"
+              ],
+              "file_date": "2013-08-30",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "10-Q",
+              "adsh": "0001193125-13-354101",
+              "film_num": [
+                "131072985"
+              ],
+              "biz_locations": [
+                "San Francisco, CA"
+              ],
+              "file_type": "EX-32.1",
+              "file_description": "EX-32.1",
+              "inc_states": [
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-23-022204:form4.xml",
+            "_score": 24.710135,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2023-08-07",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X05",
+              "schema_version": "X0508",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2023-08-08",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-23-022204",
+              "film_num": [
+                "231152035"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001193125-11-241110:dex321.htm",
+            "_score": 24.701723,
+            "_source": {
+              "ciks": [
+                "0001108524"
+              ],
+              "period_ending": "2011-07-31",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "SALESFORCE COM INC  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": null,
+              "sequence": 4,
+              "root_forms": [
+                "10-Q"
+              ],
+              "file_date": "2011-09-06",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "10-Q",
+              "adsh": "0001193125-11-241110",
+              "film_num": [
+                "111075741"
+              ],
+              "biz_locations": [
+                "San Francisco, CA"
+              ],
+              "file_type": "EX-32.1",
+              "file_description": "CERTIFICATION OF CEO AND CFO PURSUANT TO SECTION 906",
+              "inc_states": [
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001193125-06-031191:dsc13ga.htm",
+            "_score": 24.700615,
+            "_source": {
+              "ciks": [
+                "0001108524",
+                "0001294693"
+              ],
+              "period_ending": null,
+              "file_num": [
+                "005-79926"
+              ],
+              "display_names": [
+                "SALESFORCE COM INC  (CRM)  (CIK 0001108524)",
+                "Benioff Marc  (CIK 0001294693)"
+              ],
+              "xsl": null,
+              "sequence": 1,
+              "root_forms": [
+                "SC 13G"
+              ],
+              "file_date": "2006-02-14",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "SC 13G/A",
+              "adsh": "0001193125-06-031191",
+              "film_num": [
+                "06613465"
+              ],
+              "biz_locations": [
+                "San Francisco, CA"
+              ],
+              "file_type": "SC 13G/A",
+              "file_description": "SCHEDULE 13G AMENDMENT NO. 1",
+              "inc_states": [
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001108524-24-000022:ex321-soxcertsq2fy25.htm",
+            "_score": 24.699598,
+            "_source": {
+              "ciks": [
+                "0001108524"
+              ],
+              "period_ending": "2024-07-31",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": null,
+              "sequence": 4,
+              "root_forms": [
+                "10-Q"
+              ],
+              "file_date": "2024-08-29",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "10-Q",
+              "adsh": "0001108524-24-000022",
+              "film_num": [
+                "241257571"
+              ],
+              "biz_locations": [
+                "San Francisco, CA"
+              ],
+              "file_type": "EX-32.1",
+              "file_description": "EX-32.1",
+              "inc_states": [
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001108524-25-000088:ex321-soxcertsq2fy26.htm",
+            "_score": 24.699598,
+            "_source": {
+              "ciks": [
+                "0001108524"
+              ],
+              "period_ending": "2025-07-31",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": null,
+              "sequence": "6",
+              "root_forms": [
+                "10-Q"
+              ],
+              "file_date": "2025-09-04",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "10-Q",
+              "adsh": "0001108524-25-000088",
+              "film_num": [
+                "251291756"
+              ],
+              "biz_locations": [
+                "San Francisco, CA"
+              ],
+              "file_type": "EX-32.1",
+              "file_description": "EX-32.1",
+              "inc_states": [
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001108524-25-000238:ex321-soxcertsq3fy26.htm",
+            "_score": 24.699598,
+            "_source": {
+              "ciks": [
+                "0001108524"
+              ],
+              "period_ending": "2025-10-31",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": null,
+              "sequence": "4",
+              "root_forms": [
+                "10-Q"
+              ],
+              "file_date": "2025-12-04",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "10-Q",
+              "adsh": "0001108524-25-000238",
+              "film_num": [
+                "251547741"
+              ],
+              "biz_locations": [
+                "San Francisco, CA"
+              ],
+              "file_type": "EX-32.1",
+              "file_description": "EX-32.1",
+              "inc_states": [
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-23-026483:form4.xml",
+            "_score": 24.686806,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2023-10-31",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X05",
+              "schema_version": "X0508",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2023-11-01",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-23-026483",
+              "film_num": [
+                "231368957"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001193125-07-250417:dex321.htm",
+            "_score": 24.686024,
+            "_source": {
+              "ciks": [
+                "0001108524"
+              ],
+              "period_ending": "2007-10-31",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "SALESFORCE COM INC  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": null,
+              "sequence": 6,
+              "root_forms": [
+                "10-Q"
+              ],
+              "file_date": "2007-11-19",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "10-Q",
+              "adsh": "0001193125-07-250417",
+              "film_num": [
+                "071257185"
+              ],
+              "biz_locations": [
+                "San Francisco, CA"
+              ],
+              "file_type": "EX-32.1",
+              "file_description": "CERTIFICATION OF THE CEO AND CFO",
+              "inc_states": [
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001193125-12-377656:d378216dex321.htm",
+            "_score": 24.683588,
+            "_source": {
+              "ciks": [
+                "0001108524"
+              ],
+              "period_ending": "2012-07-31",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "SALESFORCE COM INC  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": null,
+              "sequence": 4,
+              "root_forms": [
+                "10-Q"
+              ],
+              "file_date": "2012-08-31",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "10-Q",
+              "adsh": "0001193125-12-377656",
+              "film_num": [
+                "121068996"
+              ],
+              "biz_locations": [
+                "San Francisco, CA"
+              ],
+              "file_type": "EX-32.1",
+              "file_description": "CERTIFICATION OF CEO AND CFO PURSUANT TO SECTION 906 OF THE SARBANES-OXLEY ACT",
+              "inc_states": [
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-23-022028:form4.xml",
+            "_score": 24.67306,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2023-08-03",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X05",
+              "schema_version": "X0508",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2023-08-04",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-23-022028",
+              "film_num": [
+                "231144506"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-24-012832:form4.xml",
+            "_score": 24.667305,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2024-04-11",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X05",
+              "schema_version": "X0508",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2024-04-12",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-24-012832",
+              "film_num": [
+                "24842293"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-23-029201:form4.xml",
+            "_score": 24.667305,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2023-12-08",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X05",
+              "schema_version": "X0508",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2023-12-11",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-23-029201",
+              "film_num": [
+                "231478713"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-23-018474:form4.xml",
+            "_score": 24.660166,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2023-06-09",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X04",
+              "schema_version": "X0407",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2023-06-09",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-23-018474",
+              "film_num": [
+                "231006828"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001108524-22-000060:ex321-soxcertsq3fy23.htm",
+            "_score": 24.654613,
+            "_source": {
+              "ciks": [
+                "0001108524"
+              ],
+              "period_ending": "2022-10-31",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": null,
+              "sequence": 5,
+              "root_forms": [
+                "10-Q"
+              ],
+              "file_date": "2022-12-01",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "10-Q",
+              "adsh": "0001108524-22-000060",
+              "film_num": [
+                "221436576"
+              ],
+              "biz_locations": [
+                "San Francisco, CA"
+              ],
+              "file_type": "EX-32.1",
+              "file_description": "EX-32.1",
+              "inc_states": [
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001108524-26-000002:form4.xml",
+            "_score": 24.65079,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2026-01-13",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X05",
+              "schema_version": "X0508",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2026-01-14",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001108524-26-000002",
+              "film_num": [
+                "26533589"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001193125-14-048234:d664203dsc13ga.htm",
+            "_score": 24.650486,
+            "_source": {
+              "ciks": [
+                "0001108524",
+                "0001294693"
+              ],
+              "period_ending": null,
+              "file_num": [
+                "005-79926"
+              ],
+              "display_names": [
+                "SALESFORCE COM INC  (CRM)  (CIK 0001108524)",
+                "Benioff Marc  (CIK 0001294693)"
+              ],
+              "xsl": null,
+              "sequence": 1,
+              "root_forms": [
+                "SC 13G"
+              ],
+              "file_date": "2014-02-12",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "SC 13G/A",
+              "adsh": "0001193125-14-048234",
+              "film_num": [
+                "14600808"
+              ],
+              "biz_locations": [
+                "San Francisco, CA",
+                ""
+              ],
+              "file_type": "SC 13G/A",
+              "file_description": "SC 13G/A",
+              "inc_states": [
+                "DE",
+                ""
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-23-026364:form4.xml",
+            "_score": 24.649672,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2023-10-27",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X05",
+              "schema_version": "X0508",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2023-10-30",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-23-026364",
+              "film_num": [
+                "231360843"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001193125-12-249119:d334385dex321.htm",
+            "_score": 24.647474,
+            "_source": {
+              "ciks": [
+                "0001108524"
+              ],
+              "period_ending": "2012-04-30",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "SALESFORCE COM INC  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": null,
+              "sequence": 5,
+              "root_forms": [
+                "10-Q"
+              ],
+              "file_date": "2012-05-25",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "10-Q",
+              "adsh": "0001193125-12-249119",
+              "film_num": [
+                "12871217"
+              ],
+              "biz_locations": [
+                "San Francisco, CA"
+              ],
+              "file_type": "EX-32.1",
+              "file_description": "CERTIFICATION OF CEO AND CFO PURSUANT TO SECTION 906",
+              "inc_states": [
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001108524-25-000006:ex321-soxcertsq4fy25.htm",
+            "_score": 24.647474,
+            "_source": {
+              "ciks": [
+                "0001108524"
+              ],
+              "period_ending": "2025-01-31",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": null,
+              "sequence": "11",
+              "root_forms": [
+                "10-K"
+              ],
+              "file_date": "2025-03-05",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "10-K",
+              "adsh": "0001108524-25-000006",
+              "film_num": [
+                "25711276"
+              ],
+              "biz_locations": [
+                "San Francisco, CA"
+              ],
+              "file_type": "EX-32.1",
+              "file_description": "EX-32.1",
+              "inc_states": [
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001108524-26-000127:ex321-soxcertsq1fy27.htm",
+            "_score": 24.647474,
+            "_source": {
+              "ciks": [
+                "0001108524"
+              ],
+              "period_ending": "2026-04-30",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": null,
+              "sequence": "5",
+              "root_forms": [
+                "10-Q"
+              ],
+              "file_date": "2026-05-28",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "10-Q",
+              "adsh": "0001108524-26-000127",
+              "film_num": [
+                "261027867"
+              ],
+              "biz_locations": [
+                "San Francisco, CA"
+              ],
+              "file_type": "EX-32.1",
+              "file_description": "EX-32.1",
+              "inc_states": [
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001971857-24-000005:primary_doc.xml",
+            "_score": 24.641933,
+            "_source": {
+              "ciks": [
+                "0001108524",
+                "0001294693"
+              ],
+              "period_ending": null,
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)",
+                "Benioff Marc  (CIK 0001294693)"
+              ],
+              "xsl": "xsl144X01",
+              "sequence": 1,
+              "root_forms": [
+                "144"
+              ],
+              "file_date": "2024-01-02",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "144",
+              "adsh": "0001971857-24-000005",
+              "film_num": [
+                "24502888"
+              ],
+              "biz_locations": [
+                "San Francisco, CA",
+                ""
+              ],
+              "file_type": "144",
+              "file_description": null,
+              "inc_states": [
+                "DE",
+                ""
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-24-012480:form4.xml",
+            "_score": 24.636208,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2024-04-03",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X05",
+              "schema_version": "X0508",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2024-04-04",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-24-012480",
+              "film_num": [
+                "24823334"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-24-011826:form4.xml",
+            "_score": 24.636208,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2024-04-01",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X05",
+              "schema_version": "X0508",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2024-04-02",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-24-011826",
+              "film_num": [
+                "24814331"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001108524-20-000047:ex321-soxcertsq3fy21.htm",
+            "_score": 24.636068,
+            "_source": {
+              "ciks": [
+                "0001108524"
+              ],
+              "period_ending": "2020-10-31",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "SALESFORCE.COM, INC.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": null,
+              "sequence": 4,
+              "root_forms": [
+                "10-Q"
+              ],
+              "file_date": "2020-12-04",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "10-Q",
+              "adsh": "0001108524-20-000047",
+              "film_num": [
+                "201368787"
+              ],
+              "biz_locations": [
+                "San Francisco, CA"
+              ],
+              "file_type": "EX-32.1",
+              "file_description": "EX-32.1",
+              "inc_states": [
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-24-015823:form4.xml",
+            "_score": 24.636066,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2024-05-16",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X05",
+              "schema_version": "X0508",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2024-05-17",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-24-015823",
+              "film_num": [
+                "24960079"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001108524-26-000088:form4.xml",
+            "_score": 24.632624,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2026-04-22",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X06",
+              "schema_version": "X0609",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2026-04-23",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001108524-26-000088",
+              "film_num": [
+                "26889930"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001193125-06-116421:dex321.htm",
+            "_score": 24.62965,
+            "_source": {
+              "ciks": [
+                "0001108524"
+              ],
+              "period_ending": "2006-04-30",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "SALESFORCE COM INC  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": null,
+              "sequence": 5,
+              "root_forms": [
+                "10-Q"
+              ],
+              "file_date": "2006-05-19",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "10-Q",
+              "adsh": "0001193125-06-116421",
+              "film_num": [
+                "06856004"
+              ],
+              "biz_locations": [
+                "San Francisco, CA"
+              ],
+              "file_type": "EX-32.1",
+              "file_description": "CERTIFICATION OF CHIEF EXECUTIVE OFFICER",
+              "inc_states": [
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0000000000-08-027850:filename1.pdf",
+            "_score": 24.628931,
+            "_source": {
+              "ciks": [
+                "0001108524"
+              ],
+              "period_ending": null,
+              "file_num": [],
+              "display_names": [
+                "SALESFORCE COM INC  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": null,
+              "sequence": 1,
+              "root_forms": [
+                "UPLOAD"
+              ],
+              "file_date": "2008-06-03",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "UPLOAD",
+              "adsh": "0000000000-08-027850",
+              "film_num": [],
+              "biz_locations": [
+                "San Francisco, CA"
+              ],
+              "file_type": "LETTER",
+              "file_description": null,
+              "inc_states": [
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001193125-07-118825:dex321.htm",
+            "_score": 24.624882,
+            "_source": {
+              "ciks": [
+                "0001108524"
+              ],
+              "period_ending": "2007-04-30",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "SALESFORCE COM INC  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": null,
+              "sequence": 4,
+              "root_forms": [
+                "10-Q"
+              ],
+              "file_date": "2007-05-18",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "10-Q",
+              "adsh": "0001193125-07-118825",
+              "film_num": [
+                "07865550"
+              ],
+              "biz_locations": [
+                "San Francisco, CA"
+              ],
+              "file_type": "EX-32.1",
+              "file_description": "CERTIFICATION OF CHIEF EXECUTIVE OFFICER AND CHIEF FINANCIAL OFFICER",
+              "inc_states": [
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-24-018405:form4.xml",
+            "_score": 24.6242,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2024-06-10",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X05",
+              "schema_version": "X0508",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2024-06-11",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-24-018405",
+              "film_num": [
+                "241037020"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-23-021240:form4.xml",
+            "_score": 24.622505,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2023-07-24",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X05",
+              "schema_version": "X0508",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2023-07-25",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-23-021240",
+              "film_num": [
+                "231109005"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-24-009227:form4.xml",
+            "_score": 24.622505,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2024-03-07",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X05",
+              "schema_version": "X0508",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2024-03-08",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-24-009227",
+              "film_num": [
+                "24735470"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-24-009029:form4.xml",
+            "_score": 24.621565,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2024-03-06",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X05",
+              "schema_version": "X0508",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2024-03-07",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-24-009029",
+              "film_num": [
+                "24731299"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001193125-10-207193:dex321.htm",
+            "_score": 24.618439,
+            "_source": {
+              "ciks": [
+                "0001108524"
+              ],
+              "period_ending": "2010-07-31",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "SALESFORCE COM INC  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": null,
+              "sequence": 4,
+              "root_forms": [
+                "10-Q"
+              ],
+              "file_date": "2010-09-09",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "10-Q",
+              "adsh": "0001193125-10-207193",
+              "film_num": [
+                "101063597"
+              ],
+              "biz_locations": [
+                "San Francisco, CA"
+              ],
+              "file_type": "EX-32.1",
+              "file_description": "CERTIFICATION OF CEO AND CFO PURSUANT TO SECTION 906",
+              "inc_states": [
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001193125-04-146497:dex321.htm",
+            "_score": 24.618439,
+            "_source": {
+              "ciks": [
+                "0001108524"
+              ],
+              "period_ending": "2004-07-31",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "SALESFORCE COM INC  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": null,
+              "sequence": 4,
+              "root_forms": [
+                "10-Q"
+              ],
+              "file_date": "2004-08-25",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "10-Q",
+              "adsh": "0001193125-04-146497",
+              "film_num": [
+                "04996862"
+              ],
+              "biz_locations": [
+                "San Francisco, CA"
+              ],
+              "file_type": "EX-32.1",
+              "file_description": "SECTION 906 CEO AND CFO CERTIFICATION",
+              "inc_states": [
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001108524-22-000041:ex321-soxcertsq2fy23.htm",
+            "_score": 24.618221,
+            "_source": {
+              "ciks": [
+                "0001108524"
+              ],
+              "period_ending": "2022-07-31",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": null,
+              "sequence": 5,
+              "root_forms": [
+                "10-Q"
+              ],
+              "file_date": "2022-08-25",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "10-Q",
+              "adsh": "0001108524-22-000041",
+              "film_num": [
+                "221197612"
+              ],
+              "biz_locations": [
+                "San Francisco, CA"
+              ],
+              "file_type": "EX-32.1",
+              "file_description": "EX-32.1",
+              "inc_states": [
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001108524-23-000040:ex321-soxcertsq2fy24.htm",
+            "_score": 24.613813,
+            "_source": {
+              "ciks": [
+                "0001108524"
+              ],
+              "period_ending": "2023-07-31",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": null,
+              "sequence": 4,
+              "root_forms": [
+                "10-Q"
+              ],
+              "file_date": "2023-08-31",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "10-Q",
+              "adsh": "0001108524-23-000040",
+              "film_num": [
+                "231226373"
+              ],
+              "biz_locations": [
+                "San Francisco, CA"
+              ],
+              "file_type": "EX-32.1",
+              "file_description": "EX-32.1",
+              "inc_states": [
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001108524-26-000068:form4.xml",
+            "_score": 24.61281,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2026-03-22",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X06",
+              "schema_version": "X0609",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2026-03-24",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001108524-26-000068",
+              "film_num": [
+                "26788184"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-23-027874:form4.xml",
+            "_score": 24.609684,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2023-11-16",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X05",
+              "schema_version": "X0508",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2023-11-17",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-23-027874",
+              "film_num": [
+                "231419898"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-25-019226:form4.xml",
+            "_score": 24.604374,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2025-07-14",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X05",
+              "schema_version": "X0508",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2025-07-15",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-25-019226",
+              "film_num": [
+                "251125945"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-25-020250:form4.xml",
+            "_score": 24.604374,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2025-08-06",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X05",
+              "schema_version": "X0508",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2025-08-07",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-25-020250",
+              "film_num": [
+                "251195367"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-23-024444:form4.xml",
+            "_score": 24.60273,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2023-09-18",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X05",
+              "schema_version": "X0508",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2023-09-19",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-23-024444",
+              "film_num": [
+                "231264518"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001193125-12-249119:d334385dex311.htm",
+            "_score": 24.600822,
+            "_source": {
+              "ciks": [
+                "0001108524"
+              ],
+              "period_ending": "2012-04-30",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "SALESFORCE COM INC  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": null,
+              "sequence": 3,
+              "root_forms": [
+                "10-Q"
+              ],
+              "file_date": "2012-05-25",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "10-Q",
+              "adsh": "0001193125-12-249119",
+              "film_num": [
+                "12871217"
+              ],
+              "biz_locations": [
+                "San Francisco, CA"
+              ],
+              "file_type": "EX-31.1",
+              "file_description": "CERTIFICATION OF CHIEF EXECUTIVE OFFICER PURSUANT TO SECTION 302",
+              "inc_states": [
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001108524-25-000238:ex311-ceocertq3fy26.htm",
+            "_score": 24.600822,
+            "_source": {
+              "ciks": [
+                "0001108524"
+              ],
+              "period_ending": "2025-10-31",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": null,
+              "sequence": "2",
+              "root_forms": [
+                "10-Q"
+              ],
+              "file_date": "2025-12-04",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "10-Q",
+              "adsh": "0001108524-25-000238",
+              "film_num": [
+                "251547741"
+              ],
+              "biz_locations": [
+                "San Francisco, CA"
+              ],
+              "file_type": "EX-31.1",
+              "file_description": "EX-31.1",
+              "inc_states": [
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-23-022381:form4.xml",
+            "_score": 24.59812,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2023-08-10",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X05",
+              "schema_version": "X0508",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2023-08-11",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-23-022381",
+              "film_num": [
+                "231164825"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-23-029435:form4.xml",
+            "_score": 24.596182,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2023-12-11",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X05",
+              "schema_version": "X0508",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2023-12-12",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-23-029435",
+              "film_num": [
+                "231481776"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-24-012713:form4.xml",
+            "_score": 24.596182,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2024-04-08",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X05",
+              "schema_version": "X0508",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2024-04-09",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-24-012713",
+              "film_num": [
+                "24833121"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001193125-06-176211:dex321.htm",
+            "_score": 24.595367,
+            "_source": {
+              "ciks": [
+                "0001108524"
+              ],
+              "period_ending": "2006-07-31",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "SALESFORCE COM INC  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": null,
+              "sequence": 5,
+              "root_forms": [
+                "10-Q"
+              ],
+              "file_date": "2006-08-18",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "10-Q",
+              "adsh": "0001193125-06-176211",
+              "film_num": [
+                "061044176"
+              ],
+              "biz_locations": [
+                "San Francisco, CA"
+              ],
+              "file_type": "EX-32.1",
+              "file_description": "CERTIFICATION OF CEO + CFO",
+              "inc_states": [
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001193125-08-183002:dex321.htm",
+            "_score": 24.589275,
+            "_source": {
+              "ciks": [
+                "0001108524"
+              ],
+              "period_ending": "2008-07-31",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "SALESFORCE COM INC  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": null,
+              "sequence": 5,
+              "root_forms": [
+                "10-Q"
+              ],
+              "file_date": "2008-08-22",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "10-Q",
+              "adsh": "0001193125-08-183002",
+              "film_num": [
+                "081035080"
+              ],
+              "biz_locations": [
+                "San Francisco, CA"
+              ],
+              "file_type": "EX-32.1",
+              "file_description": "CERTIFICATION OF CEO AND CFO PURSUANT TO SECTION 906",
+              "inc_states": [
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001193125-09-020097:dsc13ga.htm",
+            "_score": 24.589214,
+            "_source": {
+              "ciks": [
+                "0001108524",
+                "0001294693"
+              ],
+              "period_ending": null,
+              "file_num": [
+                "005-79926"
+              ],
+              "display_names": [
+                "SALESFORCE COM INC  (CRM)  (CIK 0001108524)",
+                "Benioff Marc  (CIK 0001294693)"
+              ],
+              "xsl": null,
+              "sequence": 1,
+              "root_forms": [
+                "SC 13G"
+              ],
+              "file_date": "2009-02-05",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "SC 13G/A",
+              "adsh": "0001193125-09-020097",
+              "film_num": [
+                "09573533"
+              ],
+              "biz_locations": [
+                "San Francisco, CA"
+              ],
+              "file_type": "SC 13G/A",
+              "file_description": "SCHEDULE 13G AMENDMENT NO. 4",
+              "inc_states": [
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-23-022241:form4.xml",
+            "_score": 24.582914,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2023-08-08",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X05",
+              "schema_version": "X0508",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2023-08-09",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-23-022241",
+              "film_num": [
+                "231155890"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-24-006716:form4.xml",
+            "_score": 24.582914,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2024-02-22",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X05",
+              "schema_version": "X0508",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2024-02-23",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-24-006716",
+              "film_num": [
+                "24672612"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001193125-09-242413:dex321.htm",
+            "_score": 24.581556,
+            "_source": {
+              "ciks": [
+                "0001108524"
+              ],
+              "period_ending": "2009-10-31",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "SALESFORCE COM INC  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": null,
+              "sequence": 4,
+              "root_forms": [
+                "10-Q"
+              ],
+              "file_date": "2009-11-25",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "10-Q",
+              "adsh": "0001193125-09-242413",
+              "film_num": [
+                "091208349"
+              ],
+              "biz_locations": [
+                "San Francisco, CA"
+              ],
+              "file_type": "EX-32.1",
+              "file_description": "CERTIFICATION OF CHIEF EXECUTIVE OFFICER AND CHIEF FINANCIAL OFFICER",
+              "inc_states": [
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-23-023913:form4.xml",
+            "_score": 24.581541,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2023-09-07",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X05",
+              "schema_version": "X0508",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2023-09-08",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-23-023913",
+              "film_num": [
+                "231245917"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-24-014447:form4.xml",
+            "_score": 24.581541,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2024-05-06",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X05",
+              "schema_version": "X0508",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2024-05-07",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-24-014447",
+              "film_num": [
+                "24922678"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-23-024229:form4.xml",
+            "_score": 24.579605,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2023-09-14",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X05",
+              "schema_version": "X0508",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2023-09-15",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-23-024229",
+              "film_num": [
+                "231259176"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001971857-23-000717:primary_doc.xml",
+            "_score": 24.573954,
+            "_source": {
+              "ciks": [
+                "0001108524",
+                "0001294693"
+              ],
+              "period_ending": null,
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)",
+                "Benioff Marc  (CIK 0001294693)"
+              ],
+              "xsl": "xsl144X01",
+              "sequence": 1,
+              "root_forms": [
+                "144"
+              ],
+              "file_date": "2023-10-02",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "144",
+              "adsh": "0001971857-23-000717",
+              "film_num": [
+                "231299760"
+              ],
+              "biz_locations": [
+                "San Francisco, CA",
+                ""
+              ],
+              "file_type": "144",
+              "file_description": null,
+              "inc_states": [
+                "DE",
+                ""
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-24-002420:form4.xml",
+            "_score": 24.573826,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2024-01-26",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X05",
+              "schema_version": "X0508",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2024-01-29",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-24-002420",
+              "film_num": [
+                "24573859"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-23-025777:form4.xml",
+            "_score": 24.573124,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2023-10-10",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X05",
+              "schema_version": "X0508",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2023-10-11",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-23-025777",
+              "film_num": [
+                "231320933"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-24-002844:form4.xml",
+            "_score": 24.572887,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2024-01-29",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X05",
+              "schema_version": "X0508",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2024-01-31",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-24-002844",
+              "film_num": [
+                "24584626"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-24-009982:form4.xml",
+            "_score": 24.572887,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2024-03-12",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X05",
+              "schema_version": "X0508",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2024-03-13",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-24-009982",
+              "film_num": [
+                "24746130"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001108524-24-000034:ex321-soxcertsq3fy25.htm",
+            "_score": 24.572357,
+            "_source": {
+              "ciks": [
+                "0001108524"
+              ],
+              "period_ending": "2024-10-31",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": null,
+              "sequence": "5",
+              "root_forms": [
+                "10-Q"
+              ],
+              "file_date": "2024-12-04",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "10-Q",
+              "adsh": "0001108524-24-000034",
+              "film_num": [
+                "241524535"
+              ],
+              "biz_locations": [
+                "San Francisco, CA"
+              ],
+              "file_type": "EX-32.1",
+              "file_description": "EX-32.1",
+              "inc_states": [
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-23-019646:form4.xml",
+            "_score": 24.571098,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2023-06-29",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X04",
+              "schema_version": "X0407",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2023-06-30",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-23-019646",
+              "film_num": [
+                "231062644"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001193125-07-185336:dex321.htm",
+            "_score": 24.567163,
+            "_source": {
+              "ciks": [
+                "0001108524"
+              ],
+              "period_ending": "2007-07-31",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "SALESFORCE COM INC  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": null,
+              "sequence": 5,
+              "root_forms": [
+                "10-Q"
+              ],
+              "file_date": "2007-08-17",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "10-Q",
+              "adsh": "0001193125-07-185336",
+              "film_num": [
+                "071065901"
+              ],
+              "biz_locations": [
+                "San Francisco, CA"
+              ],
+              "file_type": "EX-32.1",
+              "file_description": "CERTIFICATION OF CHIEF EXECUTIVE OFFICER AND CHIEF FINANCIAL OFFICER",
+              "inc_states": [
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-25-019605:form4.xml",
+            "_score": 24.566303,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2025-07-24",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X05",
+              "schema_version": "X0508",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2025-07-25",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-25-019605",
+              "film_num": [
+                "251152614"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          },
+          {
+            "_index": "edgar_file",
+            "_id": "0001127602-24-011455:form4.xml",
+            "_score": 24.561571,
+            "_source": {
+              "ciks": [
+                "0001294693",
+                "0001108524"
+              ],
+              "period_ending": "2024-03-28",
+              "file_num": [
+                "001-32224"
+              ],
+              "display_names": [
+                "Benioff Marc  (CIK 0001294693)",
+                "Salesforce, Inc.  (CRM)  (CIK 0001108524)"
+              ],
+              "xsl": "xslF345X05",
+              "schema_version": "X0508",
+              "sequence": 1,
+              "root_forms": [
+                "4"
+              ],
+              "file_date": "2024-03-29",
+              "biz_states": [
+                "CA"
+              ],
+              "sics": [
+                "7372"
+              ],
+              "form": "4",
+              "adsh": "0001127602-24-011455",
+              "film_num": [
+                "24804591"
+              ],
+              "biz_locations": [
+                "",
+                "San Francisco, CA"
+              ],
+              "file_type": "4",
+              "file_description": "PRIMARY DOCUMENT",
+              "inc_states": [
+                "",
+                "DE"
+              ],
+              "items": []
+            }
+          }
+        ]
+      },
+      "aggregations": {
+        "entity_filter": {
+          "doc_count_error_upper_bound": 50,
+          "sum_other_doc_count": 6978,
+          "buckets": [
+            {
+              "key": "Benioff Marc  (CIK 0001294693)",
+              "doc_count": 3145
+            },
+            {
+              "key": "SALESFORCE COM INC  (CRM)  (CIK 0001108524)",
+              "doc_count": 2692
+            },
+            {
+              "key": "Salesforce, Inc.  (CRM)  (CIK 0001108524)",
+              "doc_count": 574
+            },
+            {
+              "key": "SALESFORCE.COM, INC.  (CRM)  (CIK 0001108524)",
+              "doc_count": 443
+            },
+            {
+              "key": "Salesforce, Inc.  (CIK 0001108524)",
+              "doc_count": 82
+            },
+            {
+              "key": "VANGUARD WORLD FUND  (CIK 0000052848)",
+              "doc_count": 57
+            },
+            {
+              "key": "VANGUARD INDEX FUNDS  (CIK 0000036405)",
+              "doc_count": 46
+            },
+            {
+              "key": "CISCO SYSTEMS, INC.  (CSCO)  (CIK 0000858877)",
+              "doc_count": 35
+            },
+            {
+              "key": "VANGUARD SCOTTSDALE FUNDS  (CIK 0001021882)",
+              "doc_count": 30
+            },
+            {
+              "key": "Advisors' Inner Circle Fund III  (CIK 0001593547)",
+              "doc_count": 28
+            },
+            {
+              "key": "EQ ADVISORS TRUST  (CIK 0001027263)",
+              "doc_count": 26
+            },
+            {
+              "key": "ETF Series Solutions  (CIK 0001540305)",
+              "doc_count": 26
+            },
+            {
+              "key": "ADVISORS SERIES TRUST  (CIK 0001027596)",
+              "doc_count": 24
+            },
+            {
+              "key": "ADVANCED SERIES TRUST  (CIK 0000814679)",
+              "doc_count": 21
+            },
+            {
+              "key": "iSHARES TRUST  (CIK 0001100663)",
+              "doc_count": 19
+            },
+            {
+              "key": "DBX ETF TRUST  (CIK 0001503123)",
+              "doc_count": 18
+            },
+            {
+              "key": "ADVISORS' INNER CIRCLE FUND  (CIK 0000878719)",
+              "doc_count": 17
+            },
+            {
+              "key": "Tableau Software Inc  (CIK 0001303652)",
+              "doc_count": 17
+            },
+            {
+              "key": "VANGUARD VARIABLE INSURANCE FUNDS  (CIK 0000857490)",
+              "doc_count": 17
+            },
+            {
+              "key": "ALLIANZ VARIABLE INSURANCE PRODUCTS TRUST  (CIK 0001091439)",
+              "doc_count": 16
+            },
+            {
+              "key": "CLEARWATER INVESTMENT TRUST  (CIK 0000811161)",
+              "doc_count": 16
+            },
+            {
+              "key": "AMERICAN CENTURY MUTUAL FUNDS, INC.  (CIK 0000100334)",
+              "doc_count": 15
+            },
+            {
+              "key": "AMERICAN CENTURY STRATEGIC ASSET ALLOCATIONS INC  (CIK 0000924211)",
+              "doc_count": 15
+            },
+            {
+              "key": "BLACKROCK FUNDS  (CIK 0000844779)",
+              "doc_count": 15
+            },
+            {
+              "key": "BlackRock Series Fund, Inc.  (CIK 0000319108)",
+              "doc_count": 15
+            },
+            {
+              "key": "BlackRock Variable Series Funds, Inc.  (CIK 0000355916)",
+              "doc_count": 15
+            },
+            {
+              "key": "COLUMBIA FUNDS SERIES TRUST I  (CIK 0000773757)",
+              "doc_count": 15
+            },
+            {
+              "key": "Columbia Funds Variable Series Trust II  (CIK 0001413032)",
+              "doc_count": 15
+            },
+            {
+              "key": "FIDELITY CONCORD STREET TRUST  (CIK 0000819118)",
+              "doc_count": 15
+            },
+            {
+              "key": "PROFESSIONALLY MANAGED PORTFOLIOS  (CIK 0000811030)",
+              "doc_count": 15
+            }
+          ]
+        },
+        "sic_filter": {
+          "doc_count_error_upper_bound": 0,
+          "sum_other_doc_count": 0,
+          "buckets": [
+            {
+              "key": "7372",
+              "doc_count": 3855
+            },
+            {
+              "key": "3576",
+              "doc_count": 35
+            },
+            {
+              "key": "6770",
+              "doc_count": 21
+            },
+            {
+              "key": "3663",
+              "doc_count": 13
+            },
+            {
+              "key": "7371",
+              "doc_count": 8
+            },
+            {
+              "key": "2731",
+              "doc_count": 6
+            },
+            {
+              "key": "7374",
+              "doc_count": 6
+            },
+            {
+              "key": "6163",
+              "doc_count": 5
+            },
+            {
+              "key": "6189",
+              "doc_count": 4
+            },
+            {
+              "key": "2510",
+              "doc_count": 3
+            },
+            {
+              "key": "7310",
+              "doc_count": 2
+            },
+            {
+              "key": "3570",
+              "doc_count": 1
+            },
+            {
+              "key": "3571",
+              "doc_count": 1
+            },
+            {
+              "key": "3572",
+              "doc_count": 1
+            },
+            {
+              "key": "3844",
+              "doc_count": 1
+            },
+            {
+              "key": "4841",
+              "doc_count": 1
+            },
+            {
+              "key": "5961",
+              "doc_count": 1
+            },
+            {
+              "key": "6029",
+              "doc_count": 1
+            },
+            {
+              "key": "7381",
+              "doc_count": 1
+            }
+          ]
+        },
+        "biz_states_filter": {
+          "doc_count_error_upper_bound": 0,
+          "sum_other_doc_count": 70,
+          "buckets": [
+            {
+              "key": "CA",
+              "doc_count": 4481
+            },
+            {
+              "key": "MA",
+              "doc_count": 1319
+            },
+            {
+              "key": "NY",
+              "doc_count": 1249
+            },
+            {
+              "key": "PA",
+              "doc_count": 768
+            },
+            {
+              "key": "IL",
+              "doc_count": 483
+            },
+            {
+              "key": "MD",
+              "doc_count": 394
+            },
+            {
+              "key": "WI",
+              "doc_count": 327
+            },
+            {
+              "key": "OH",
+              "doc_count": 271
+            },
+            {
+              "key": "TX",
+              "doc_count": 237
+            },
+            {
+              "key": "CO",
+              "doc_count": 220
+            },
+            {
+              "key": "DE",
+              "doc_count": 204
+            },
+            {
+              "key": "NJ",
+              "doc_count": 178
+            },
+            {
+              "key": "CT",
+              "doc_count": 165
+            },
+            {
+              "key": "MN",
+              "doc_count": 125
+            },
+            {
+              "key": "AZ",
+              "doc_count": 97
+            },
+            {
+              "key": "MO",
+              "doc_count": 94
+            },
+            {
+              "key": "IN",
+              "doc_count": 77
+            },
+            {
+              "key": "IA",
+              "doc_count": 68
+            },
+            {
+              "key": "WA",
+              "doc_count": 61
+            },
+            {
+              "key": "FL",
+              "doc_count": 60
+            },
+            {
+              "key": "KS",
+              "doc_count": 60
+            },
+            {
+              "key": "NC",
+              "doc_count": 56
+            },
+            {
+              "key": "MI",
+              "doc_count": 37
+            },
+            {
+              "key": "NE",
+              "doc_count": 36
+            },
+            {
+              "key": "DC",
+              "doc_count": 30
+            },
+            {
+              "key": "OK",
+              "doc_count": 27
+            },
+            {
+              "key": "VA",
+              "doc_count": 25
+            },
+            {
+              "key": "NV",
+              "doc_count": 24
+            },
+            {
+              "key": "ME",
+              "doc_count": 11
+            },
+            {
+              "key": "NH",
+              "doc_count": 10
+            }
+          ]
+        },
+        "form_filter": {
+          "doc_count_error_upper_bound": 0,
+          "sum_other_doc_count": 18,
+          "buckets": [
+            {
+              "key": "N-PX",
+              "doc_count": 7298
+            },
+            {
+              "key": "4",
+              "doc_count": 3126
+            },
+            {
+              "key": "8-K",
+              "doc_count": 228
+            },
+            {
+              "key": "10-Q",
+              "doc_count": 163
+            },
+            {
+              "key": "10-K",
+              "doc_count": 83
+            },
+            {
+              "key": "425",
+              "doc_count": 75
+            },
+            {
+              "key": "S-8",
+              "doc_count": 71
+            },
+            {
+              "key": "DEF 14A",
+              "doc_count": 30
+            },
+            {
+              "key": "DEFA14A",
+              "doc_count": 21
+            },
+            {
+              "key": "S-1",
+              "doc_count": 17
+            },
+            {
+              "key": "CORRESP",
+              "doc_count": 16
+            },
+            {
+              "key": "S-3ASR",
+              "doc_count": 13
+            },
+            {
+              "key": "UPLOAD",
+              "doc_count": 13
+            },
+            {
+              "key": "D",
+              "doc_count": 11
+            },
+            {
+              "key": "SC 13G",
+              "doc_count": 11
+            },
+            {
+              "key": "144",
+              "doc_count": 10
+            },
+            {
+              "key": "S-4",
+              "doc_count": 8
+            },
+            {
+              "key": "SC TO-C",
+              "doc_count": 7
+            },
+            {
+              "key": "PRE 14A",
+              "doc_count": 6
+            },
+            {
+              "key": "SC 13E3",
+              "doc_count": 6
+            },
+            {
+              "key": "N-CSR",
+              "doc_count": 5
+            },
+            {
+              "key": "SC 14D9",
+              "doc_count": 5
+            },
+            {
+              "key": "6-K",
+              "doc_count": 4
+            },
+            {
+              "key": "S-8 POS",
+              "doc_count": 4
+            },
+            {
+              "key": "SC TO-T",
+              "doc_count": 4
+            },
+            {
+              "key": "424B3",
+              "doc_count": 3
+            },
+            {
+              "key": "ARS",
+              "doc_count": 3
+            },
+            {
+              "key": "DFAN14A",
+              "doc_count": 3
+            },
+            {
+              "key": "FWP",
+              "doc_count": 3
+            },
+            {
+              "key": "PX14A6G",
+              "doc_count": 3
+            }
+          ]
+        }
+      },
+      "query": {
+        "_source": {
+          "exclude": [
+            "doc_text"
+          ]
+        },
+        "query": {
+          "bool": {
+            "must": [
+              {
+                "match_phrase": {
+                  "doc_text": "Marc Benioff"
+                }
+              }
+            ],
+            "must_not": [],
+            "should": [],
+            "filter": []
+          }
+        },
+        "from": 0,
+        "size": 100,
+        "aggregations": {
+          "form_filter": {
+            "terms": {
+              "field": "root_forms",
+              "size": 30
+            }
+          },
+          "entity_filter": {
+            "terms": {
+              "field": "display_names.raw",
+              "size": 30
+            }
+          },
+          "sic_filter": {
+            "terms": {
+              "field": "sics",
+              "size": 30
+            }
+          },
+          "biz_states_filter": {
+            "terms": {
+              "field": "biz_states",
+              "size": 30
+            }
+          }
+        }
+      }
+    }
+  }
+}

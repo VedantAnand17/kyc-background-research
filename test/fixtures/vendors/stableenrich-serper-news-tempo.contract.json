@@ -1,0 +1,71 @@
+{
+  "slug": "stableenrich-serper-news-tempo",
+  "name": "StableEnrich: Serper News",
+  "description": "Search the latest news headlines and articles about a company, brand, person, or topic. Use it for recent news coverage, press, and current events for research or monitoring.",
+  "capability": "news",
+  "keywords": [
+    "news",
+    "headlines",
+    "articles",
+    "latest",
+    "recent",
+    "press",
+    "coverage",
+    "topic",
+    "company",
+    "current"
+  ],
+  "price": {
+    "amount": "0.04",
+    "currency": "USD"
+  },
+  "maxChargePerCall": {
+    "amount": "0.04",
+    "currency": "USD"
+  },
+  "pricingUnit": "call",
+  "latencyMsP50": 98,
+  "payable": true,
+  "schemaConfidence": "high",
+  "input": {
+    "fields": [
+      {
+        "name": "q",
+        "in": "body",
+        "type": "string",
+        "required": true,
+        "description": "Google search query"
+      },
+      {
+        "name": "num",
+        "in": "body",
+        "type": "integer",
+        "required": false,
+        "description": "Number of results to return (Serper `num`)"
+      },
+      {
+        "name": "gl",
+        "in": "body",
+        "type": "string",
+        "required": false,
+        "description": "Country code (e.g. 'us')"
+      },
+      {
+        "name": "hl",
+        "in": "body",
+        "type": "string",
+        "required": false,
+        "description": "Language code (e.g. 'en')"
+      },
+      {
+        "name": "location",
+        "in": "body",
+        "type": "string",
+        "required": false,
+        "description": "Location (e.g. 'New York, NY')"
+      }
+    ],
+    "example": null
+  },
+  "docsUrl": "https://stableenrich.dev"
+}

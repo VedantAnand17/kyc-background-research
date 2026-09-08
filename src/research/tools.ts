@@ -6,9 +6,10 @@ import { extractFor } from "../evidence/extract.js";
 import type { EvidenceStore } from "../evidence/store.js";
 import type { PerfloClient } from "../perflo/client.js";
 import { ledgerActionForError, PerfloError } from "../perflo/errors.js";
-import type { VendorContract } from "../perflo/types.js";
+import type { PayResult, VendorContract } from "../perflo/types.js";
 import { normalizeName } from "../identity/normalize.js";
 import { capabilityOf, preferredVendors, type ToolName } from "./capabilities.js";
+import { vendorRequest, type Placed } from "./requests.js";
 
 export interface ToolContext {
   readonly jobId: string;
@@ -70,13 +71,13 @@ const FindPeopleArgs = z.object({
   fullName: z.string().trim().min(1),
   locationHint: z.string().trim().min(1).optional(),
 });
-const ProfessionalArgs = z
-  .object({
-    profileUrl: z.url().optional(),
-    fullName: z.string().trim().min(1).optional(),
-    company: z.string().trim().min(1).optional(),
-  })
-  .refine((v) => Boolean(v.profileUrl || v.fullName), { message: "profileUrl or fullName is required" });
+const LINKEDIN_PROFILE = /linkedin\.com\/in\/[^/?#]+/i;
+const LinkedInUrl = z.url().regex(LINKEDIN_PROFILE, "must be a linkedin.com/in/<id> profile URL, as returned by find_people");
+const ProfessionalArgs = z.object({
+  profileUrl: LinkedInUrl,
+  fullName: z.string().trim().min(1).optional(),
+  company: z.string().trim().min(1).optional(),
+});
 const QueryArgs = z.object({ query: z.string().trim().min(1) });
 const WatchlistArgs = z.object({
   fullName: z.string().trim().min(1),
@@ -84,10 +85,10 @@ const WatchlistArgs = z.object({
   country: z.string().trim().min(1).optional(),
 });
 const EnrichArgs = z.object({
-  fullName: z.string().trim().min(1),
+  profileUrl: LinkedInUrl,
+  fullName: z.string().trim().min(1).optional(),
   company: z.string().trim().min(1).optional(),
   location: z.string().trim().min(1).optional(),
-  profileUrl: z.string().trim().min(1).optional(),
 });
 const SocialArgs = z.object({
   network: z.enum(["x", "instagram"]),
@@ -171,11 +172,10 @@ export function dedupeKeyFor(tool: ToolName, args: Record<string, unknown>): str
     return JSON.stringify({ subject: `${network}:${handle}` });
   }
   if (PERSON_TOOLS.has(tool)) {
+    const url = typeof args.profileUrl === "string" ? args.profileUrl.trim().toLowerCase().replace(/\/+$/, "") : "";
+    if (url) return JSON.stringify({ profileUrl: url });
     const name = typeof args.fullName === "string" ? normalizeName(args.fullName) : "";
     if (name) return JSON.stringify({ subject: name });
-    if (typeof args.profileUrl === "string" && args.profileUrl.trim()) {
-      return JSON.stringify({ profileUrl: args.profileUrl.trim() });
-    }
   }
   return canonicalizeArgs(args);
 }
@@ -188,10 +188,10 @@ function readArg(field: string, args: Record<string, unknown>): unknown {
   return undefined;
 }
 
-function placeFields(
-  contract: VendorContract,
-  args: Record<string, unknown>,
-): { input?: Record<string, unknown>; query?: Record<string, unknown> } {
+/** Vendor body: the per-vendor adapter when one exists, else the contract's field names matched by alias. */
+function placeFields(contract: VendorContract, args: Record<string, unknown>): Placed | undefined {
+  const adapted = vendorRequest(contract.slug, args);
+  if (adapted !== null) return adapted;
   const fields = contract.input?.fields ?? [];
   if (fields.length === 0) return { input: { ...args } };
   const input: Record<string, unknown> = {};
@@ -202,10 +202,21 @@ function placeFields(
     if (field.in === "query") query[field.name] = value;
     else input[field.name] = value;
   }
-  const placed: { input?: Record<string, unknown>; query?: Record<string, unknown> } = {};
+  const placed: Placed = {};
   if (Object.keys(input).length > 0) placed.input = input;
   if (Object.keys(query).length > 0) placed.query = query;
   return placed;
+}
+
+/**
+ * What Perflo actually took from the budget. A `not_required` settlement posts the whole authorization, so the
+ * reserved quote is the debit and the metered `charged` would under-count spend (PayResult.settlement doc).
+ */
+export function debitedMicro(paid: Pick<PayResult, "status" | "charged" | "settlement">, quoteMicro: Micro): Micro {
+  const metered = parseMoney(paid.charged.amount);
+  // A failed run is voided by Perflo (observed: "failed voided" rows), so only a successful one posts the authorization.
+  if (paid.status === "succeeded" && paid.settlement?.status === "not_required") return quoteMicro > metered ? quoteMicro : metered;
+  return metered;
 }
 
 function remainingOf(guard: SpendGuard): string {
@@ -251,7 +262,9 @@ async function selectVendor(
 
   if (entry.discoveryQuery) {
     const found = await client.search(entry.discoveryQuery);
-    const ordered = [...found].sort((a, b) => Number(b.isPrimary) - Number(a.isPrimary));
+    const fits = (row: { capability: string }) =>
+      !entry.discoveryCapabilities || entry.discoveryCapabilities.includes(row.capability);
+    const ordered = found.filter(fits).sort((a, b) => Number(b.isPrimary) - Number(a.isPrimary));
     for (const row of ordered) {
       const hit = await trySlug(row.slug);
       if (hit) return hit;
@@ -329,6 +342,11 @@ export function createTools(ctx: ToolContext): ResearchTools {
       }
 
       const placed = placeFields(selected.contract, args);
+      if (!placed) {
+        ctx.guard.release(reserved.id, "vendor_needs_other_args");
+        const reason = `${selected.slug} cannot use these arguments; pass the fields the tool schema names`;
+        return { outcome: "invalid_args", reason, issues: [reason] };
+      }
       try {
         const paid = await ctx.client.pay(selected.slug, {
           ...placed,
@@ -336,7 +354,7 @@ export function createTools(ctx: ToolContext): ResearchTools {
           idempotencyKey: reserved.idempotencyKey,
           signal: ctx.signal,
         });
-        const chargedMicro = parseMoney(paid.charged.amount);
+        const chargedMicro = debitedMicro(paid, selected.quote);
         ctx.guard.settle(reserved.id, chargedMicro, paid.transactionId, paid.status);
         const extracted = extractFor(name, paid.output);
         const failed = paid.status === "failed";
@@ -375,7 +393,10 @@ export function createTools(ctx: ToolContext): ResearchTools {
         }
         const action = ledgerActionForError(err);
         if (err.code === "GUARDRAIL_DENIED" || err.code === "INSUFFICIENT_BALANCE") exhausted = true;
-        if (action === "hold") ctx.guard.hold(reserved.id, err.code);
+        if (action === "hold") {
+          const runId = typeof err.details?.runId === "string" ? err.details.runId : null;
+          ctx.guard.hold(reserved.id, err.code, runId);
+        }
         else if (action === "settle_at_reserved") ctx.guard.settle(reserved.id, selected.quote, null, err.code);
         else ctx.guard.release(reserved.id, err.code);
         const chargedMicro = action === "settle_at_reserved" ? selected.quote : 0n;

@@ -1,0 +1,902 @@
+[
+  {
+    "slug": "apify-viralanalyzer-tradingview-screener",
+    "name": "TradingView Screener Stock Signals & Market Scanner",
+    "description": "TradingView Screener Stock Signals & Market Scanner by viralanalyzer — Apify actor for Business. Market to scan. Use 'america' for US stocks, 'brazil' for B3, 'crypto' for crypto, or 'global' for all. If provided, only scan these specific symbols (e.g., 'NASDAQ:AAPL', 'NYSE:MSFT'). Leave empty to use screener filters. Minimum market capitalization filter. Set to 0 to disable. Maximum number of stocks to return. Field to sort results by.",
+    "capability": "company",
+    "price": {
+      "amount": "0.05",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.50",
+      "currency": "USD"
+    },
+    "pricingUnit": "item",
+    "latencyMsP50": 41,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "paysponge-edgar-search",
+    "name": "EDGAR Full-Text Search",
+    "description": "Full-text search across all SEC EDGAR filings (10-Ks, 10-Qs, 8-Ks, proxy statements): returns matching filings with company CIKs, display names, form types, and filing dates. Filter by form type (forms), company (entity), and date range (dateRange/startdt/enddt).",
+    "capability": "company",
+    "price": {
+      "amount": "0.008",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.008",
+      "currency": "USD"
+    },
+    "pricingUnit": "call",
+    "latencyMsP50": null,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "stableenrich-pdl-people-enrich-tempo",
+    "name": "StableEnrich: PDL People Enrich",
+    "description": "Find all information about a person — who they are, where they work, and how to reach them. Use this to look up a person by name and company ('who is Jane Doe at Acme'), or to find information about someone from just an email or LinkedIn URL. People Data Labs enrichment — look up ONE known person and return their emails, phone, education, and full career history. Provide one of: email (most reliable), profile (LinkedIn URL), or first_name+last_name+company_name/company_domain. Gotcha: the top-level current job_title can be stale — treat the experience[] array as authoritative.",
+    "capability": "people_enrich",
+    "price": {
+      "amount": "0.20",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.20",
+      "currency": "USD"
+    },
+    "pricingUnit": "call",
+    "latencyMsP50": 82,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "stableenrich-pdl-people-enrich",
+    "name": "StableEnrich: PDL People Enrich",
+    "description": "Find all information about a person — who they are, where they work, and how to reach them. Use this to look up a person by name and company ('who is Jane Doe at Acme'), or to find information about someone from just an email or LinkedIn URL. People Data Labs enrichment — look up ONE known person and return their emails, phone, education, and full career history. Provide one of: email (most reliable), profile (LinkedIn URL), or first_name+last_name+company_name/company_domain. Gotcha: the top-level current job_title can be stale — treat the experience[] array as authoritative.",
+    "capability": "people_enrich",
+    "price": {
+      "amount": "0.20",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.20",
+      "currency": "USD"
+    },
+    "pricingUnit": "call",
+    "latencyMsP50": 92,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "apify-borderline-indeed-scraper",
+    "name": "Indeed jobs scraper [PPR]",
+    "description": "Indeed jobs scraper [PPR] by borderline — Apify actor for Jobs. Select country (default is US based) Enhance accuracy by selecting the associated country (e.g., 'fr' for French jobs on fr.indeed.com). Da Specify city, state, zip, or 'remote' positions. (For better accuracy, pair location with the relevant country. E.g., Paris, set country to Enter max rows (listings) to get) Enter radius (km or miles depending on country) Select if you want to get remote or hybrid work",
+    "capability": "jobs",
+    "price": {
+      "amount": "0.005",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.05",
+      "currency": "USD"
+    },
+    "pricingUnit": "item",
+    "latencyMsP50": 41,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "stableenrich-fullenrich-people-search-tempo",
+    "name": "StableEnrich: FullEnrich People Search",
+    "description": "FullEnrich People Search — find prospects matching title/seniority/location/company-domain filters and return each person's name, current title, company, location, and LinkedIn URL. Filter fields take [{\"value\":\"...\"}] arrays, e.g. current_position_titles: [{\"value\":\"CTO\"}]. Also fits lazy people asks — find people at a company, or look up who works somewhere by title — when you have filters rather than one exact person (for one known person by name/email use stableenrich-pdl-people-enrich). Flat $0.05 per query regardless of limit. At least ONE filter field is required — an empty body is billed and returns 0 matches.",
+    "capability": "people",
+    "price": {
+      "amount": "0.05",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.05",
+      "currency": "USD"
+    },
+    "pricingUnit": "call",
+    "latencyMsP50": 123,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "stableenrich-fullenrich-people-search",
+    "name": "StableEnrich: FullEnrich People Search",
+    "description": "FullEnrich People Search — find prospects matching title/seniority/location/company-domain filters and return each person's name, current title, company, location, and LinkedIn URL. Filter fields take [{\"value\":\"...\"}] arrays, e.g. current_position_titles: [{\"value\":\"CTO\"}]. Also fits lazy people asks — find people at a company, or look up who works somewhere by title — when you have filters rather than one exact person (for one known person by name/email use stableenrich-pdl-people-enrich). Flat $0.05 per query regardless of limit. At least ONE filter field is required — an empty body is billed and returns 0 matches.",
+    "capability": "people",
+    "price": {
+      "amount": "0.05",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.05",
+      "currency": "USD"
+    },
+    "pricingUnit": "call",
+    "latencyMsP50": 73,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "apify-crypto-scraper-dexscreener-tokens-scraper",
+    "name": "Dexscreener Tokens Scraper",
+    "description": "Dexscreener Tokens Scraper by Crypto Scraper — Apify actor for Other. Blockchain network to fetch data from. You can also target specific DEXes using format 'chainName/dexName' (e.g., 'solana/moonit', 'ethereu The timeframe for the pairs (sets the URL segment, e.g. /solana/6h). Field used to sort tokens on the listing page. Maps to DexScreener's rankBy URL parameter. Sort direction. Maps to DexScreener's order URL parameter. Minimum pool liquidity in USD. Leave blank or 0 to skip.",
+    "capability": "scrape",
+    "price": {
+      "amount": "0.01",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.10",
+      "currency": "USD"
+    },
+    "pricingUnit": "item",
+    "latencyMsP50": 48,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "apify-silentflow-udemy-scraper-ppe",
+    "name": "Udemy Scraper Ppe",
+    "description": "Udemy Scraper Ppe by SilentFlow — Apify actor for Education. Udemy URL(s) to scrape. Supports topic pages (/topic/python/) for listing courses and individual course pages (/course/course-slug/) for si Keywords to search for courses (e.g., 'python', 'web development', 'data science'). The maximum total number of courses to scrape. HTTP request timeout in seconds. Activate to see detailed logs.",
+    "capability": "scrape",
+    "price": {
+      "amount": "0.0025",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.05",
+      "currency": "USD"
+    },
+    "pricingUnit": "item",
+    "latencyMsP50": 29,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "blockrun-ai-api-v1-modal-sandbox-status",
+    "name": "Check Modal Sandbox Status",
+    "description": "Check whether a sandbox is still running or has terminated.",
+    "capability": null,
+    "price": {
+      "amount": "0.002",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.002",
+      "currency": "USD"
+    },
+    "pricingUnit": "call",
+    "latencyMsP50": null,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "apify-silentflow-glassdoor-jobs-scraper-ppr",
+    "name": "Glassdoor Jobs Scraper Ppr",
+    "description": "Glassdoor Jobs Scraper Ppr by SilentFlow — Apify actor for Business. Job keywords to search. Each keyword runs a separate search and results are combined. City, state, or country (e.g. 'San Francisco', 'London', 'Paris'). Glassdoor country domain to search on. Maximum number of jobs to return. Only return jobs posted within this time period.",
+    "capability": "jobs",
+    "price": {
+      "amount": "0.005",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.05",
+      "currency": "USD"
+    },
+    "pricingUnit": "item",
+    "latencyMsP50": 25,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "apify-muhammetakkurtt-dexscreener-scraper",
+    "name": "DexScreener Scraper",
+    "description": "DexScreener Scraper by Muhammet Akkurt — Apify actor for Other. Number of token data to fetch Specify how many pages to scrape Which blockchain to fetch token data from Check this if you want to get all liquidity pools for each token. This provides more data but may take longer to process. Time period for which data will be retrieved",
+    "capability": "scrape",
+    "price": {
+      "amount": "0.02",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.20",
+      "currency": "USD"
+    },
+    "pricingUnit": "item",
+    "latencyMsP50": 38,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "blockrun-ai-api-v1-modal-sandbox-terminate",
+    "name": "Terminate Modal Sandbox",
+    "description": "Terminate a running sandbox and release its resources.",
+    "capability": null,
+    "price": {
+      "amount": "0.002",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.002",
+      "currency": "USD"
+    },
+    "pricingUnit": "call",
+    "latencyMsP50": null,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "stableenrich-companyenrich-org-enrich",
+    "name": "StableEnrich: CompanyEnrich Org Enrich",
+    "description": "CompanyEnrich — full company profile for a domain: industry, employee-count and revenue ranges, founding year, funding rounds with total raised, social links, and tech stack. Pass {\"domain\":\"stripe.com\"}. Known quirks: openai.com resolves wrong; use twitter.com, not x.com.",
+    "capability": "company",
+    "price": {
+      "amount": "0.06",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.06",
+      "currency": "USD"
+    },
+    "pricingUnit": "call",
+    "latencyMsP50": 134,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "stableenrich-companyenrich-org-enrich-tempo",
+    "name": "StableEnrich: CompanyEnrich Org Enrich",
+    "description": "CompanyEnrich — full company profile for a domain: industry, employee-count and revenue ranges, founding year, funding rounds with total raised, social links, and tech stack. Pass {\"domain\":\"stripe.com\"}. Known quirks: openai.com resolves wrong; use twitter.com, not x.com.",
+    "capability": "company",
+    "price": {
+      "amount": "0.06",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.06",
+      "currency": "USD"
+    },
+    "pricingUnit": "call",
+    "latencyMsP50": 78,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "apify-jungle-synthesizer-esports-tournament-roster-scraper",
+    "name": "Esports Tournament Roster Scraper",
+    "description": "Esports Tournament Roster Scraper by BowTiedRaccoon — Apify actor for Games. Please describe how you plan to use the data extracted by this crawler. Provide any feedback or suggestions for improvements. Provide your email address so we can get in touch with you. Which Liquipedia game wikis to scrape. Each wiki has its own player roster. Defaults to the top 5 esports titles. Maximum total number of player profiles to return across all selected game wikis. Keep at 15 or below for the Apify tester (5-min timeout).",
+    "capability": "scrape",
+    "price": {
+      "amount": "0.10",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.50",
+      "currency": "USD"
+    },
+    "pricingUnit": "item",
+    "latencyMsP50": 30,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "stablejobs-coresignal-job-search-tempo",
+    "name": "StableJobs: Coresignal Job Search",
+    "description": "Search job postings by filters (Coresignal) — $1.67 USD via MPP on Tempo. At least ONE filter (e.g. title, location) is REQUIRED in practice: an empty body is billed the full $1.67 and returns nothing.",
+    "capability": "jobs",
+    "price": {
+      "amount": "1.67",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "1.67",
+      "currency": "USD"
+    },
+    "pricingUnit": "call",
+    "latencyMsP50": 110,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "blockrun-ai-api-v1-pm-predictfun-markets",
+    "name": "List Predict.Fun markets with filtering and sorting",
+    "description": "List Predict.Fun markets with filtering and sorting Provider: Predexon (predictfun). Tier 1 pricing — payment goes directly to the Predexon recipient wallet.",
+    "capability": null,
+    "price": {
+      "amount": "0.0085",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.0085",
+      "currency": "USD"
+    },
+    "pricingUnit": "call",
+    "latencyMsP50": 193,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "blockrun-ai-api-v1-pm-polymarket-wallets-filter",
+    "name": "Filter wallets by market trades with AND/OR logic",
+    "description": "Filter wallets by market trades with AND/OR logic Provider: Predexon (polymarket). Tier 2 pricing — payment goes directly to the Predexon recipient wallet.",
+    "capability": null,
+    "price": {
+      "amount": "0.0085",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.0085",
+      "currency": "USD"
+    },
+    "pricingUnit": "call",
+    "latencyMsP50": 404,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "apify-michael-g-techstars-scraper",
+    "name": "Techstars Scraper",
+    "description": "Techstars Scraper by Michael G — Apify actor for News. Techstars portfolio URL. Go to the [Techstars portfolio](https://www.techstars.com/portfolio), search using the required filters, and once Maximum number of results to return. Leave empty for no limit. Set to true to scrape all companies (over 5000) from all years on the Techstars portfolio. When true, the Companies search URL and Maximum",
+    "capability": "company",
+    "price": {
+      "amount": "0.15",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.30",
+      "currency": "USD"
+    },
+    "pricingUnit": "item",
+    "latencyMsP50": 123,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "apify-parseforge-repec-economics-scraper",
+    "name": "RePEc Economics Papers Scraper",
+    "description": "RePEc Economics Papers Scraper by ParseForge — Apify actor for Education. Free users: Limited to 10 items (preview). Paid users: Optional, max 1,000,000 RePEc series handle (two-part archive/series). Examples: 'nbr/nberwo' (NBER Working Papers), 'fip/fedgfe' (Fed Finance & Economics), 'iza/i",
+    "capability": "scrape",
+    "price": {
+      "amount": "0.0055",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.055",
+      "currency": "USD"
+    },
+    "pricingUnit": "item",
+    "latencyMsP50": 102,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "apify-automation-lab-ebay-scraper",
+    "name": "eBay Scraper",
+    "description": "eBay Scraper by Stas Persiianenko — Apify actor for Marketing. List of keywords to search on eBay. Each keyword runs a separate search. Maximum number of products to return for each keyword. Maximum number of search result pages to scrape per keyword. Each page has up to 60 products. How to sort search results. Filter by item condition. Leave empty for all conditions.",
+    "capability": "scrape",
+    "price": {
+      "amount": "0.001",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.05",
+      "currency": "USD"
+    },
+    "pricingUnit": "item",
+    "latencyMsP50": 173,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "blockrun-ai-api-v1-pm-polymarket-markets",
+    "name": "Query Polymarket markets with filtering, sorting, and pagination",
+    "description": "Query Polymarket markets with filtering, sorting, and pagination Provider: Predexon (polymarket). Tier 1 pricing — payment goes directly to the Predexon recipient wallet.",
+    "capability": null,
+    "price": {
+      "amount": "0.0085",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.0085",
+      "currency": "USD"
+    },
+    "pricingUnit": "call",
+    "latencyMsP50": 105,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "blockrun-ai-api-v1-pm-polymarket-market-0x0000000000000000000000000000000000000000000000000000000000000000-smart-money",
+    "name": "View smart money positioning on a specific market",
+    "description": "View smart money positioning on a specific market Provider: Predexon (polymarket). Tier 2 pricing — payment goes directly to the Predexon recipient wallet. The path segment shown is a placeholder — su",
+    "capability": null,
+    "price": {
+      "amount": "0.0085",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.0085",
+      "currency": "USD"
+    },
+    "pricingUnit": "call",
+    "latencyMsP50": 106,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "apify-apimaestro-linkedin-profile-detail",
+    "name": "Profile Details Scraper for LinkedIn + EMAIL (No Cookies)",
+    "description": "Enrich ONE known person from their LinkedIn profile — name, headline, current role, company, education, and contact email. For a single known individual, not filtered prospecting.",
+    "capability": "people_enrich",
+    "price": {
+      "amount": "0.005",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.05",
+      "currency": "USD"
+    },
+    "pricingUnit": "item",
+    "latencyMsP50": 30,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "blockrun-ai-api-v1-pm-limitless-markets",
+    "name": "List Limitless markets with filtering and sorting",
+    "description": "List Limitless markets with filtering and sorting Provider: Predexon (limitless). Tier 1 pricing — payment goes directly to the Predexon recipient wallet.",
+    "capability": null,
+    "price": {
+      "amount": "0.0085",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.0085",
+      "currency": "USD"
+    },
+    "pricingUnit": "call",
+    "latencyMsP50": 124,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "blockrun-ai-api-v1-pm-polymarket-market-0x0000000000000000000000000000000000000000000000000000000000000000-top-holders",
+    "name": "Get top holders for a specific market ranked by position size",
+    "description": "Get top holders for a specific market ranked by position size Provider: Predexon (polymarket). Tier 1 pricing — payment goes directly to the Predexon recipient wallet. The path segment shown is a plac",
+    "capability": null,
+    "price": {
+      "amount": "0.0085",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.0085",
+      "currency": "USD"
+    },
+    "pricingUnit": "call",
+    "latencyMsP50": 166,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "blockrun-ai-api-v1-pm-predictfun-orderbooks",
+    "name": "Fetch historical orderbook snapshots for a Predict.Fun market",
+    "description": "Fetch historical orderbook snapshots for a Predict.Fun market Provider: Predexon (predictfun). Tier 1 pricing — payment goes directly to the Predexon recipient wallet.",
+    "capability": null,
+    "price": {
+      "amount": "0.0085",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.0085",
+      "currency": "USD"
+    },
+    "pricingUnit": "call",
+    "latencyMsP50": 149,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "blockrun-ai-api-v1-pm-polymarket-leaderboard",
+    "name": "Get the global leaderboard of smart wallets",
+    "description": "Get the global leaderboard of smart wallets Provider: Predexon (polymarket). Tier 1 pricing — payment goes directly to the Predexon recipient wallet.",
+    "capability": null,
+    "price": {
+      "amount": "0.0085",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.0085",
+      "currency": "USD"
+    },
+    "pricingUnit": "call",
+    "latencyMsP50": 127,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "apify-parseforge-fanduel-scraper",
+    "name": "FanDuel Sportsbook Odds Scraper",
+    "description": "FanDuel Sportsbook Odds Scraper by ParseForge — Apify actor for Sports. Free users: Limited to 10 items (preview). Paid users: Optional, max 1,000,000 Sport league to scrape. ALL covers every supported league. NFL=American Football, NBA=Basketball, MLB=Baseball, NHL=Ice Hockey, MMA=Mixed M When enabled, the scraper also returns league-level futures (e.g. NBA Championship, NFL MVP, division winners) in addition to per-game line",
+    "capability": "scrape",
+    "price": {
+      "amount": "0.075",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.50",
+      "currency": "USD"
+    },
+    "pricingUnit": "item",
+    "latencyMsP50": 39,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "apify-parseforge-fbref-scraper",
+    "name": "FBref Scraper | Advanced Soccer Statistics",
+    "description": "FBref Scraper | Advanced Soccer Statistics by ParseForge — Apify actor for Sports. The soccer league to scrape player statistics from Season in format YYYY-YY (e.g. 2024-25 for the 2024-25 season) Free users: Limited to 10 items (preview). Paid users: Optional, max 1,000,000",
+    "capability": "scrape",
+    "price": {
+      "amount": "0.021",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.21",
+      "currency": "USD"
+    },
+    "pricingUnit": "item",
+    "latencyMsP50": 48,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "apify-sian-agency-sports-betting-odds-scraper",
+    "name": "Sports Betting Odds Scraper Live Lines by Bookmaker",
+    "description": "Sports Betting Odds Scraper Live Lines by Bookmaker by SIÁN OÜ — Apify actor for Sports. 🎯 PICK ONE OPERATION PER RUN. Each run produces one clean dataset matching the chosen mode. - 🎲 Live Odds — moneyline, spreads an 🏈 The sport / league to pull (Live Odds & Scores). Use a key from the Sports Directory operation — e.g. americanfootball_nfl, baske 🌍 Bookmaker regions to include (Live Odds). Each region adds its bookmakers' lines. - us — major US books (FanDuel, DraftKings, Be 📊 Bet markets to include (Live Odds). - h2h — moneyline (win/lose) - spreads — point spreads (with the handicap line) - tota 🔢 How prices are expressed (Live Odds). american (e.g. -110, +250) or decimal (e.g. 1.91, 3.50).",
+    "capability": "scrape",
+    "price": {
+      "amount": "0.006",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.06",
+      "currency": "USD"
+    },
+    "pricingUnit": "item",
+    "latencyMsP50": 52,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "apify-george-the-developer-linkedin-company-employees-scraper",
+    "name": "LinkedIn Company Employees Scraper & Email Finder - No Login",
+    "description": "LinkedIn Company Employees Scraper & Email Finder - No Login by George Kioko — Apify actor for Marketing. List of LinkedIn company URLs (e.g., https://www.linkedin.com/company/google/) or company names to search for employees. You can mix URLs a Optional extra keyword phrase layered onto the base company discovery query (e.g., 'hiring', 'supply chain', 'import export'). Title target Optional ICP title list. When missing or empty, the actor uses the default English/Spanish decision-maker set for runs of 50 companies or f Filter employees by location (e.g., 'San Francisco', 'United States', 'Europe'). Leave empty for all locations. Current build supports short-profile extraction: name, title, location, LinkedIn URL, company match, and title match. LinkedIn verification",
+    "capability": "people",
+    "price": {
+      "amount": "0.015",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.15",
+      "currency": "USD"
+    },
+    "pricingUnit": "item",
+    "latencyMsP50": 127,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "apify-anchor-linkedin-profile-enrichment",
+    "name": "LinkedIn Profile Scraper for cheap lead enrichment",
+    "description": "Enrich supplied LinkedIn profile URLs into full person records — role, company, and email — for cheap lead enrichment of known people.",
+    "capability": "people_enrich",
+    "price": {
+      "amount": "0.006",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.06",
+      "currency": "USD"
+    },
+    "pricingUnit": "item",
+    "latencyMsP50": 33,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "blockrun-ai-api-v1-pm-polymarket-wallet-0x0000000000000000000000000000000000000000",
+    "name": "Get a complete smart wallet profile with all metrics",
+    "description": "Get a complete smart wallet profile with all metrics Provider: Predexon (polymarket). Tier 2 pricing — payment goes directly to the Predexon recipient wallet. The path segment shown is a placeholder",
+    "capability": null,
+    "price": {
+      "amount": "0.0085",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.0085",
+      "currency": "USD"
+    },
+    "pricingUnit": "call",
+    "latencyMsP50": 77,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "apify-automation-lab-trustpilot",
+    "name": "Trustpilot Reviews Scraper",
+    "description": "Trustpilot Reviews Scraper by Stas Persiianenko — Apify actor for Business. Enter Trustpilot company URLs (e.g., https://www.trustpilot.com/review/example.com) or just the domain (e.g., example.com). One per line. Maximum number of reviews to scrape per company. Set to 0 for unlimited reviews. Filter reviews by star rating. Select one or more ratings (for example, 1 star and 5 stars) or leave empty for all ratings. Filter reviews by ISO language code (for example: en, fr, de, es). Add one code per line. Leave empty for Trustpilot default/all available Sort reviews by recency or relevance (default).",
+    "capability": "company",
+    "price": {
+      "amount": "0.005",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.05",
+      "currency": "USD"
+    },
+    "pricingUnit": "item",
+    "latencyMsP50": 92,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "blockrun-ai-api-v1-pm-opinion-markets",
+    "name": "List Opinion markets with filtering and sorting",
+    "description": "List Opinion markets with filtering and sorting Provider: Predexon (opinion). Tier 1 pricing — payment goes directly to the Predexon recipient wallet.",
+    "capability": null,
+    "price": {
+      "amount": "0.0085",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.0085",
+      "currency": "USD"
+    },
+    "pricingUnit": "call",
+    "latencyMsP50": 111,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "apify-apify-playwright-scraper",
+    "name": "Playwright Scraper",
+    "description": "Playwright Scraper by Apify — Apify actor for Developer tools. Glob patterns to match links in the page that you want to enqueue. Combine with Link selector to tell the scraper where to find links. Omit Pseudo-URLs to match links in the page that you want to enqueue. Combine with Link selector to tell the scraper where to find links. Omitti Glob patterns to match links in the page that you want to exclude from being enqueued. CSS selector matching elements with 'href' attributes that should be enqueued. To enqueue urls from tags, you would enter div.my-class. Lea URL fragments (the parts of URL after a #) are not considered when the scraper determines whether a URL has already been visited. This mean",
+    "capability": "scrape",
+    "price": {
+      "amount": "0.10",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.10",
+      "currency": "USD"
+    },
+    "pricingUnit": "call",
+    "latencyMsP50": 34,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "blockrun-ai-api-v1-pm-polymarket-markets-smart-activity",
+    "name": "Discover markets where high-performing wallets are active",
+    "description": "Discover markets where high-performing wallets are active Provider: Predexon (polymarket). Tier 2 pricing — payment goes directly to the Predexon recipient wallet.",
+    "capability": null,
+    "price": {
+      "amount": "0.0085",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.0085",
+      "currency": "USD"
+    },
+    "pricingUnit": "call",
+    "latencyMsP50": 111,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "stableenrich-serper-news",
+    "name": "StableEnrich: Serper News",
+    "description": "Search the latest news headlines and articles about a company, brand, person, or topic. Use it for recent news coverage, press, and current events for research or monitoring.",
+    "capability": "news",
+    "price": {
+      "amount": "0.04",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.04",
+      "currency": "USD"
+    },
+    "pricingUnit": "call",
+    "latencyMsP50": 168,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "stableenrich-serper-news-tempo",
+    "name": "StableEnrich: Serper News",
+    "description": "Search the latest news headlines and articles about a company, brand, person, or topic. Use it for recent news coverage, press, and current events for research or monitoring.",
+    "capability": "news",
+    "price": {
+      "amount": "0.04",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.04",
+      "currency": "USD"
+    },
+    "pricingUnit": "call",
+    "latencyMsP50": 98,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "stableenrich-hunter-email-verifier",
+    "name": "StableEnrich: Hunter Email Verifier",
+    "description": "Verify an email address's deliverability and validity — confirm an email is real and safe to send to before outreach.",
+    "capability": "email_verify",
+    "price": {
+      "amount": "0.03",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.03",
+      "currency": "USD"
+    },
+    "pricingUnit": "call",
+    "latencyMsP50": 81,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "apify-michael-g-email-verifier-validator",
+    "name": "Email Verifier & Validator | Bulk Email Verification",
+    "description": "Bulk email verification — validate a list of email addresses for deliverability and bounce risk before a campaign.",
+    "capability": "email_verify",
+    "price": {
+      "amount": "0.10",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.50",
+      "currency": "USD"
+    },
+    "pricingUnit": "item",
+    "latencyMsP50": 159,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "stablejobs-coresignal-job-search",
+    "name": "StableJobs: Coresignal Job Search",
+    "description": "Search job postings by filters (Coresignal) — $1.67 USD via x402 on Base. At least ONE filter (e.g. title, location) is REQUIRED in practice: an empty body is billed the full $1.67 and returns nothing.",
+    "capability": "jobs",
+    "price": {
+      "amount": "1.67",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "1.67",
+      "currency": "USD"
+    },
+    "pricingUnit": "call",
+    "latencyMsP50": 155,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "blockrun-ai-api-v1-pm-polymarket-events",
+    "name": "List Polymarket events with filtering and sorting",
+    "description": "List Polymarket events with filtering and sorting Provider: Predexon (polymarket). Tier 1 pricing — payment goes directly to the Predexon recipient wallet.",
+    "capability": null,
+    "price": {
+      "amount": "0.0085",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.0085",
+      "currency": "USD"
+    },
+    "pricingUnit": "call",
+    "latencyMsP50": 121,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "blockrun-ai-api-v1-pm-polymarket-crypto-updown",
+    "name": "List crypto up/down prediction markets",
+    "description": "List crypto up/down prediction markets Provider: Predexon (polymarket). Tier 1 pricing — payment goes directly to the Predexon recipient wallet.",
+    "capability": null,
+    "price": {
+      "amount": "0.0085",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.0085",
+      "currency": "USD"
+    },
+    "pricingUnit": "call",
+    "latencyMsP50": 125,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "stableenrich-minerva-validate-emails",
+    "name": "StableEnrich: Minerva Validate Emails",
+    "description": "Check whether email addresses are valid and deliverable before sending — catches invalid, risky, and bouncing addresses. Use it to validate a list of emails for outreach.",
+    "capability": "email_verify",
+    "price": {
+      "amount": "0.01",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.01",
+      "currency": "USD"
+    },
+    "pricingUnit": "call",
+    "latencyMsP50": 85,
+    "isPrimary": true,
+    "payable": true
+  },
+  {
+    "slug": "blockrun-ai-api-v1-pm-polymarket-wallet-0x0000000000000000000000000000000000000000-similar",
+    "name": "Find wallets with similar market portfolios",
+    "description": "Find wallets with similar market portfolios Provider: Predexon (polymarket). Tier 2 pricing — payment goes directly to the Predexon recipient wallet. The path segment shown is a placeholder — substitu",
+    "capability": null,
+    "price": {
+      "amount": "0.0085",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.0085",
+      "currency": "USD"
+    },
+    "pricingUnit": "call",
+    "latencyMsP50": 83,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "blockrun-ai-api-v1-pm-opinion-orderbooks",
+    "name": "Fetch historical orderbook snapshots for an Opinion market",
+    "description": "Fetch historical orderbook snapshots for an Opinion market Provider: Predexon (opinion). Tier 1 pricing — payment goes directly to the Predexon recipient wallet.",
+    "capability": null,
+    "price": {
+      "amount": "0.0085",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.0085",
+      "currency": "USD"
+    },
+    "pricingUnit": "call",
+    "latencyMsP50": 164,
+    "isPrimary": false,
+    "payable": true
+  },
+  {
+    "slug": "blockrun-ai-api-v1-pm-polymarket-trades",
+    "name": "Query historical Polymarket trade data with flexible filtering",
+    "description": "Query historical Polymarket trade data with flexible filtering Provider: Predexon (polymarket). Tier 1 pricing — payment goes directly to the Predexon recipient wallet.",
+    "capability": null,
+    "price": {
+      "amount": "0.0085",
+      "currency": "USD"
+    },
+    "maxChargePerCall": {
+      "amount": "0.0085",
+      "currency": "USD"
+    },
+    "pricingUnit": "call",
+    "latencyMsP50": 109,
+    "isPrimary": false,
+    "payable": true
+  }
+]

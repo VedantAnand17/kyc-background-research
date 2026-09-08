@@ -20,9 +20,17 @@ export function tierForCap(capMicro: Micro): Tier {
   return "deep";
 }
 
-/** Wall-clock default when the request and operator config omit deadlineMs. */
-export function defaultDeadlineMs(_capMicro: Micro): number {
-  return 45_000;
+/**
+ * Wall-clock default when the request and operator config omit deadlineMs.
+ * Measured on the funded catalog (M7, 2026-09-08): Perflo settles each call on-chain in about 9-11 s
+ * server-side, and the Apify profile, enrichment, and skip-trace actors take about 30 s. A basic run is
+ * resolve, then a parallel enrich turn, then the 15 s report window, with a model turn between each;
+ * standard and deep add a 30 s disambiguation step. 120 s is the schema maximum for deadlineMs.
+ */
+const DEADLINE_MS: Readonly<Record<Tier, number>> = { basic: 90_000, standard: 120_000, deep: 120_000 };
+
+export function defaultDeadlineMs(capMicro: Micro): number {
+  return DEADLINE_MS[tierForCap(capMicro)];
 }
 
 export function plan(capMicro: Micro, deadlineMs: number, now: number = Date.now()): Plan {

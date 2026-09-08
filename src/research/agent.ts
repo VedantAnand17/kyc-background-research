@@ -47,6 +47,8 @@ export interface AgentContext {
   readonly signal: AbortSignal;
   readonly lead?: string;
   readonly runner?: string;
+  /** The resolved primary candidate, including the profileUrl the enrich tools take. */
+  readonly primary?: string;
 }
 
 export interface RiskHit {
@@ -225,7 +227,7 @@ export function createAgent(config: Config): ResearchAgent {
       );
     },
     enrich(ctx) {
-      return loop(ctx, agentSystemPrompt(factsOf(ctx)), enrichUserPrompt(), ENRICH_STEPS);
+      return loop(ctx, agentSystemPrompt(factsOf(ctx)), enrichUserPrompt(ctx.primary), ENRICH_STEPS);
     },
     async classifyRisk(hits, primary, signal) {
       if (hits.length === 0) return { classifications: [], failed: false };

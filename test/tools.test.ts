@@ -11,10 +11,10 @@ const PAID_TOOLS = CAPABILITIES.map((c) => c.tool).filter((name): name is Exclud
 
 const ARGS: Record<Exclude<ToolName, "finish">, Record<string, unknown>> = {
   find_people: { fullName: "Ada Okonkwo", locationHint: "Lagos" },
-  get_professional_profile: { fullName: "Ada Okonkwo", company: "Paystack" },
+  get_professional_profile: { profileUrl: "https://www.linkedin.com/in/ada-okonkwo", company: "Paystack" },
   search_news: { query: "Ada Okonkwo Lagos" },
   screen_watchlist: { fullName: "Ada Okonkwo", country: "NG" },
-  enrich_person: { fullName: "Ada Okonkwo", company: "Paystack", location: "Lagos" },
+  enrich_person: { profileUrl: "https://www.linkedin.com/in/ada-okonkwo", fullName: "Ada Okonkwo", location: "Lagos" },
   get_social_profile: { network: "x", handleOrName: "ada" },
   search_web: { query: "Ada Okonkwo Paystack" },
   skip_trace: { fullName: "Ada Okonkwo", city: "Lagos", region: "Lagos" },
@@ -101,13 +101,14 @@ describe("tool layer", () => {
     expect(ctx.store.forJob()).toHaveLength(1);
   });
 
-  it("dedupes enrich_person by the person, not by optional argument text", async () => {
+  it("dedupes enrich_person by the profile, not by optional argument text", async () => {
     const { server, tools, ctx } = await harness();
     const first = await call(tools, "enrich_person", {
-      fullName: "Ada Okonkwo",
+      profileUrl: "https://www.linkedin.com/in/ada-okonkwo",
       location: "Lagos",
     });
     const second = await call(tools, "enrich_person", {
+      profileUrl: "https://www.linkedin.com/in/Ada-Okonkwo/",
       fullName: "Ada Okonkwo",
       company: "Paystack",
       location: "Lagos, Nigeria",
@@ -123,36 +124,105 @@ describe("tool layer", () => {
     expect(ctx.guard.snapshot().spentMicro).toBe(25_200n);
   });
 
-  it("places fields from the vendor contract in, never by guessing", async () => {
+  it("places fields from the vendor contract when no adapter owns the vendor", async () => {
     const { server, tools } = await harness();
-    server.setContract("ottoai-filtered-news", {
+    server.setContract("stableenrich-firecrawl-scrape", {
       input: {
         fields: [
-          { name: "query", in: "query", required: true, type: "string" },
+          { name: "url", in: "query", required: true, type: "string" },
           { name: "fullName", in: "body", required: false, type: "string" },
         ],
       },
     });
-    const result = await call(tools, "search_news", { query: "Ada Okonkwo" });
+    const result = await call(tools, "fetch_page", { url: "https://example.com/ada" });
     expect(result.outcome).toBe("ok");
     expect(server.payCalls[0]?.body).toMatchObject({
-      query: { query: "Ada Okonkwo" },
+      query: { url: "https://example.com/ada" },
       maxCharge: { amount: "0.025200", currency: "USD" },
     });
-    expect(server.payCalls[0]?.body).not.toHaveProperty("input.query");
+    expect(server.payCalls[0]?.body).not.toHaveProperty("input.url");
+  });
+
+  it("sends each live vendor the body its real contract takes, not the model-facing argument names", async () => {
+    const { server, tools } = await harness();
+    await call(tools, "find_people");
+    await call(tools, "get_professional_profile");
+    await call(tools, "search_news");
+    await call(tools, "enrich_person");
+    await call(tools, "skip_trace");
+    await call(tools, "search_filings");
+    const bodies = Object.fromEntries(server.payCalls.map((c) => [c.slug, (c.body as { input?: unknown }).input]));
+    expect(bodies["stableenrich-exa-search"]).toMatchObject({ query: "Ada Okonkwo Lagos", category: "linkedin profile" });
+    expect(bodies["apify-apimaestro-linkedin-profile-detail"]).toMatchObject({ username: "ada-okonkwo" });
+    expect(bodies["stableenrich-serper-news"]).toMatchObject({ q: "Ada Okonkwo Lagos" });
+    expect(bodies["apify-anchor-linkedin-profile-enrichment"]).toEqual({
+      startUrls: [{ url: "https://www.linkedin.com/in/ada-okonkwo" }],
+    });
+    expect(bodies["apify-one-api-skip-trace"]).toEqual({ name: ["Ada Okonkwo;Lagos, Lagos"], max_results: 3 });
+    expect(bodies["paysponge-edgar-search"]).toMatchObject({ q: '"Ada Okonkwo"' });
+  });
+
+  it("refuses to pay a vendor whose adapter cannot be satisfied and releases the reservation", async () => {
+    const { server, tools, ctx } = await harness();
+    server.setContract("stableenrich-exa-search", { payable: false });
+    server.setContract("stableenrich-exa-search-tempo", { payable: false });
+    const result = await call(tools, "search_web", { query: "" });
+    expect(result.outcome).toBe("invalid_args");
+    expect(server.payCalls).toHaveLength(0);
+    expect(ctx.guard.snapshot().spentMicro).toBe(0n);
+  });
+
+  it("settles a per-item vendor at the authorization Perflo debits, not the metered charge it reports", async () => {
+    const { server, tools, ctx } = await harness();
+    // Live shape (2026-09-08): apimaestro lists price $0.005 and cap $0.05, meters $0.0065, and the account is
+    // debited $0.05 with settlement.status "not_required". A finalized vendor is debited exactly what it meters.
+    server.setContract("apify-apimaestro-linkedin-profile-detail", {
+      price: { amount: "0.005000", currency: "USD" },
+      maxChargePerCall: { amount: "0.050000", currency: "USD" },
+    });
+    server.setContract("stableenrich-serper-news", {
+      price: { amount: "0.040000", currency: "USD" },
+      maxChargePerCall: { amount: "0.040000", currency: "USD" },
+    });
+    const profile = await call(tools, "get_professional_profile");
+    expect(profile.outcome).toBe("ok");
+    if (profile.outcome === "ok") expect(profile.charged).toBe("0.050000");
+    const news = await call(tools, "search_news");
+    if (news.outcome === "ok") expect(news.charged).toBe("0.040000");
+    expect(ctx.guard.snapshot().spentMicro).toBe(90_000n);
+  });
+
+  it("discovery ignores catalog hits whose capability does not fit the tool", async () => {
+    const { server, tools } = await harness();
+    server.setSearchResults("PEP sanctions watchlist screening", [
+      {
+        slug: "apify-some-stock-screener",
+        name: "Stock screener",
+        description: "Scans stock markets.",
+        capability: "company",
+        price: { amount: "0.05", currency: "USD" },
+        maxChargePerCall: { amount: "0.50", currency: "USD" },
+        pricingUnit: "item",
+        isPrimary: false,
+        payable: true,
+      },
+    ]);
+    const result = await call(tools, "screen_watchlist");
+    expect(result.outcome).toBe("unavailable");
+    expect(server.payCalls).toHaveLength(0);
   });
 
   it("falls back to the next payable vendor when the first is unpayable", async () => {
     const { server, tools } = await harness();
-    server.setPayable("stableenrich-minerva-resolve", false);
+    server.setPayable("stableenrich-exa-search", false);
     const result = await call(tools, "find_people");
     expect(result.outcome).toBe("ok");
-    expect(server.payCalls[0]?.slug).toBe("stableenrich-fullenrich-people-search");
+    expect(server.payCalls[0]?.slug).toBe("stableenrich-exa-search-tempo");
   });
 
   it("retry after a released VENDOR_ERROR pays the fallback vendor instead of serving the failure from cache", async () => {
     const { server, tools } = await harness();
-    server.setScenario("stableenrich-minerva-resolve", "VENDOR_ERROR");
+    server.setScenario("stableenrich-exa-search", "VENDOR_ERROR");
     const first = await call(tools, "find_people", { fullName: "Ada Okonkwo" });
     expect(first.outcome).toBe("failed");
     if (first.outcome === "failed") {
@@ -161,8 +231,8 @@ describe("tool layer", () => {
     const second = await call(tools, "find_people", { fullName: "Ada Okonkwo" });
     expect(second).toMatchObject({ outcome: "ok", cached: false });
     expect(server.payCalls.map((c) => c.slug)).toEqual([
-      "stableenrich-minerva-resolve",
-      "stableenrich-fullenrich-people-search",
+      "stableenrich-exa-search",
+      "stableenrich-exa-search-tempo",
     ]);
   });
 
@@ -177,9 +247,9 @@ describe("tool layer", () => {
 
   it("refuses only the unaffordable tool while a cheaper allowed quote still fits", async () => {
     const { tools, server } = await harness({ capMicro: 50_000n });
-    server.setContract("stableenrich-pdl-people-enrich", {
-      maxChargePerCall: { amount: "0.280000", currency: "USD" },
-    });
+    for (const slug of ["apify-anchor-linkedin-profile-enrichment", "apify-apimaestro-linkedin-profile-detail"]) {
+      server.setContract(slug, { maxChargePerCall: { amount: "0.280000", currency: "USD" } });
+    }
     const enrich = await call(tools, "enrich_person");
     expect(enrich).toEqual({ outcome: "budget_exhausted", remaining: "0.050000" });
     expect(server.payCalls).toHaveLength(0);
@@ -189,7 +259,7 @@ describe("tool layer", () => {
     expect(news.cached).toBe(false);
     expect(news.charged).toBe("0.025200");
     expect(server.payCalls).toHaveLength(1);
-    expect(server.payCalls[0]?.slug).toBe("ottoai-filtered-news");
+    expect(server.payCalls[0]?.slug).toBe("stableenrich-serper-news");
   });
 
   it("reports unavailable when discovery finds no payable watchlist vendor", async () => {

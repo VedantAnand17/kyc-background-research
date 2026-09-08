@@ -60,6 +60,12 @@ export interface PayResult {
   readonly output?: unknown;
   readonly failure?: { readonly reason?: string; readonly message?: string };
   readonly upstream?: { readonly httpStatus?: number };
+  /**
+   * How the charge settled. Observed 2026-09-08 on the funded account: `finalized` means `charged` is what the
+   * budget paid; `not_required` (per-item Apify actors) means the account was debited the full authorization,
+   * `maxCharge`, and `charged` is only the vendor's metered figure. GET /v1/key `spent` confirms the former.
+   */
+  readonly settlement?: { readonly status?: string; readonly flow?: string; readonly chain?: string | null };
 }
 
 /** GET /v1/transactions and GET /v1/transactions/{id}. amount is signed: negative leaves the account. */

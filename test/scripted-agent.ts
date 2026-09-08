@@ -1,6 +1,9 @@
 import type { ClassificationResult, ResearchAgent } from "../src/research/agent.js";
 import type { ResearchTools } from "../src/research/tools.js";
 
+/** The LinkedIn URL find_people hands back for Ada in every fixture; the profile tools need a URL, never a name. */
+export const SCRIPTED_PROFILE_URL = "https://www.linkedin.com/in/ada-okonkwo";
+
 async function call(
   tools: ResearchTools,
   name: keyof ResearchTools,
@@ -37,14 +40,18 @@ export function createScriptedAgent(
         });
         return;
       }
-      await call(ctx.tools, "get_professional_profile", { fullName });
+      await call(ctx.tools, "get_professional_profile", { profileUrl: SCRIPTED_PROFILE_URL, fullName });
     },
     async enrich(ctx) {
       const fullName = `${ctx.subject.firstName} ${ctx.subject.lastName}`;
       const calls: Array<Promise<void>> = [];
-      if (ctx.tools.get_professional_profile) calls.push(call(ctx.tools, "get_professional_profile", { fullName }));
+      if (ctx.tools.get_professional_profile) {
+        calls.push(call(ctx.tools, "get_professional_profile", { profileUrl: SCRIPTED_PROFILE_URL, fullName }));
+      }
       if (ctx.tools.enrich_person) {
-        calls.push(call(ctx.tools, "enrich_person", { fullName, location: ctx.subject.address?.city }));
+        calls.push(
+          call(ctx.tools, "enrich_person", { profileUrl: SCRIPTED_PROFILE_URL, fullName, location: ctx.subject.address?.city }),
+        );
       }
       if (ctx.tools.get_social_profile) {
         calls.push(call(ctx.tools, "get_social_profile", { network: "x", handleOrName: ctx.subject.firstName }));

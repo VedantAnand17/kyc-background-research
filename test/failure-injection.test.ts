@@ -123,7 +123,10 @@ describe("failure injection end to end", () => {
         listTransactions: async () => {
           throw new Error("unused");
         },
-        getBalance: async () => {
+        getTask: async () => {
+          throw new Error("unused");
+        },
+        getKey: async () => {
           const { PerfloError } = await import("../src/perflo/errors.js");
           throw new PerfloError("NETWORK_ERROR", "Could not reach Perflo.", 0, undefined, undefined);
         },
@@ -145,7 +148,7 @@ describe("failure injection end to end", () => {
     const { server, db, deps } = await startResearchHarness();
     dbs.push(db);
     closers.push(() => server.close());
-    server.setScenario("stableenrich-pdl-people-enrich", "failed");
+    server.setScenario("apify-anchor-linkedin-profile-enrichment", "failed");
     const report = await runResearch(researchRequest("1.50"), deps);
     expect(warningCodes(report)).toContain("vendor_failed");
     const failed = report.costs.calls.filter((row) => row.capability === "enrich_person");
@@ -159,15 +162,72 @@ describe("failure injection end to end", () => {
     const { server, db, deps } = await startResearchHarness({ timeoutMs: 250 });
     dbs.push(db);
     closers.push(() => server.close());
-    server.setScenario("stableenrich-pdl-people-enrich", "hang");
+    server.setScenario("apify-anchor-linkedin-profile-enrichment", "hang");
     const report = await runResearch(researchRequest("1.50"), deps);
     expect(warningCodes(report)).toContain("TIMEOUT");
     const held = db
       .prepare(`SELECT state FROM ledger WHERE vendor = ?`)
-      .all("stableenrich-pdl-people-enrich") as Array<{ state: string }>;
+      .all("apify-anchor-linkedin-profile-enrichment") as Array<{ state: string }>;
     expect(held.length).toBeGreaterThan(0);
     expect(held.every((row) => row.state === "settled" || row.state === "released")).toBe(true);
     expect(held.some((row) => row.state === "settled")).toBe(true);
+    expectValidCosts(report, "1.50");
+  });
+
+  it("polls a 202 running vendor task to its result instead of treating it as confirm-first", async () => {
+    const { server, db, deps } = await startResearchHarness();
+    dbs.push(db);
+    closers.push(() => server.close());
+    server.setScenario("apify-anchor-linkedin-profile-enrichment", "running");
+    const report = await runResearch(researchRequest("1.50"), deps);
+    expect(warningCodes(report)).not.toContain("CONFIRMATION_REQUIRED");
+    expect(server.taskReads.length).toBeGreaterThanOrEqual(2);
+    const enrich = report.costs.calls.filter((row) => row.capability === "enrich_person");
+    expect(enrich).toHaveLength(1);
+    expect(enrich[0]!.status).toBe("succeeded");
+    expect(enrich[0]!.transactionId).toMatch(/^tx-run_res_/);
+    expect(parseMoney(enrich[0]!.charged.amount)).toBeGreaterThan(0n);
+    expectValidCosts(report, "1.50");
+  });
+
+  it("holds a task still running at the vendor timeout, then settles it from the outcome recorded before the report", async () => {
+    const { server, db, deps } = await startResearchHarness({ timeoutMs: 300 });
+    dbs.push(db);
+    closers.push(() => server.close());
+    server.setScenario("apify-anchor-linkedin-profile-enrichment", "running-forever");
+    // Only reconciliation calls getTask; the pay poll loop reads poll.url directly. Finishing the task
+    // there models a vendor that completed after our timeout but before the report was assembled.
+    const client = {
+      ...deps.client,
+      getTask: (runId: string) => {
+        server.finishTask(runId);
+        return deps.client.getTask(runId);
+      },
+    };
+    const report = await runResearch(researchRequest("1.50"), { ...deps, client });
+    expect(warningCodes(report)).toContain("TIMEOUT");
+    const enrich = report.costs.calls.filter((row) => row.capability === "enrich_person");
+    expect(enrich).toHaveLength(1);
+    expect(enrich[0]!.transactionId).toMatch(/^tx-run_res_/);
+    expect(parseMoney(enrich[0]!.charged.amount)).toBe(parseMoney("0.025200"));
+    expectValidCosts(report, "1.50");
+  });
+
+  it("settles a task still running at report time at its reserved quote so a late charge cannot breach the cap", async () => {
+    const { server, db, deps } = await startResearchHarness({ timeoutMs: 300 });
+    dbs.push(db);
+    closers.push(() => server.close());
+    server.setScenario("apify-anchor-linkedin-profile-enrichment", "running-forever");
+    const report = await runResearch(researchRequest("1.50"), deps);
+    expect(warningCodes(report)).toContain("TIMEOUT");
+    const enrich = report.costs.calls.filter((row) => row.capability === "enrich_person");
+    expect(enrich).toHaveLength(1);
+    expect(enrich[0]!.transactionId).toMatch(/^run_res_/);
+    const row = db
+      .prepare(`SELECT state, reserved_micro, charged_micro FROM ledger WHERE vendor = ?`)
+      .get("apify-anchor-linkedin-profile-enrichment") as { state: string; reserved_micro: string; charged_micro: string };
+    expect(row.state).toBe("settled");
+    expect(row.charged_micro).toBe(row.reserved_micro);
     expectValidCosts(report, "1.50");
   });
 
@@ -175,13 +235,13 @@ describe("failure injection end to end", () => {
     const { server, db, deps } = await startResearchHarness();
     dbs.push(db);
     closers.push(() => server.close());
-    server.setScenario("stableenrich-pdl-people-enrich", "GUARDRAIL_DENIED");
+    server.setScenario("apify-anchor-linkedin-profile-enrichment", "GUARDRAIL_DENIED");
     const paysBefore = server.payCalls.length;
     const report = await runResearch(researchRequest("1.50"), deps);
     expect(warningCodes(report)).toContain("GUARDRAIL_DENIED");
     const enrichPays = server.payCalls
       .slice(paysBefore)
-      .filter((row) => row.slug === "stableenrich-pdl-people-enrich");
+      .filter((row) => row.slug === "apify-anchor-linkedin-profile-enrichment");
     expect(enrichPays.length).toBeGreaterThan(0);
     const enrichCalls = report.costs.calls.filter((row) => row.capability === "enrich_person");
     expect(enrichCalls.every((row) => parseMoney(row.charged.amount) === 0n)).toBe(true);

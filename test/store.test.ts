@@ -20,7 +20,7 @@ function tracked(jobId = "job-1"): Db {
 
 function sample(over: Partial<Parameters<ReturnType<typeof createEvidenceStore>["insert"]>[0]> = {}) {
   return {
-    vendor: "stableenrich-minerva-resolve",
+    vendor: "stableenrich-exa-search",
     capability: "find_people",
     purpose: "resolve candidates",
     status: "succeeded" as const,

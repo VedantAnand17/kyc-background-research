@@ -1,0 +1,67 @@
+{
+  "slug": "apify-one-api-skip-trace",
+  "name": "Skip Trace",
+  "description": "Skip Trace by ONE API — Apify actor for Real estate. When you search for a name/address/phone, it finds many related persons. Set how many to scrape for each search. Default:1 You can search by only 'name' or with '(name;citystatezip)' Separate Street and citystatezip by semicolon(;) Search by Phone Number Search by Email Address",
+  "capability": "people",
+  "keywords": [
+    "skip",
+    "trace",
+    "real",
+    "estate",
+    "apify",
+    "scrape"
+  ],
+  "price": {
+    "amount": "0.02",
+    "currency": "USD"
+  },
+  "maxChargePerCall": {
+    "amount": "0.20",
+    "currency": "USD"
+  },
+  "pricingUnit": "item",
+  "latencyMsP50": 51,
+  "payable": true,
+  "schemaConfidence": "high",
+  "input": {
+    "fields": [
+      {
+        "name": "max_results",
+        "in": "body",
+        "type": "integer",
+        "required": false,
+        "description": "When you search for a name/address/phone, it finds many related persons. Set how many to scrape for each search. Default:1"
+      },
+      {
+        "name": "name",
+        "in": "body",
+        "type": "array",
+        "required": false,
+        "description": "You can search by only 'name' or with '(name;citystatezip)'"
+      },
+      {
+        "name": "street_citystatezip",
+        "in": "body",
+        "type": "array",
+        "required": false,
+        "description": "Separate Street and citystatezip by semicolon(;)"
+      },
+      {
+        "name": "phone_number",
+        "in": "body",
+        "type": "array",
+        "required": false,
+        "description": "Search by Phone Number"
+      },
+      {
+        "name": "email",
+        "in": "body",
+        "type": "array",
+        "required": false,
+        "description": "Search by Email Address"
+      }
+    ],
+    "example": null
+  },
+  "docsUrl": "https://docs.apify.com/platform/integrations/x402"
+}

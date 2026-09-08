@@ -1,0 +1,372 @@
+{
+  "runId": "run_res_5625710f-3a85-40b3-a78f-d076d83215e1",
+  "transactionId": "a757ba05-29ee-40e0-b600-6f77a66d14ee",
+  "slug": "apify-apimaestro-linkedin-profile-detail",
+  "status": "succeeded",
+  "terminal": true,
+  "charged": {
+    "amount": "0.0065",
+    "currency": "USD"
+  },
+  "charges": [
+    {
+      "step": "buy",
+      "slug": "apify-apimaestro-linkedin-profile-detail",
+      "amount": {
+        "amount": "0.0065",
+        "currency": "USD"
+      },
+      "transactionId": "a757ba05-29ee-40e0-b600-6f77a66d14ee"
+    }
+  ],
+  "chargeIsFinal": true,
+  "chargedTo": "credit",
+  "subAccount": "kyc-research",
+  "remaining": {
+    "amount": "13.9808",
+    "currency": "USD"
+  },
+  "subAccountRemaining": {
+    "amount": "8.5308",
+    "currency": "USD"
+  },
+  "createdAt": "2026-09-08T16:17:08.938Z",
+  "endedAt": "2026-09-08T16:17:38.271Z",
+  "settlement": {
+    "status": "not_required",
+    "flow": "authorization",
+    "chain": "base",
+    "txHash": null,
+    "explorer": null
+  },
+  "upstream": {
+    "httpStatus": 200
+  },
+  "output": [
+    {
+      "basic_info": {
+        "fullname": "Satya Nadella",
+        "first_name": "Satya",
+        "last_name": "Nadella",
+        "headline": "Chairman and CEO at Microsoft",
+        "public_identifier": "satyanadella",
+        "profile_url": "https://linkedin.com/in/satyanadella",
+        "profile_picture_url": "https://media.licdn.com/dms/image/v2/C5603AQHHUuOSlRVA1w/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1579726625483?e=1790208000&v=beta&t=6ACTGZJegkYWGRa4YOfOfYR5T3omufE1QF_V9X-tGYc",
+        "about": "As chairman and CEO of Microsoft, I define my mission and that of my company as empowering every person and every organization on the planet to achieve more.",
+        "location": {
+          "country": "United States",
+          "city": "Redmond, Washington",
+          "full": "Redmond, Washington, United States",
+          "postal_code": "[redacted]",
+          "country_code": "US"
+        },
+        "creator_hashtags": [],
+        "is_creator": true,
+        "is_influencer": true,
+        "is_premium": true,
+        "open_to_work": false,
+        "created_timestamp": 1197664502000,
+        "show_follower_count": true,
+        "background_picture_url": "https://media.licdn.com/dms/image/v2/D5616AQFVwYcBLAcPqQ/profile-displaybackgroundimage-shrink_350_1400/B56Z6tkWeBKAAU-/0/1781028448390?e=1790208000&v=beta&t=WlF6q_sAVdZ3aJm9q8vgwerwZWTnqzseW-k2y2mRIUE",
+        "memorialized": false,
+        "is_top_voice": true,
+        "primary_locale": "en_US",
+        "urn": "ACoAAAEkwwAB9KEc2TrQgOLEQ-vzRyZeCDyc6DQ",
+        "follower_count": 12154500,
+        "connection_count": 831,
+        "current_company": "Microsoft",
+        "current_company_urn": "1035",
+        "current_company_url": "https://www.linkedin.com/company/microsoft",
+        "current_company_logo_url": "https://media.licdn.com/dms/image/v2/D560BAQH32RJQCl3dDQ/company-logo_400_400/B56ZYQ0mrGGoAc-/0/1744038948046/microsoft_logo?e=1790208000&v=beta&t=U4u5GqZwilvpz9VM7BbcrZETNnqPY13f5VJ3WSREGUs",
+        "top_education_school": {
+          "name": "The University of Chicago Booth School of Business",
+          "urn": "18315",
+          "url": "https://www.linkedin.com/school/universityofchicagoboothschoolofbusiness",
+          "logo_url": "https://media.licdn.com/dms/image/v2/D560BAQFZO05jhYKSkw/company-logo_400_400/company-logo_400_400/0/1692627816910/universityofchicagoboothschoolofbusiness_logo?e=1790208000&v=beta&t=mvCzRYhSpZ443bBfXKJh7aIJZ5TYnFVOyBBWYGhoEvA"
+        },
+        "is_verified": true,
+        "top_skills": [],
+        "email": "[redacted]"
+      },
+      "experience": [
+        {
+          "title": "Chairman and CEO",
+          "company": "Microsoft",
+          "location": "Greater Seattle Area",
+          "duration": "Feb 2014 - Present · 12 yrs 8 mos",
+          "start_date": {
+            "year": 2014,
+            "month": "Feb"
+          },
+          "is_current": true,
+          "company_linkedin_url": "https://www.linkedin.com/company/1035/",
+          "company_logo_url": "https://media.licdn.com/dms/image/v2/D560BAQH32RJQCl3dDQ/company-logo_400_400/B56ZYQ0mrGGoAc-/0/1744038948046/microsoft_logo?e=1790208000&v=beta&t=U4u5GqZwilvpz9VM7BbcrZETNnqPY13f5VJ3WSREGUs",
+          "company_id": "1035"
+        },
+        {
+          "title": "Member Board Of Trustees",
+          "company": "University of Chicago",
+          "duration": "2018 - Present · 8 yrs 9 mos",
+          "start_date": {
+            "year": 2018
+          },
+          "is_current": true,
+          "company_linkedin_url": "https://www.linkedin.com/company/3881/",
+          "company_logo_url": "https://media.licdn.com/dms/image/v2/C4D0BAQHbp_dv8CAlpQ/company-logo_400_400/company-logo_400_400/0/1630577480920/uchicago_logo?e=1790208000&v=beta&t=WUXA3MnFhP9vD_73QXxmeTT3-FMiSBfRoKwt9sqp2N0",
+          "company_id": "3881"
+        },
+        {
+          "title": "Board Member",
+          "company": "Starbucks",
+          "duration": "2017 - 2024 · 7 yrs",
+          "start_date": {
+            "year": 2017
+          },
+          "end_date": {
+            "year": 2024
+          },
+          "is_current": false,
+          "company_linkedin_url": "https://www.linkedin.com/company/2271/",
+          "company_logo_url": "https://media.licdn.com/dms/image/v2/C4D0BAQEQxk9y2rk7Hw/company-logo_400_400/company-logo_400_400/0/1631316692276?e=1790208000&v=beta&t=OEF5lPhVrU5g_k21pXMUDAvi5RB6jIvVHahOekyASZY",
+          "company_id": "2271"
+        },
+        {
+          "title": "Chairman",
+          "company": "The Business Council U.S.",
+          "duration": "2021 - 2023 · 2 yrs",
+          "start_date": {
+            "year": 2021
+          },
+          "end_date": {
+            "year": 2023
+          },
+          "is_current": false,
+          "company_linkedin_url": "https://www.linkedin.com/company/5301945/",
+          "company_logo_url": "https://media.licdn.com/dms/image/v2/C4D0BAQGcnaZNpjMvrw/company-logo_400_400/company-logo_400_400/0/1630557702704/the_business_council_us_logo?e=1790208000&v=beta&t=WfTdxSze6kOJonYplcr2onP6QLNYShAvqNZ74g7srDo",
+          "company_id": "5301945"
+        },
+        {
+          "title": "Board Member",
+          "company": "Fred Hutch",
+          "duration": "2016 - 2022 · 6 yrs",
+          "start_date": {
+            "year": 2016
+          },
+          "end_date": {
+            "year": 2022
+          },
+          "is_current": false,
+          "company_linkedin_url": "https://www.linkedin.com/company/7158/",
+          "company_logo_url": "https://media.licdn.com/dms/image/v2/D4D0BAQGF4eOou62nvQ/company-logo_400_400/company-logo_400_400/0/1664795263764/fredhutch_logo?e=1790208000&v=beta&t=NcVJm7yuf8M6P1q5V-q9LVPxaL7WJaQCXm7XpdL5NAw",
+          "company_id": "7158"
+        }
+      ],
+      "education": [
+        {
+          "school": "The University of Chicago Booth School of Business",
+          "duration": "1994 - 1996",
+          "school_linkedin_url": "https://www.linkedin.com/company/8398/",
+          "school_logo_url": "https://media.licdn.com/dms/image/v2/D560BAQFZO05jhYKSkw/company-logo_400_400/company-logo_400_400/0/1692627816910/universityofchicagoboothschoolofbusiness_logo?e=1790208000&v=beta&t=mvCzRYhSpZ443bBfXKJh7aIJZ5TYnFVOyBBWYGhoEvA",
+          "start_date": {
+            "year": 1994
+          },
+          "end_date": {
+            "year": 1996
+          },
+          "school_id": "8398"
+        },
+        {
+          "school": "Manipal Institute of Technology",
+          "degree": "Bachelor’s Degree, Electrical Engineering",
+          "degree_name": "Bachelor’s Degree",
+          "field_of_study": "Electrical Engineering",
+          "school_linkedin_url": "https://www.linkedin.com/company/577550/",
+          "school_logo_url": "https://media.licdn.com/dms/image/v2/D4D0BAQHodG_7cUqs6w/company-logo_400_400/B4DZ8hC8AUJQAU-/0/1782965846315/manipal_institute_of_technology_logo?e=1790208000&v=beta&t=sI6dbJQUbnYj7C6X4B7ovHluHWka_VsQ2M0RA_ZiGMY",
+          "school_id": "577550"
+        }
+      ],
+      "featured": [
+        {
+          "type": "post",
+          "description": "Just wrapped our earnings call. It was a very strong close to what was a record fiscal year for Microsoft.\n  \n· Annual revenue: $331B, +18%\n· MS Cloud: $214B, + 27%\n· And Azure: $100B+, +41%\n  \nAnd even bigger opportunity ahead!\n  \nI wanted to share some more perspective on two areas of focus for us:\n  \nFirst, we are building a new model system, where the harness, context, memory, and action space are separate from any one model family, thereby moving the frontier on the cost -to-outcome curve. \n  \nAnd it’s not just about cost. It also has the added benefit of business continuity and resilience because every model is substitutable. \n  \nThis is the system we are using in our products, with great results. And we are making it available for our customers via Foundry too.\n\nYou can read more about this from Mustafa Suleyman here: https://lnkd.in/gQwfAbuc\n \nSecond, when it comes to Copilot, we are innovating rapidly, from chat to Cowork to Autopilots.\n  \nWe have also been super focused on improving the quality and performance of Copilot. Over the last three quarters, user satisfaction scores have doubled. And this quarter alone, we cut latency by 25 percent.\n  \nCopilot usage intensity speaks for itself:\n  \n· Number of conversations per user nearly doubled year over year\n· Average weekly engagement on par with Outlook and Teams\n· Number of customers with over 50K seats up 7X Y/Y\n· Customers deploying Copilot to majority of information workers, up nearly 75% QoQ\n  \nAnd this quarter we will bring all our Copilot experiences together in one “super app” spanning both our consumer and commercial experiences. I’m greatly looking forward to this!\n  \nA big Thank you to our employees and to our customers for continuing to put their trust in us. Read more here: https://lnkd.in/gR3xdrUb",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7488369807969370112?updateEntityUrn=urn%3Ali%3Afs_feedUpdate%3A%28V2%2Curn%3Ali%3Aactivity%3A7488369807969370112%29",
+          "social_counts": {
+            "likes": 11781,
+            "comments": 521,
+            "reaction_counts": [
+              {
+                "type": "like",
+                "count": 10091
+              },
+              {
+                "type": "praise",
+                "count": 1061
+              },
+              {
+                "type": "empathy",
+                "count": 476
+              },
+              {
+                "type": "interest",
+                "count": 85
+              },
+              {
+                "type": "appreciation",
+                "count": 49
+              },
+              {
+                "type": "entertainment",
+                "count": 19
+              }
+            ]
+          }
+        },
+        {
+          "type": "post",
+          "description": "In a world where software has real marginal cost for the first time, how do we ensure frontier benefits are diffused across the entire ecosystem?\n\nThe key is to optimize the cost-to-outcome frontier in real world context. In practical terms, that means using the right model for each task, and optimizing the context, skills, tools, and agent harness around it.\n\nThis is the motivation behind our MAI model family. These models have been built ground up with clean data lineage and optimized for learning transfer from generalist to specialized skills in enterprise RLEs. We continue to make rapid progress in this pursuit.\n\nWe can now take saturated frontier capabilities and deliver them at scale and at lower cost through models optimized for high-usage products, while continuing to use frontier models for frontier needs. We are proving this out across our first party products, and thereby creating a template for every other AI native, SaaS, or Enterprise company out there.\n\nIn our products, frontier models from OpenAI and Anthropic are part of the orchestration system alongside MAI. But the model is only one part of the hill-climbing system. Harness, memory, context, tools, skills, user interactions, etc. all shape the evals and performance of these agentic systems.\n\nThe other key criteria to ensure that you are in control, is your evals should continue to hill climb even when any given model has been removed. \n\nTherefore we build RLEs where models learn inside the product system and are rewarded for completing the tasks customers actually care about. We train models against the actual product harness, interactions, and outcomes they will encounter. And strategically ensure that the harness, memory, context, skills are externalized outside of the model.\n\nProduct-specific evals and model independence give us the control and a direct hill to climb, and to keep refining until we reach the right quality-cost target. We are now seeing MAI models outperform general-purpose frontier models in many use cases while using a fraction of the tokens.\n\nWe believe the biggest opportunity is to optimize all of these layers together in the products where the world works every day. And we are beginning to route traffic across our first-party surfaces to MAI whenever our models match or outperform frontier alternatives.\n\nWe are seeing promising early results across GitHub Copilot, Excel, and Outlook and are beginning to take the same approach across Copilot Chat, PowerPoint, and more. And all these results will only get better as the entire system keeps hill-climbing!\n\nWhat we are doing across our first party products is also what every enterprise customer can be doing in their real world agentic systems with their proprietary evals, their proprietary RLEs, workflows, and context. We are making all this available as part of Foundry and our toolchain.\n\nRead more here: https://lnkd.in/gR7UgHkp",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7486096178292498432?updateEntityUrn=urn%3Ali%3Afs_feedUpdate%3A%28V2%2Curn%3Ali%3Aactivity%3A7486096178292498432%29",
+          "social_counts": {
+            "likes": 7765,
+            "comments": 821,
+            "reaction_counts": [
+              {
+                "type": "like",
+                "count": 7093
+              },
+              {
+                "type": "interest",
+                "count": 324
+              },
+              {
+                "type": "empathy",
+                "count": 170
+              },
+              {
+                "type": "praise",
+                "count": 129
+              },
+              {
+                "type": "appreciation",
+                "count": 39
+              },
+              {
+                "type": "entertainment",
+                "count": 10
+              }
+            ]
+          }
+        },
+        {
+          "type": "post",
+          "title": "The Reverse Information Paradox",
+          "description": "Some thoughts on the Reverse Information Paradox. https://lnkd.in/g-QKwksS",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7482090659898630144?updateEntityUrn=urn%3Ali%3Afs_feedUpdate%3A%28V2%2Curn%3Ali%3Aactivity%3A7482090659898630144%29",
+          "image_url": "https://media.licdn.com/dms/image/sync/v2/D5627AQGBPIAoLYXvbA/articleshare-shrink_1280_800/B56Z9W5vJWHYAg-/0/1783869404196?e=1789491600&v=beta&t=43614BRxPVGtgZiq6VaZ7SSnqteAZjV4Ryj48fZPiWc",
+          "social_counts": {
+            "likes": 2702,
+            "comments": 302,
+            "reaction_counts": [
+              {
+                "type": "like",
+                "count": 2309
+              },
+              {
+                "type": "interest",
+                "count": 295
+              },
+              {
+                "type": "empathy",
+                "count": 63
+              },
+              {
+                "type": "praise",
+                "count": 21
+              },
+              {
+                "type": "appreciation",
+                "count": 10
+              },
+              {
+                "type": "entertainment",
+                "count": 4
+              }
+            ]
+          }
+        },
+        {
+          "type": "post",
+          "title": "A frontier without an ecosystem is not stable",
+          "description": "Thoughts on the future of the firm in an AI-driven economy, and why every company will need to compound the loop between their human capital and token capital … https://lnkd.in/gD_CzSuj",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7471948728229322753?updateEntityUrn=urn%3Ali%3Afs_feedUpdate%3A%28V2%2Curn%3Ali%3Aactivity%3A7471948728229322753%29",
+          "image_url": "https://media.licdn.com/dms/image/sync/v2/D5627AQH2vsHGQX5iVw/articleshare-shrink_1280_800/B56Z7GxuH6JsAg-/0/1781451383636?e=1789491600&v=beta&t=ZN5_8iWt7Dh1pDigzo9RogYhVQ1m-dRDFvOYHzDkFhI",
+          "social_counts": {
+            "likes": 4357,
+            "comments": 437,
+            "reaction_counts": [
+              {
+                "type": "like",
+                "count": 3649
+              },
+              {
+                "type": "interest",
+                "count": 421
+              },
+              {
+                "type": "empathy",
+                "count": 177
+              },
+              {
+                "type": "praise",
+                "count": 70
+              },
+              {
+                "type": "appreciation",
+                "count": 34
+              },
+              {
+                "type": "entertainment",
+                "count": 6
+              }
+            ]
+          }
+        },
+        {
+          "type": "post",
+          "description": "Building a frontier intelligence ecosystem together.\n\nHighlights from my keynote at Microsoft Build this morning.",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7467787167491100672?updateEntityUrn=urn%3Ali%3Afs_feedUpdate%3A%28V2%2Curn%3Ali%3Aactivity%3A7467787167491100672%29",
+          "image_url": "https://media.licdn.com/dms/image/v2/D5605AQEJ-6q4Hy_Pcg/videocover-high/B56Z6Low1lHEBM-/0/1780459189021?e=1789491600&v=beta&t=GkwMTs51rP37Q-N2u-NO5IVcoqpLEyTvzeSZaPoc-58",
+          "social_counts": {
+            "likes": 7108,
+            "comments": 257,
+            "reaction_counts": [
+              {
+                "type": "like",
+                "count": 6081
+              },
+              {
+                "type": "praise",
+                "count": 449
+              },
+              {
+                "type": "empathy",
+                "count": 434
+              },
+              {
+                "type": "interest",
+                "count": 106
+              },
+              {
+                "type": "appreciation",
+                "count": 34
+              },
+              {
+                "type": "entertainment",
+                "count": 4
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

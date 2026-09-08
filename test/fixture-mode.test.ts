@@ -9,7 +9,7 @@ import { createLogger } from "../src/logger.js";
 import { createScriptedAgent } from "./scripted-agent.js";
 import { researchRequest } from "./research-harness.js";
 
-const FIXTURE_MARKER = resolve("test/fixtures/vendors/stableenrich-minerva-resolve.contract.json");
+const FIXTURE_MARKER = resolve("test/fixtures/vendors/stableenrich-exa-search.contract.json");
 const fixturesReady = existsSync(FIXTURE_MARKER);
 
 const dbs: Db[] = [];

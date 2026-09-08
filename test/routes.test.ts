@@ -39,7 +39,7 @@ const ADA = {
 async function appWithFake() {
   const server = await startFakePerflo();
   fakes.push(server);
-  server.setPayOutput("stableenrich-minerva-resolve", {
+  server.setPayOutput("stableenrich-exa-search", {
     people: [
       { name: "Ada Okonkwo", dateOfBirth: "1991-04-12", city: "Lagos", country: "NG", company: "Paystack" },
     ],
@@ -114,7 +114,10 @@ describe("POST /research", () => {
         listTransactions: async () => {
           throw new Error("unused");
         },
-        getBalance: async () => {
+        getTask: async () => {
+          throw new Error("unused");
+        },
+        getKey: async () => {
           throw new PerfloError("NETWORK_ERROR", "Could not reach Perflo.", 0, undefined, undefined);
         },
       },

@@ -54,7 +54,7 @@ const AMBIGUOUS = {
 async function harness() {
   const server = await startFakePerflo();
   fakes.push(server);
-  server.setPayOutput("stableenrich-minerva-resolve", CONFIRMED);
+  server.setPayOutput("stableenrich-exa-search", CONFIRMED);
   server.setSearchResults("PEP sanctions watchlist screening", []);
   server.setSearchResults("web search", []);
   const db = openDatabase(":memory:");
@@ -136,7 +136,7 @@ describe("orchestrator (fixture mode)", () => {
 
   it("a skipped screen marks every risk category not_screened and overall unknown", async () => {
     const { server, deps } = await harness();
-    server.setPayOutput("stableenrich-minerva-resolve", { people: [] });
+    server.setPayOutput("stableenrich-exa-search", { people: [] });
     const report = await runResearch(request("1.50"), deps);
     expect(report.identity.status).toBe("not_found");
     expect(report.risk.pep.status).toBe("not_screened");
@@ -166,7 +166,7 @@ describe("orchestrator (fixture mode)", () => {
 
   it("ambiguous identity yields empty profile and overall risk unknown", async () => {
     const { server, deps } = await harness();
-    server.setPayOutput("stableenrich-minerva-resolve", AMBIGUOUS);
+    server.setPayOutput("stableenrich-exa-search", AMBIGUOUS);
     const report = await runResearch(request("0.40"), {
       ...deps,
       agent: createScriptedAgent({ disambiguate: "skip" }),
@@ -215,7 +215,7 @@ describe("orchestrator (fixture mode)", () => {
 
   it("keeps unclassified news off the primary when classification fails", async () => {
     const { server, deps } = await harness();
-    server.setPayOutput("ottoai-filtered-news", {
+    server.setPayOutput("stableenrich-serper-news", {
       articles: [
         { title: "Paystack names Ada Okonkwo product lead", url: "https://news.example/1" },
         { title: "Ada Okonkwo of Houston fined in Shell expense probe", url: "https://news.example/2" },
@@ -252,7 +252,7 @@ describe("orchestrator (fixture mode)", () => {
 
   it("hands the classifier the subject plus the primary candidate's city and employer", async () => {
     const { server, deps } = await harness();
-    server.setPayOutput("ottoai-filtered-news", {
+    server.setPayOutput("stableenrich-serper-news", {
       articles: [{ title: "Ada Okonkwo of Houston fined in Shell expense probe", url: "https://news.example/2" }],
     });
     let seenPrimary = "";

@@ -36,6 +36,7 @@ export function disambiguationPrompt(facts: PromptFacts & { readonly lead: strin
     `Closest lead: ${facts.lead}.`,
     `Closest runner-up: ${facts.runner}.`,
     "Pick exactly one allowed tool that would separate them.",
+    "Profile tools take the candidate's profileUrl exactly as listed; skip_trace takes the full name and city.",
     "Then stop.",
   ].join("\n");
 }
@@ -55,9 +56,10 @@ export function resolveUserPrompt(): string {
   return "Call find_people with the subject's full name and any location hint. Then finish.";
 }
 
-export function enrichUserPrompt(): string {
+export function enrichUserPrompt(primary?: string): string {
   return [
-    "The primary candidate is already resolved.",
+    primary ? `The primary candidate is already resolved: ${primary}.` : "The primary candidate is already resolved.",
+    "Pass that profileUrl, exactly as written, to get_professional_profile and enrich_person.",
     "Do not call find_people again.",
     "In one turn, call every allowed enrich tool you still need for that one person.",
     "Do not take a second turn.",

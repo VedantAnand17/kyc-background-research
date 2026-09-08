@@ -87,6 +87,21 @@ describe("perflo client against fake server", () => {
     await expect(client.getTransaction("missing")).rejects.toMatchObject({ code: "TRANSACTION_NOT_FOUND" });
   });
 
+  it("a deadline abort while a vendor task is still running names the run id so the hold can be reconciled", async () => {
+    const server = await fake();
+    server.setScenario("demo-vendor", "running-forever");
+    const client = await clientAgainst(server, 5_000);
+    const controller = new AbortController();
+    const paying = client.pay("demo-vendor", { maxCharge, idempotencyKey: "idem-abort", signal: controller.signal });
+    await new Promise((resolve) => setTimeout(resolve, 30));
+    controller.abort();
+    await expect(paying).rejects.toMatchObject({
+      code: "TIMEOUT",
+      details: { runId: expect.stringMatching(/^run_/) },
+    });
+    expect(server.payCalls).toHaveLength(1);
+  });
+
   it("maps every documented pay code to the documented ledger action", async () => {
     const server = await fake();
     const client = await clientAgainst(server);
@@ -163,8 +178,8 @@ describe("perflo client against fake server", () => {
     const found = await client.search("web search", { limit: 2 });
     expect(found[0]?.payable).toBe(true);
 
-    const balance = await client.getBalance();
-    expect(balance).toMatchObject({ spendable: { currency: "USD" } });
+    const key = await client.getKey();
+    expect(key).toMatchObject({ scope: "agent", limits: { hourly: { remaining: { currency: "USD" } } } });
 
     const paid = await client.pay("demo-vendor", { maxCharge, idempotencyKey: "idem-tx" });
     const row = await client.getTransaction(paid.transactionId);

@@ -34,7 +34,7 @@ describe("loop model", () => {
       LLM_PROVIDER: "openai-compatible",
       LLM_BASE_URL: "http://127.0.0.1:9",
     });
-    expect(config.RESEARCH_DEADLINE_MS).toBe(45_000);
+    expect(config.RESEARCH_DEADLINE_MS).toBe(90_000);
   });
 
   it("reuses LLM_MODEL for the loop on non-Cloudflare providers", () => {

@@ -26,6 +26,7 @@ export const CONFIRMED_PEOPLE = {
       city: "Lagos",
       country: "NG",
       company: "Paystack",
+      profileUrl: "https://www.linkedin.com/in/ada-okonkwo",
     },
   ],
 };
@@ -48,8 +49,8 @@ export async function startResearchHarness(
   over: { readonly timeoutMs?: number; readonly concurrency?: number } = {},
 ): Promise<ResearchHarness> {
   const server = await startFakePerflo();
-  server.setPayOutput("stableenrich-minerva-resolve", CONFIRMED_PEOPLE);
-  server.setPayOutput("ottoai-filtered-news", {
+  server.setPayOutput("stableenrich-exa-search", CONFIRMED_PEOPLE);
+  server.setPayOutput("stableenrich-serper-news", {
     articles: [
       { title: LAGOS_TITLE, url: "https://news.example/lagos" },
       { title: HOUSTON_TITLE, url: "https://news.example/houston" },
