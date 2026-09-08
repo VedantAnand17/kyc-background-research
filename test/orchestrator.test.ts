@@ -179,4 +179,58 @@ describe("orchestrator (fixture mode)", () => {
     expect(report.warnings.some((w) => w.code === "identity_ambiguous")).toBe(true);
     expectValidCosts(report, "0.40");
   });
+
+  it("throws llm_unavailable when the model fails before the first lookup", async () => {
+    const { deps } = await harness();
+    const agent = createScriptedAgent();
+    await expect(
+      runResearch(request("0.40"), {
+        ...deps,
+        agent: {
+          ...agent,
+          resolve: async () => {
+            throw new Error("model 401");
+          },
+        },
+      }),
+    ).rejects.toMatchObject({ name: "ResearchUnavailableError", code: "llm_unavailable" });
+  });
+
+  it("warns llm_unavailable and still reports when the model fails after a lookup", async () => {
+    const { deps } = await harness();
+    const agent = createScriptedAgent();
+    const report = await runResearch(request("0.40"), {
+      ...deps,
+      agent: {
+        ...agent,
+        enrich: async () => {
+          throw new Error("model timeout");
+        },
+      },
+    });
+    expect(report.identity.status).toBe("confirmed");
+    expect(report.warnings.some((w) => w.code === "llm_unavailable" && w.message.includes("enrich"))).toBe(true);
+    expectValidCosts(report, "0.40");
+  });
+
+  it("keeps unclassified news off the primary when classification fails", async () => {
+    const { server, deps } = await harness();
+    server.setPayOutput("ottoai-filtered-news", {
+      articles: [
+        { title: "Paystack names Ada Okonkwo product lead", url: "https://news.example/1" },
+        { title: "Ada Okonkwo of Houston fined in Shell expense probe", url: "https://news.example/2" },
+      ],
+    });
+    const report = await runResearch(request("1.50"), {
+      ...deps,
+      agent: createScriptedAgent({
+        classify: () => ({ classifications: [], failed: true }),
+      }),
+    });
+    expect(report.warnings.some((w) => w.code === "unclassified")).toBe(true);
+    expect(report.profile.news).toEqual([]);
+    expect(report.risk.reputational.hits).toEqual([]);
+    expect(report.risk.reputational.status).not.toBe("hits");
+    expectValidCosts(report, "1.50");
+  });
 });

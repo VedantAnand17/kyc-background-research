@@ -203,6 +203,16 @@ describe("tool layer", () => {
     expect(server.payCalls).toHaveLength(0);
   });
 
+  it("returns invalid_args to the caller when the model omits a required field", async () => {
+    const { server, tools } = await harness();
+    const result = await call(tools, "find_people", { locationHint: "Lagos" });
+    expect(result.outcome).toBe("invalid_args");
+    if (result.outcome === "invalid_args") {
+      expect(result.issues.join(" ")).toMatch(/fullName/i);
+    }
+    expect(server.payCalls).toHaveLength(0);
+  });
+
   it("finish does not pay", async () => {
     const { server, tools } = await harness();
     const finish = tools.finish;

@@ -91,15 +91,15 @@ Field rules:
 - `address`: optional; every subfield optional; `country` is ISO 3166-1 alpha-2 when present.
 - `maxBudget.amount`: required, decimal string matching `^\d+(\.\d{1,6})?$`, greater than zero, at most `1000.000000`.
 - `maxBudget.currency`: required, MUST be `USD` in this release.
-- `options.deadlineMs`: optional, 5000 to 120000, default 90000 for basic and standard, 120000 for deep, or `RESEARCH_DEADLINE_MS` when that variable is set.
+- `options.deadlineMs`: optional, 5000 to 120000, default 45000 for every tier, or `RESEARCH_DEADLINE_MS` when that variable is set.
 
 Responses:
 
 - `200` with a Report whenever at least one lookup ran or was attempted, even if every lookup failed.
   Warnings carry the failures.
 - `400` with a validation error body when the request does not match the schema.
-- `503` only when no lookup could be attempted at all: Perflo unreachable, agent key rejected, or account empty before the first call.
-  The body names the reason with Perflo's error code where one exists.
+- `503` only when no lookup could be attempted at all: Perflo unreachable, agent key rejected, account empty before the first call, or the model failing before the first lookup (`llm_unavailable`).
+  The body names the reason with Perflo's error code where one exists, or `llm_unavailable` for a model failure.
 
 ### 5.2 `GET /health`
 
@@ -244,9 +244,9 @@ The final object is validated against the report schema.
 
 ### 6.7 Deadline behavior
 
-The orchestrator holds an `AbortSignal` derived from `deadlineAt` minus a synthesis allowance of 35 seconds.
+The orchestrator holds an `AbortSignal` derived from `deadlineAt` minus a synthesis allowance of 12 seconds.
 When it fires: tool calls not yet started are dropped, in-flight calls are awaited for up to 5 more seconds, then phase 5 runs with whatever exists.
-The narrative pass still runs inside the 35 second synthesis allowance; it does not inherit the aborted tool-phase signal.
+The narrative pass still runs inside the 12 second synthesis allowance; it does not inherit the aborted tool-phase signal.
 Each narrative attempt gets a fresh timeout for the time still left in that allowance.
 If the screen phase never started, every risk category is `not_screened` with a warning and `risk.overall.level` is `unknown`.
 `timing.deadlineHit` is true and a warning names the phase that was cut.
@@ -394,7 +394,11 @@ Classification and the narrative pass use plain text generation plus a JSON pars
 `generateObject` / json_schema mode on glm-5.3 spends the token budget on hidden reasoning and returns no object.
 Reasoning models on Workers AI otherwise spend the default budget on thinking and return an empty completion.
 The agent loop uses tool calling with a step limit of 4 on resolve, 2 on disambiguate, and 3 on enrich (one fan-out turn, then finish).
-The narrative pass uses structured output against a Zod schema containing only the narrative fields.
+The narrative pass and risk classification send `response_format: json_schema` on a raw chat-completions request.
+The AI SDK openai-compatible provider does not reliably deliver that constraint to Workers AI glm-5.3.
+When classification fails, hits become an `unclassified` warning and are never attached to the primary candidate.
+A failed model call adds `llm_unavailable` naming the phase.
+If that failure happens before the first lookup, the API returns 503 instead of a not-found report.
 `@cf/openai/gpt-oss-120b` with `reasoning_effort: low` is a documented override via `LLM_LOOP_MODEL`.
 Workers AI rejects its second tool-calling turn, so it is not the default.
 System prompts live in `src/research/prompts.ts` as plain template strings and MUST state: the subject, the tier, the remaining budget in dollars, the list of allowed tools, and the rule that the model never invents facts not present in tool results.
@@ -426,7 +430,7 @@ Missing required values fail startup with a message naming the variable.
 | `LLM_LOOP_MODEL` | no | `LLM_MODEL` | tool-loop override |
 | `LLM_API_KEY` | yes | | provider key; for Cloudflare, an API token with Workers AI read |
 | `LLM_BASE_URL` | when `openai-compatible` | | endpoint |
-| `RESEARCH_DEADLINE_MS` | no | unset: `90000` basic/standard, `120000` deep | operator override for the default deadline |
+| `RESEARCH_DEADLINE_MS` | no | unset: `45000` for every tier | operator override for the default deadline |
 | `TOOL_CONCURRENCY` | no | `4` | parallel paid calls |
 | `VENDOR_TIMEOUT_MS` | no | `15000` | per paid call |
 | `DATABASE_PATH` | no | `./data/research.db` | SQLite file |
@@ -445,7 +449,11 @@ Never log the agent key, the LLM key, or raw vendor payloads at info level.
 
 ## 15. Performance targets
 
-- Basic tier p50 under 10 seconds, standard under 25 seconds, deep under 45 seconds, measured with fixture mode and a fast model.
+- Fixture mode with the scripted agent stays fast: basic, standard, and deep complete well under 5 seconds in the existing suite.
+- Live Workers AI `@cf/zai-org/glm-5.3`, measured 2026-09-08: a constrained `json_schema` narrative call is 5.8 seconds; a tool step is 3 to 12 seconds.
+- Until a five-run sample exists, live p50 targets are basic under 30 seconds, standard under 45 seconds, deep under 45 seconds.
+- The default wall-clock deadline is 45 seconds for every tier.
+- Raise a target or the default deadline only after a measured sample says the p50 is higher.
 - Independent tool calls run concurrently; no phase serializes calls that do not depend on each other.
 - The deadline is honored within 5 seconds in every case.
 
@@ -464,6 +472,8 @@ Required before the must-have release is considered done:
 - `orchestrator.test.ts`: end-to-end in fixture mode for one basic, one standard, one deep request; a deadline-hit request; a budget-exhausted request; an ambiguous-identity request.
 
 Fixture mode is a first-class feature, not a test hack: `FIXTURE_MODE=true` makes the Perflo client serve recorded responses from `test/fixtures/` so the interviewer can run the whole flow without a funded account.
+Those recordings are M7 work.
+Until then, `FIXTURE_MODE=true` at runtime has no recorded vendor payloads; tests inject the in-process fake server instead.
 
 ## 17. Documentation deliverables
 

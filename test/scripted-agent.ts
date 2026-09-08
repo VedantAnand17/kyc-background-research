@@ -1,4 +1,4 @@
-import type { ResearchAgent, RiskClassification } from "../src/research/agent.js";
+import type { ClassificationResult, ResearchAgent } from "../src/research/agent.js";
 import type { ResearchTools } from "../src/research/tools.js";
 
 async function call(
@@ -15,7 +15,7 @@ async function call(
 export function createScriptedAgent(
   over: {
     disambiguate?: "skip" | "professional";
-    classify?: (hits: readonly { sourceId: string; title: string }[]) => readonly RiskClassification[];
+    classify?: (hits: readonly { sourceId: string; title: string }[]) => ClassificationResult;
   } = {},
 ): ResearchAgent {
   return {
@@ -54,13 +54,16 @@ export function createScriptedAgent(
     },
     classifyRisk(hits) {
       if (over.classify) return over.classify(hits);
-      return hits.map((hit) => ({
-        sourceId: hit.sourceId,
-        title: hit.title,
-        aboutPrimary: true,
-        severity: "low" as const,
-        summary: hit.title,
-      }));
+      return {
+        failed: false,
+        classifications: hits.map((hit) => ({
+          sourceId: hit.sourceId,
+          title: hit.title,
+          aboutPrimary: true,
+          severity: "low" as const,
+          summary: hit.title,
+        })),
+      };
     },
     async narrate() {
       return {

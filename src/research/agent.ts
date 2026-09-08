@@ -6,8 +6,10 @@ import { createOpenAI } from "@ai-sdk/openai";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { z } from "zod";
 import { llmBaseUrl, loopModelName, type Config } from "../config.js";
+import { createLogger } from "../logger.js";
 import type { ResearchTools } from "./tools.js";
 import type { ToolName } from "./capabilities.js";
+import { generateStructured, structuredReasoningEffort } from "./structured.js";
 import {
   agentSystemPrompt,
   describeSubject,
@@ -18,6 +20,8 @@ import {
   riskClassifyPrompt,
   type PromptFacts,
 } from "./prompts.js";
+
+export { extractJsonObject } from "./structured.js";
 
 export interface AgentSubject {
   readonly firstName: string;
@@ -51,6 +55,11 @@ export interface RiskClassification {
   readonly title?: string;
 }
 
+export interface ClassificationResult {
+  readonly classifications: readonly RiskClassification[];
+  readonly failed: boolean;
+}
+
 export interface NarrativeFields {
   readonly candidateSummaries: Readonly<Record<string, string>>;
   readonly reputationalSummaries: Readonly<Record<string, string>>;
@@ -64,7 +73,7 @@ export interface ResearchAgent {
   classifyRisk(
     hits: readonly RiskHit[],
     signal?: AbortSignal,
-  ): Promise<readonly RiskClassification[]> | readonly RiskClassification[];
+  ): Promise<ClassificationResult> | ClassificationResult;
   narrate(ctx: AgentContext & { readonly evidenceNotes: string }): Promise<NarrativeFields>;
 }
 
@@ -75,19 +84,6 @@ function factsOf(ctx: AgentContext): PromptFacts {
     remainingBudget: ctx.remainingBudget,
     allowedTools: ctx.allowedTools,
   };
-}
-
-function sdkTools(tools: ResearchTools): ToolSet {
-  const out: ToolSet = {};
-  for (const [name, row] of Object.entries(tools)) {
-    if (!row) continue;
-    out[name] = tool({
-      description: row.description,
-      inputSchema: row.inputSchema,
-      execute: async (args) => row.execute(args as Record<string, unknown>),
-    }) as ToolSet[string];
-  }
-  return out;
 }
 
 function languageModel(config: Config, modelName = config.LLM_MODEL) {
@@ -108,34 +104,8 @@ function reasoningOptions(model: string): { openaiCompatible: { reasoningEffort:
   return { openaiCompatible: { reasoningEffort: "low" } };
 }
 
-/** glm-5.3 json_schema mode spends the token budget on reasoning_content and returns empty content. */
-export function extractJsonObject(text: string): unknown {
-  const stripped = text.trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/u, "");
-  const start = stripped.indexOf("{");
-  const end = stripped.lastIndexOf("}");
-  if (start < 0 || end <= start) throw new Error("no json object in model text");
-  return JSON.parse(stripped.slice(start, end + 1));
-}
-
-async function structuredObject<T>(
-  schema: z.ZodType<T>,
-  input: {
-    readonly model: ReturnType<typeof languageModel>;
-    readonly system: string;
-    readonly prompt: string;
-    readonly signal?: AbortSignal;
-    readonly providerOptions?: { openaiCompatible: { reasoningEffort: string } };
-  },
-): Promise<T> {
-  const result = await generateText({
-    model: input.model,
-    system: `${input.system}\nReply with one JSON object only. No markdown fence.`,
-    prompt: input.prompt,
-    maxOutputTokens: 1500,
-    ...(input.signal ? { abortSignal: input.signal } : {}),
-    ...(input.providerOptions ? { providerOptions: input.providerOptions } : {}),
-  });
-  return schema.parse(extractJsonObject(result.text));
+function reasoningEffortOf(model: string): string | undefined {
+  return structuredReasoningEffort(model);
 }
 
 const ClassificationSchema = z.object({
@@ -159,11 +129,49 @@ const RESOLVE_STEPS = 4;
 const DISAMBIGUATE_STEPS = 2;
 const ENRICH_STEPS = 3;
 
+const LooseArgs = z.record(z.string(), z.unknown());
+
 export function createAgent(config: Config): ResearchAgent {
   const loopModel = languageModel(config, loopModelName(config));
-  const narrativeModel = languageModel(config);
   const loopOptions = reasoningOptions(loopModelName(config));
-  const narrativeOptions = reasoningOptions(config.LLM_MODEL);
+  const log = createLogger(config.LOG_LEVEL);
+
+  function sdkTools(tools: ResearchTools): ToolSet {
+    const out: ToolSet = {};
+    for (const [name, row] of Object.entries(tools)) {
+      if (!row) continue;
+      out[name] = tool({
+        description: row.description,
+        inputSchema: LooseArgs,
+        execute: async (args) => {
+          const parsed = row.inputSchema.safeParse(args);
+          if (!parsed.success) {
+            const issues = parsed.error.issues.map((i) => `${i.path.join(".") || "(root)"}: ${i.message}`);
+            log.warn({ tool: name, issues }, "tool arguments invalid");
+            return { outcome: "invalid_args", reason: issues.join("; "), issues };
+          }
+          return row.execute(parsed.data as Record<string, unknown>);
+        },
+      }) as ToolSet[string];
+    }
+    return out;
+  }
+
+  async function structured<T>(
+    schema: z.ZodType<T>,
+    input: { readonly system: string; readonly prompt: string; readonly name: string; readonly signal?: AbortSignal },
+  ): Promise<T> {
+    const effort = reasoningEffortOf(config.LLM_MODEL);
+    return generateStructured(schema, {
+      config,
+      model: config.LLM_MODEL,
+      system: input.system,
+      prompt: input.prompt,
+      name: input.name,
+      ...(input.signal ? { signal: input.signal } : {}),
+      ...(effort ? { reasoningEffort: effort } : {}),
+    });
+  }
 
   async function loop(ctx: AgentContext, system: string, prompt: string, steps: number): Promise<void> {
     if (ctx.signal.aborted) return;
@@ -195,33 +203,35 @@ export function createAgent(config: Config): ResearchAgent {
       return loop(ctx, agentSystemPrompt(factsOf(ctx)), enrichUserPrompt(), ENRICH_STEPS);
     },
     async classifyRisk(hits, signal) {
-      if (hits.length === 0) return [];
+      if (hits.length === 0) return { classifications: [], failed: false };
       const listed = hits.map((h) => `${h.sourceId}: ${h.title}`).join("\n");
       try {
-        const object = await structuredObject(ClassificationSchema, {
-          model: narrativeModel,
+        const object = await structured(ClassificationSchema, {
           system: "Classify only the listed hits. Never invent facts.",
           prompt: riskClassifyPrompt(listed),
+          name: "classification",
           ...(signal ? { signal } : {}),
-          ...(narrativeOptions ? { providerOptions: narrativeOptions } : {}),
         });
         const unused = [...hits];
-        return object.hits.map((row) => {
-          const idx = unused.findIndex((hit) => hit.sourceId === row.sourceId);
-          const hit = idx >= 0 ? unused.splice(idx, 1)[0] : undefined;
-          return { ...row, ...(hit?.title ? { title: hit.title } : {}) };
-        });
-      } catch {
-        return [];
+        return {
+          failed: false,
+          classifications: object.hits.map((row) => {
+            const idx = unused.findIndex((hit) => hit.sourceId === row.sourceId);
+            const hit = idx >= 0 ? unused.splice(idx, 1)[0] : undefined;
+            return { ...row, ...(hit?.title ? { title: hit.title } : {}) };
+          }),
+        };
+      } catch (err) {
+        log.warn({ err, hitCount: hits.length }, "risk classification failed");
+        return { classifications: [], failed: true };
       }
     },
     async narrate(ctx) {
-      const object = await structuredObject(NarrativeSchema, {
-        model: narrativeModel,
+      const object = await structured(NarrativeSchema, {
         system: narrativePrompt(factsOf(ctx)),
         prompt: ctx.evidenceNotes,
+        name: "narrative",
         signal: ctx.signal,
-        ...(narrativeOptions ? { providerOptions: narrativeOptions } : {}),
       });
       const candidateSummaries: Record<string, string> = {};
       for (const row of object.candidateSummaries) candidateSummaries[row.id] = row.summary;

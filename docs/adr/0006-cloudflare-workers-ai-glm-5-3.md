@@ -27,13 +27,14 @@ glm-5.3 also stopped calling tools and said it was finishing when handed a `budg
 
 - Default provider: Cloudflare Workers AI via the AI SDK `@ai-sdk/openai-compatible` provider, `LLM_PROVIDER=cloudflare`, base URL derived from `CLOUDFLARE_ACCOUNT_ID`.
 - Default model for the tool loop, risk classification, and narrative: `@cf/zai-org/glm-5.3`.
-- The enrich loop is capped at three steps (one fan-out turn, then finish) and the narrative allowance is 35 seconds.
-  A live glm-5.3 run against the fake Perflo server spent 85 seconds in an uncapped enrich loop and timed out an 8 second, then a 20 second, narrative pass.
+- The enrich loop is capped at three steps (one fan-out turn, then finish) and the narrative allowance is 12 seconds.
+  A raw `response_format: json_schema` call on glm-5.3 returned valid narrative JSON in 5.8 seconds.
+  The AI SDK openai-compatible path without that constraint spent the token budget on reasoning and returned empty `content`.
 - `LLM_LOOP_MODEL` can override the tool-loop model.
   `@cf/openai/gpt-oss-120b` is not the default: Workers AI returns 400 on its second tool-calling turn (`messages[].content` shape), so a live resolve called `find_people` and then died.
-- Classification and narrative use `generateText` plus a JSON parse, not `generateObject`.
-  glm-5.3's json_schema mode spends the token budget on `reasoning_content` and returns empty `content`.
-- Every LLM call sets `max_tokens` explicitly (1500) so reasoning models never return an empty completion.
+- Classification and narrative send `response_format: json_schema` on a raw chat-completions request, not through the AI SDK `generateText` prose path.
+- glm-5.3 thinking cannot be disabled; structured calls send `reasoning_effort: low` so reasoning tokens do not exhaust `max_tokens` before JSON lands.
+- Every LLM call sets `max_tokens` explicitly so reasoning models never return an empty completion.
 - `openai` and `openai-compatible` remain selectable so an interviewer can run with their own key.
 
 ## Consequences

@@ -24,7 +24,8 @@ export type ToolOutcome =
   | { readonly outcome: "ok"; readonly sourceId: string; readonly summary: string; readonly charged: string; readonly remaining: string; readonly cached: boolean }
   | { readonly outcome: "failed"; readonly sourceId: string | null; readonly reason: string; readonly charged: string; readonly remaining: string }
   | { readonly outcome: "budget_exhausted"; readonly remaining: string }
-  | { readonly outcome: "unavailable"; readonly reason: string };
+  | { readonly outcome: "unavailable"; readonly reason: string }
+  | { readonly outcome: "invalid_args"; readonly reason: string; readonly issues: readonly string[] };
 
 export interface ExecutableTool {
   readonly description: string;
@@ -401,8 +402,12 @@ export function createTools(ctx: ToolContext): ResearchTools {
     description: capabilityOf(name).description,
     inputSchema,
     async execute(args) {
-      const parsed = inputSchema.parse(args);
-      return invoke(name, parsed as Record<string, unknown>);
+      const parsed = inputSchema.safeParse(args);
+      if (!parsed.success) {
+        const issues = parsed.error.issues.map((i) => `${i.path.join(".") || "(root)"}: ${i.message}`);
+        return { outcome: "invalid_args", reason: issues.join("; "), issues };
+      }
+      return invoke(name, parsed.data as Record<string, unknown>);
     },
   });
 

@@ -24,7 +24,7 @@ The typed Perflo client covers every section-10 endpoint and error code against 
 The tool layer maps each capability to a vendor, quotes the live contract, reserves, pays, and stores a Source.
 A repeat call is served from that store at zero charge.
 The matcher scores each Candidate against the Subject with the section-8 weights, labels it, and selects a Primary candidate only when it is confirmed or a probable lead of at least 0.15.
-The orchestrator runs the five phases, honors the deadline, and returns a schema-valid report in fixture-style tests for basic, standard, deep, deadline-hit, budget-exhausted, and ambiguous identity.
+The orchestrator runs the five phases, honors a 45 second default deadline, and returns a schema-valid report in fixture-style tests for basic, standard, deep, deadline-hit, budget-exhausted, and ambiguous identity.
 `POST /research` returns that report over HTTP.
 `GET /docs` renders the OpenAPI explorer.
 A skipped risk screen marks every category `not_screened` with warnings and forces overall risk `unknown`.
@@ -46,7 +46,10 @@ pnpm test
 pnpm check                # typecheck
 ```
 
-Fixture mode (`FIXTURE_MODE=true`) serves recorded vendor responses from `test/fixtures/` and spends nothing.
+Fixture mode (`FIXTURE_MODE=true`) is meant to serve recorded vendor responses from `test/fixtures/` and spend nothing.
+Those recordings do not exist yet; they are M7 work.
+Until then, setting `FIXTURE_MODE=true` at runtime will fail on the first lookup with `missing fixture`.
+Tests inject the in-process fake Perflo server and do not use those files.
 Live mode needs a Perflo agent key plus a Cloudflare account id and an API token with Workers AI read.
 The default model is `@cf/zai-org/glm-5.3` (ADR-0006).
 See `.env.example` and PRD section 13.
