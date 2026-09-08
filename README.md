@@ -8,6 +8,7 @@ One line: one search in, one honest costed file out, never overspend.
 
 ## Read first
 
+- [AGENTS.md](AGENTS.md): always-loaded agent contract (Claude loads it via `CLAUDE.md`).
 - [PRD.md](PRD.md): the full specification, milestone by milestone.
   Agents build from this.
 - [CONTEXT.md](CONTEXT.md): the vocabulary this codebase uses.
