@@ -8,7 +8,7 @@ import type { ResearchRequest, ResearchReport } from "../api/schemas.js";
 import type { Db } from "../db/sqlite.js";
 import type { Logger } from "../logger.js";
 import type { PerfloClient } from "../perflo/client.js";
-import type { ResearchAgent, AgentContext, RiskClassification, RiskHit } from "./agent.js";
+import type { ResearchAgent, AgentContext, ClassificationResult, RiskClassification, RiskHit } from "./agent.js";
 import { assembleReport, type CostCall, type Warning } from "../evidence/report.js";
 import { PerfloError } from "../perflo/errors.js";
 import { candidatesFromSources } from "./candidates.js";
@@ -26,8 +26,8 @@ export class ResearchUnavailableError extends Error {
   }
 }
 
-/** Wall-clock reserved for the narrative pass. Fresh timeout per attempt; generateText finishes in ~20s. */
-export const SYNTHESIS_MS = 35_000;
+/** Wall-clock reserved for the narrative pass. Constrained json_schema on glm-5.3 measured at 5.8 s. */
+export const SYNTHESIS_MS = 12_000;
 const DRAIN_MS = 5_000;
 
 export interface OrchestratorDeps {
@@ -206,6 +206,16 @@ export async function runResearch(req: ResearchRequest, deps: OrchestratorDeps):
   );
 
   let phaseWork: Promise<unknown> = Promise.resolve();
+  const phaseFailed: Record<string, boolean> = {};
+
+  const noteLlmFailure = (phase: string, err: unknown): void => {
+    phaseFailed[phase] = true;
+    deps.log.warn({ err, phase, requestId }, "phase failed");
+    warnings.push({
+      code: "llm_unavailable",
+      message: `Model call failed during ${phase}.`,
+    });
+  };
 
   const runPhase = async (name: string, fn: () => Promise<void>): Promise<void> => {
     if (controller.signal.aborted) return;
@@ -216,9 +226,7 @@ export async function runResearch(req: ResearchRequest, deps: OrchestratorDeps):
     try {
       await work;
     } catch (err) {
-      if (!controller.signal.aborted) {
-        deps.log.warn({ err, phase: name, requestId }, "phase failed");
-      }
+      if (!controller.signal.aborted) noteLlmFailure(name, err);
     }
     phases[name] = Date.now() - t0;
   };
@@ -227,6 +235,14 @@ export async function runResearch(req: ResearchRequest, deps: OrchestratorDeps):
     agentCtx(req, planned.tier, planned.allowedTools, tools, guard, controller.signal, extra);
 
   await runPhase("resolve", () => deps.agent.resolve(ctx()));
+
+  if (phaseFailed.resolve && store.forJob().length === 0) {
+    if (timer) clearTimeout(timer);
+    throw new ResearchUnavailableError(
+      "llm_unavailable",
+      "Model call failed before the first lookup.",
+    );
+  }
 
   let evidence = candidatesFromSources(store.forJob());
   let identity = decideIdentity(subjectOf(req), evidence);
@@ -296,7 +312,19 @@ export async function runResearch(req: ResearchRequest, deps: OrchestratorDeps):
         if (item.title) hits.push({ sourceId: source.id, title: item.title });
       }
     }
-    classifications = [...(await Promise.resolve(deps.agent.classifyRisk(hits, controller.signal)))];
+    const classified: ClassificationResult = await Promise.resolve(
+      deps.agent.classifyRisk(hits, controller.signal),
+    );
+    if (classified.failed) {
+      classifications = [];
+      warnings.push({
+        code: "unclassified",
+        message:
+          "Risk classification failed; news and reputational hits were not attributed to the primary candidate.",
+      });
+    } else {
+      classifications = [...classified.classifications];
+    }
   };
 
   if (!skipResearch && !adverseOnly) {
@@ -355,8 +383,9 @@ export async function runResearch(req: ResearchRequest, deps: OrchestratorDeps):
         evidenceNotes: notes,
       });
       break;
-    } catch {
+    } catch (err) {
       if (attempt === 1 || reportBudgetEnds - Date.now() < 3_000) {
+        noteLlmFailure("report", err);
         warnings.push({
           code: "narrative_unavailable",
           message: "Narrative pass failed after two retries; summaries use the fallback string.",

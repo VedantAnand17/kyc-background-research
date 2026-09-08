@@ -92,6 +92,7 @@ function newsAboutPrimary(
   title: string,
   classifications: readonly RiskClassification[],
 ): boolean {
+  if (classifications.length === 0) return false;
   const withTitles = classifications.filter((row) => row.title);
   if (withTitles.length > 0) {
     return withTitles.some((row) => titlesMatch(row.title!, title) && row.aboutPrimary);

@@ -28,6 +28,15 @@ describe("loop model", () => {
     expect(loopModelName(config)).toBe("loop-model");
   });
 
+  it("defaults the operator deadline override to 45 seconds", () => {
+    const config = loadConfig({
+      ...base,
+      LLM_PROVIDER: "openai-compatible",
+      LLM_BASE_URL: "http://127.0.0.1:9",
+    });
+    expect(config.RESEARCH_DEADLINE_MS).toBe(45_000);
+  });
+
   it("reuses LLM_MODEL for the loop on non-Cloudflare providers", () => {
     const config = loadConfig({
       ...base,

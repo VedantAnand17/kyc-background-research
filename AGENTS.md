@@ -71,6 +71,7 @@ A pull request that violates them is not mergeable.
 - Do not add dependencies beyond `package.json` without stating why in the PR.
 - Keep each sentence on its own line in Markdown files.
 - Do not add an agent name as a commit co-author.
+- Strip any `Co-authored-by` trailer that names an agent, including Cursor, before committing.
 - Never commit `.env` or a Perflo / LLM key.
 
 ## Context re-entry (multi-project juggling)
@@ -157,7 +158,8 @@ pnpm check
 pnpm dev                  # GET /health and /openapi.json
 ```
 
-`FIXTURE_MODE=true` serves recorded vendor responses from `test/fixtures/` and spends nothing.
+`FIXTURE_MODE=true` is supposed to serve recorded vendor responses from `test/fixtures/` and spend nothing.
+Those recordings are filled in M7; until then only tests inject the fake server.
 Live mode needs `PERFLO_AGENT_KEY` plus a Cloudflare account id and an API token with Workers AI read.
 The default model is `@cf/zai-org/glm-5.3` (ADR-0006).
 Do not run a paid live call unless the human asked for one.

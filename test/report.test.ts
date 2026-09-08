@@ -282,6 +282,46 @@ describe("report invariants", () => {
     expect(report.risk.reputational.hits[0]?.summary).toMatch(/Lagos/);
   });
 
+  it("never treats news as about the primary when classification produced no rows", () => {
+    const newsSource = source("s-news", "search_news", {
+      candidateId: null,
+      extracted: {
+        facts: {
+          articles: [{ title: "Ada Okonkwo of Houston fined in Shell expense probe", outlet: "Houston Chronicle" }],
+        },
+        summary: "one article",
+      },
+    });
+    const report = assembleReport(
+      input({
+        sources: [source("s1", "find_people"), newsSource],
+        classifications: [],
+        calls: [
+          {
+            sourceId: "s1",
+            vendor: "v",
+            capability: "find_people",
+            status: "succeeded",
+            chargedMicro: parseMoney("0.01"),
+            transactionId: "tx-1",
+          },
+          {
+            sourceId: "s-news",
+            vendor: "v",
+            capability: "search_news",
+            status: "succeeded",
+            chargedMicro: parseMoney("0.01"),
+            transactionId: "tx-2",
+          },
+        ],
+        ledgerSpentMicro: parseMoney("0.02"),
+      }),
+    );
+    expect(report.profile.news).toEqual([]);
+    expect(report.risk.reputational.hits).toEqual([]);
+    expect(report.risk.reputational.status).toBe("clear");
+  });
+
   it("marks every risk category not_screened and overall unknown when the screen did not run", () => {
     const report = assembleReport(
       input({

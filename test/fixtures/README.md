@@ -1,6 +1,9 @@
 # Fixtures
 
-Recorded Perflo responses used by fixture mode (`FIXTURE_MODE=true`) and by tests.
+Recorded Perflo responses for fixture mode (`FIXTURE_MODE=true`).
+They are not recorded yet; that is M7 work.
+Until then, `FIXTURE_MODE=true` at runtime has no vendor payloads to serve.
+Tests inject `test/fake-perflo.ts` instead of these files.
 Identity-matcher cases live in `identity.ts` and are loaded by `test/matcher.test.ts`.
 
 Layout, one file per vendor and scenario:

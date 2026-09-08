@@ -130,6 +130,33 @@ describe("POST /research", () => {
     expect(body.error).toBe("unavailable");
     expect(body.code).toBe("NETWORK_ERROR");
   });
+
+  it("returns 503 when the model fails before the first lookup", async () => {
+    const { app: _unused, server } = await appWithFake();
+    const db = openDatabase(":memory:");
+    dbs.push(db);
+    const app = createApp({
+      config: config(),
+      db,
+      log: createLogger("silent"),
+      client: createPerfloClient({ baseUrl: server.baseUrl, agentKey: "perflo_test_fake", timeoutMs: 2_000 }),
+      agent: {
+        ...createScriptedAgent(),
+        resolve: async () => {
+          throw new Error("model 401");
+        },
+      },
+    });
+    const res = await app.request("/research", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(ADA),
+    });
+    expect(res.status).toBe(503);
+    const body = (await res.json()) as { error: string; code: string };
+    expect(body.error).toBe("unavailable");
+    expect(body.code).toBe("llm_unavailable");
+  });
 });
 
 describe("GET /docs", () => {
