@@ -469,7 +469,18 @@ Required before the must-have release is considered done:
 - `matcher.test.ts`: fixtures for exact match, nickname match, same name other city, DOB conflict cap, missing DOB renormalization, corroboration bonus, ambiguity gap.
 - `report.test.ts`: every invariant in section 5.4 asserted against a generated report; schema validation failure path.
 - `perflo-client.test.ts`: every error code in section 10 mapped to the documented ledger action, using the fake Perflo server in `test/fake-perflo.ts`.
-- `orchestrator.test.ts`: end-to-end in fixture mode for one basic, one standard, one deep request; a deadline-hit request; a budget-exhausted request; an ambiguous-identity request.
+- `orchestrator.test.ts`: end-to-end in fixture mode for one basic, one standard, one deep request; a deadline-hit request; a budget-exhausted request; an ambiguous-identity request; a tight-cap parallel enrich that never exceeds the cap.
+- `failure-injection.test.ts`: model auth failure and model timeout, Perflo unreachable, vendor `200 failed` (charged), vendor timeout (held then reconciled), and `GUARDRAIL_DENIED`.
+  Each case asserts the report or `503` this document specifies, including the warning code.
+- `live-model.test.ts` (`pnpm test:live`, skipped without Workers AI credentials): real `@cf/zai-org/glm-5.3` against the fake Perflo server for basic, standard, and deep.
+  Asserts narrative present, `deadlineHit` false, total within cap, each person-tool paid once, the Houston article excluded from the Lagos candidate, and per-phase timings under the section-15 targets.
+- `logger.test.ts`: keys and `Authorization` headers never reach the log line.
+- `fixture-mode.test.ts`: `POST /research` with `FIXTURE_MODE=true` and no network, skipped until M7 records vendor fixtures.
+- CI on a clean clone: `pnpm install --frozen-lockfile && pnpm test && pnpm check && docker build`.
+- `pnpm test:perf` samples five live runs per tier and prints p50 per phase.
+  Raise the default deadline only from that evidence.
+
+Do not spend real Perflo money until those gates are green.
 
 Fixture mode is a first-class feature, not a test hack: `FIXTURE_MODE=true` makes the Perflo client serve recorded responses from `test/fixtures/` so the interviewer can run the whole flow without a funded account.
 Those recordings are M7 work.

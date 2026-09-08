@@ -58,7 +58,11 @@ function subjectOf(req: ResearchRequest): SubjectInput {
   };
 }
 
-function wrapTools(tools: ResearchTools, onExhausted: () => void): ResearchTools {
+function wrapTools(
+  tools: ResearchTools,
+  onExhausted: () => void,
+  onFailed: (result: Extract<ToolOutcome, { outcome: "failed" }>) => void,
+): ResearchTools {
   const out: ResearchTools = {};
   for (const [name, row] of Object.entries(tools)) {
     if (!row) continue;
@@ -67,6 +71,7 @@ function wrapTools(tools: ResearchTools, onExhausted: () => void): ResearchTools
       async execute(args: Record<string, unknown>): Promise<ToolOutcome> {
         const result = await row.execute(args);
         if (result.outcome === "budget_exhausted") onExhausted();
+        if (result.outcome === "failed") onFailed(result);
         return result;
       },
     };
@@ -109,16 +114,18 @@ function agentCtx(
 
 async function reconcileHeld(db: Db, jobId: string, guard: SpendGuard, client: PerfloClient, log: Logger): Promise<void> {
   const held = db
-    .prepare(`SELECT id, transaction_id FROM ledger WHERE job_id = ? AND state = 'held'`)
-    .all(jobId) as Array<{ id: string; transaction_id: string | null }>;
+    .prepare(`SELECT id, transaction_id, idempotency_key FROM ledger WHERE job_id = ? AND state = 'held'`)
+    .all(jobId) as Array<{ id: string; transaction_id: string | null; idempotency_key: string }>;
   for (const row of held) {
     try {
-      if (!row.transaction_id) {
-        guard.resolveHold(row.id, null);
-        continue;
+      let tx = null;
+      if (row.transaction_id) {
+        tx = await client.getTransaction(row.transaction_id);
+      } else {
+        const listed = await client.listTransactions({ limit: 50 });
+        tx = listed.find((item) => item.idempotencyKey === row.idempotency_key) ?? null;
       }
-      const tx = await client.getTransaction(row.transaction_id);
-      if (tx.ledgerState === "posted" && tx.amount.amount.startsWith("-")) {
+      if (tx && tx.ledgerState === "posted" && tx.amount.amount.startsWith("-")) {
         guard.resolveHold(row.id, {
           chargedMicro: parseMoney(tx.amount.amount.slice(1)),
           transactionId: tx.id,
@@ -201,6 +208,11 @@ export async function runResearch(req: ResearchRequest, deps: OrchestratorDeps):
           code: "budget_exhausted",
           message: "Remaining headroom is below the cheapest live quote among the allowed tools.",
         });
+      }
+    },
+    (result) => {
+      if (!warnings.some((w) => w.code === result.code && w.message === result.reason)) {
+        warnings.push({ code: result.code, message: result.reason });
       }
     },
   );
@@ -396,6 +408,8 @@ export async function runResearch(req: ResearchRequest, deps: OrchestratorDeps):
   }
   phases.report = Date.now() - tReport;
 
+  await reconcileHeld(deps.db, requestId, guard, deps.client, deps.log);
+
   const ledgerRows = deps.db
     .prepare(`SELECT id, vendor, capability, charged_micro, transaction_id, state FROM ledger WHERE job_id = ?`)
     .all(requestId) as LedgerRow[];
@@ -442,6 +456,5 @@ export async function runResearch(req: ResearchRequest, deps: OrchestratorDeps):
     .prepare(`UPDATE jobs SET finished_at = ?, spent_micro = ?, status = 'succeeded', report_json = ? WHERE id = ?`)
     .run(new Date().toISOString(), spent.toString(), JSON.stringify(report), requestId);
 
-  await reconcileHeld(deps.db, requestId, guard, deps.client, deps.log);
   return report;
 }

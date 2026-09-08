@@ -32,6 +32,8 @@ The default model is `@cf/zai-org/glm-5.3` for the tool loop and the narrative.
 Person-targeted tools cache by the subject so a second `enrich_person` with different optional fields does not pay twice.
 News in the profile uses the same about-primary filter as reputational hits.
 A `Dockerfile` builds the API image.
+CI builds that image on a clean clone.
+`pnpm test:live` is the real-model harness that must stay green before M7 spends Perflo money.
 M7 (live verification and README polish) remains.
 
 ## Run
@@ -42,9 +44,16 @@ Requires Node 22 and pnpm 11.
 pnpm install
 cp .env.example .env      # fill in keys, or set FIXTURE_MODE=true to run without money
 pnpm dev                  # http://localhost:3000/health, /docs, /openapi.json, POST /research
-pnpm test
+pnpm test                 # unit and fake-server suite; skips live-model and funded Perflo tests
+pnpm test:live            # real glm-5.3 against the fake Perflo server; skipped without Workers AI credentials
+pnpm test:perf            # five live runs per tier; prints p50 per phase
 pnpm check                # typecheck
 ```
+
+CI on every push runs `pnpm install --frozen-lockfile`, `pnpm test`, `pnpm check`, and `docker build`.
+Do not spend real Perflo money until `pnpm test` and `pnpm test:live` are green.
+`pnpm test:live` is the gate: it still fails on live timing as of 2026-09-08 (basic ~40-87s against a 30s target; the 45s default deadline cuts the tool loop).
+Raise a target only after `pnpm test:perf` prints a p50. Do not start M7 until that gate is green.
 
 Fixture mode (`FIXTURE_MODE=true`) is meant to serve recorded vendor responses from `test/fixtures/` and spend nothing.
 Those recordings do not exist yet; they are M7 work.

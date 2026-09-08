@@ -233,4 +233,12 @@ describe("orchestrator (fixture mode)", () => {
     expect(report.risk.reputational.status).not.toBe("hits");
     expectValidCosts(report, "1.50");
   });
+
+  it("parallel enrich under a tight cap never exceeds it and shows the refusal", async () => {
+    const { deps } = await harness();
+    const report = await runResearch(request("0.04"), { ...deps, concurrency: 4 });
+    expect(parseMoney(report.costs.total.amount)).toBeLessThanOrEqual(parseMoney("0.04"));
+    expect(report.warnings.some((w) => w.code === "budget_exhausted")).toBe(true);
+    expectValidCosts(report, "0.04");
+  });
 });

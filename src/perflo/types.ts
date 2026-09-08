@@ -73,6 +73,7 @@ export interface Transaction {
   readonly capability?: string;
   readonly amount: PerfloMoney;
   readonly createdAt: string;
+  readonly idempotencyKey?: string;
 }
 
 /** Every error code PRD.md section 10 gives a behavior. Match on code, never on message. */

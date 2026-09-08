@@ -3,9 +3,15 @@ import pino from "pino";
 
 export type Logger = pino.Logger;
 
-export function createLogger(level: string): Logger {
-  return pino({
-    level,
-    redact: { paths: ["*.authorization", "*.apiKey", "*.PERFLO_AGENT_KEY", "*.LLM_API_KEY"], censor: "[redacted]" },
-  });
+export function createLogger(level: string, destination?: pino.DestinationStream): Logger {
+  return pino(
+    {
+      level,
+      redact: {
+        paths: ["authorization", "*.authorization", "apiKey", "*.apiKey", "PERFLO_AGENT_KEY", "*.PERFLO_AGENT_KEY", "LLM_API_KEY", "*.LLM_API_KEY"],
+        censor: "[redacted]",
+      },
+    },
+    destination,
+  );
 }

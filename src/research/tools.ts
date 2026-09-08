@@ -22,7 +22,7 @@ export interface ToolContext {
 
 export type ToolOutcome =
   | { readonly outcome: "ok"; readonly sourceId: string; readonly summary: string; readonly charged: string; readonly remaining: string; readonly cached: boolean }
-  | { readonly outcome: "failed"; readonly sourceId: string | null; readonly reason: string; readonly charged: string; readonly remaining: string }
+  | { readonly outcome: "failed"; readonly sourceId: string | null; readonly reason: string; readonly charged: string; readonly remaining: string; readonly code: string }
   | { readonly outcome: "budget_exhausted"; readonly remaining: string }
   | { readonly outcome: "unavailable"; readonly reason: string }
   | { readonly outcome: "invalid_args"; readonly reason: string; readonly issues: readonly string[] };
@@ -357,6 +357,7 @@ export function createTools(ctx: ToolContext): ResearchTools {
             reason: paid.failure?.message ?? "vendor answered and failed",
             charged: formatMoney(chargedMicro),
             remaining: remainingOf(ctx.guard),
+            code: "vendor_failed",
           };
         }
         return {
@@ -373,6 +374,7 @@ export function createTools(ctx: ToolContext): ResearchTools {
           cache.invalidate(selected.slug);
         }
         const action = ledgerActionForError(err);
+        if (err.code === "GUARDRAIL_DENIED" || err.code === "INSUFFICIENT_BALANCE") exhausted = true;
         if (action === "hold") ctx.guard.hold(reserved.id, err.code);
         else if (action === "settle_at_reserved") ctx.guard.settle(reserved.id, selected.quote, null, err.code);
         else ctx.guard.release(reserved.id, err.code);
@@ -393,6 +395,7 @@ export function createTools(ctx: ToolContext): ResearchTools {
           reason: err.message,
           charged: formatMoney(chargedMicro),
           remaining: remainingOf(ctx.guard),
+          code: err.code,
         };
       }
     });

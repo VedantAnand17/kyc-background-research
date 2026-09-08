@@ -111,7 +111,7 @@ function payOk(slug: string, status: "succeeded" | "failed", transactionId: stri
   return { ...result, failure: { reason: "vendor_failed", message: "vendor answered and failed" } };
 }
 
-function transactionRow(id: string, slug: string, status: string): Transaction {
+function transactionRow(id: string, slug: string, status: string, idempotencyKey?: string | null): Transaction {
   return {
     id,
     kind: "payment",
@@ -122,6 +122,7 @@ function transactionRow(id: string, slug: string, status: string): Transaction {
     capability: "web_search",
     amount: { amount: "-0.025200", currency: "USD" },
     createdAt: "2026-09-08T10:00:00.000Z",
+    ...(idempotencyKey ? { idempotencyKey } : {}),
   };
 }
 
@@ -224,10 +225,13 @@ export async function startFakePerflo(): Promise<FakePerflo> {
     }
 
     if (scenario === "hang") {
+      paySeq += 1;
+      const id = `tx-${paySeq}`;
+      transactions.set(id, transactionRow(id, slug, "succeeded", idempotencyKey));
       await new Promise<void>((resolve) => {
         hangTimers.push(setTimeout(resolve, 30_000));
       });
-      return remember(200, { data: payOk(slug, "succeeded", "tx-late"), meta: { requestId: "fake-req" } });
+      return remember(200, { data: payOk(slug, "succeeded", id, payOutputs.get(slug)), meta: { requestId: "fake-req" } });
     }
 
     const charged: FakePayScenario[] = ["succeeded", "failed", "SETTLEMENT_RECORDING_FAILED"];
@@ -235,7 +239,7 @@ export async function startFakePerflo(): Promise<FakePerflo> {
       paySeq += 1;
       const id = `tx-${paySeq}`;
       const status = scenario === "failed" ? "failed" : "succeeded";
-      transactions.set(id, transactionRow(id, slug, status));
+      transactions.set(id, transactionRow(id, slug, status, idempotencyKey));
       if (scenario === "SETTLEMENT_RECORDING_FAILED") {
         return remember(500, { error: { code: "SETTLEMENT_RECORDING_FAILED", message: "bookkeeping failed" }, meta: { requestId: "fake-req" } });
       }
