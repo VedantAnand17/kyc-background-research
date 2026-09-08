@@ -1,6 +1,7 @@
 # Fixtures
 
 Recorded Perflo responses used by fixture mode (`FIXTURE_MODE=true`) and by tests.
+Identity-matcher cases live in `identity.ts` and are loaded by `test/matcher.test.ts`.
 
 Layout, one file per vendor and scenario:
 
