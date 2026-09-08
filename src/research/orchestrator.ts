@@ -1,20 +1,380 @@
 // Runs the five phases for one request and owns the deadline. PRD.md section 6.
-//
-// TODO(M5):
-//   0. plan()                                   -> Plan
-//   1. resolve   (agent, find_people)           -> candidates
-//   2. disambiguate (matcher; one reserve-funded discriminator call if ambiguous)
-//   3. enrich    (agent, parallel, primary candidate only)
-//   4. risk      (adverse-media queries from a fixed template list + screen_watchlist)
-//   5. report    (assembler; narrative pass; schema validation)
-// Deadline: AbortSignal at deadlineAt - 8000 ms synthesis allowance; await in-flight calls <= 5 s more;
-// after the response, reconcile any held reservation through GET /v1/transactions.
-import type { ResearchRequest } from "../api/schemas.js";
+import { randomUUID } from "node:crypto";
+import { parseMoney, formatMoney, type Micro } from "../budget/money.js";
+import { createSpendGuard, type SpendGuard } from "../budget/ledger.js";
+import { createEvidenceStore } from "../evidence/store.js";
+import { decideIdentity, type SubjectInput } from "../identity/matcher.js";
+import type { ResearchRequest, ResearchReport } from "../api/schemas.js";
+import type { Db } from "../db/sqlite.js";
+import type { Logger } from "../logger.js";
+import type { PerfloClient } from "../perflo/client.js";
+import type { ResearchAgent, AgentContext, RiskClassification, RiskHit } from "./agent.js";
+import { candidatesFromSources } from "./candidates.js";
+import { plan } from "./planner.js";
+import { adverseMediaQuery } from "./prompts.js";
+import { buildRunReport, type CostCall, type Warning } from "./run-report.js";
+import { createTools, type ResearchTools, type ToolOutcome } from "./tools.js";
+
+const SYNTHESIS_MS = 8_000;
+const DRAIN_MS = 5_000;
 
 export interface OrchestratorDeps {
-  // filled in M5: config, db, log, perflo client, agent, matcher
+  readonly db: Db;
+  readonly log: Logger;
+  readonly client: PerfloClient;
+  readonly agent: ResearchAgent;
+  readonly now?: number;
+  readonly deadlineMs?: number;
+  readonly concurrency?: number;
 }
 
-export async function runResearch(_req: ResearchRequest, _deps: OrchestratorDeps): Promise<unknown> {
-  throw new Error("TODO(M5): implement runResearch per PRD.md section 6");
+interface LedgerRow {
+  readonly id: string;
+  readonly vendor: string;
+  readonly capability: string;
+  readonly charged_micro: string | null;
+  readonly transaction_id: string | null;
+  readonly state: string;
+}
+
+function subjectOf(req: ResearchRequest): SubjectInput {
+  return {
+    fullName: `${req.firstName} ${req.lastName}`,
+    ...(req.dateOfBirth ? { dateOfBirth: req.dateOfBirth } : {}),
+    ...(req.address?.city ? { city: req.address.city } : {}),
+    ...(req.address?.country ? { country: req.address.country } : {}),
+  };
+}
+
+function wrapTools(tools: ResearchTools, onExhausted: () => void): ResearchTools {
+  const out: ResearchTools = {};
+  for (const [name, row] of Object.entries(tools)) {
+    if (!row) continue;
+    out[name as keyof ResearchTools] = {
+      ...row,
+      async execute(args: Record<string, unknown>): Promise<ToolOutcome> {
+        const result = await row.execute(args);
+        if (result.outcome === "budget_exhausted") onExhausted();
+        return result;
+      },
+    };
+  }
+  return out;
+}
+
+function agentCtx(
+  req: ResearchRequest,
+  planTier: string,
+  allowed: readonly import("./capabilities.js").ToolName[],
+  tools: ResearchTools,
+  guard: SpendGuard,
+  signal: AbortSignal,
+  extra: Partial<AgentContext> = {},
+): AgentContext {
+  return {
+    subject: {
+      firstName: req.firstName,
+      lastName: req.lastName,
+      ...(req.dateOfBirth ? { dateOfBirth: req.dateOfBirth } : {}),
+      ...(req.address
+        ? {
+            address: {
+              ...(req.address.city ? { city: req.address.city } : {}),
+              ...(req.address.region ? { region: req.address.region } : {}),
+              ...(req.address.country ? { country: req.address.country } : {}),
+            },
+          }
+        : {}),
+    },
+    tier: planTier,
+    remainingBudget: formatMoney(guard.snapshot().headroomMicro),
+    allowedTools: allowed,
+    tools,
+    signal,
+    ...extra,
+  };
+}
+
+async function reconcileHeld(db: Db, jobId: string, guard: SpendGuard, client: PerfloClient, log: Logger): Promise<void> {
+  const held = db
+    .prepare(`SELECT id, transaction_id FROM ledger WHERE job_id = ? AND state = 'held'`)
+    .all(jobId) as Array<{ id: string; transaction_id: string | null }>;
+  for (const row of held) {
+    try {
+      if (!row.transaction_id) {
+        guard.resolveHold(row.id, null);
+        continue;
+      }
+      const tx = await client.getTransaction(row.transaction_id);
+      if (tx.ledgerState === "posted" && tx.amount.amount.startsWith("-")) {
+        guard.resolveHold(row.id, {
+          chargedMicro: parseMoney(tx.amount.amount.slice(1)),
+          transactionId: tx.id,
+        });
+      } else {
+        guard.resolveHold(row.id, null);
+      }
+    } catch (err) {
+      log.error({ jobId, reservationId: row.id, err }, "unreconciled held reservation");
+      guard.resolveHold(row.id, null);
+    }
+  }
+}
+
+export async function runResearch(req: ResearchRequest, deps: OrchestratorDeps): Promise<ResearchReport> {
+  const started = deps.now ?? Date.now();
+  const capMicro = parseMoney(req.maxBudget.amount);
+  const deadlineMs = req.options?.deadlineMs ?? deps.deadlineMs ?? 45_000;
+  const planned = plan(capMicro, deadlineMs, started);
+  const requestId = `req_${randomUUID()}`;
+  const warnings: Warning[] = [];
+  const phases: Record<string, number> = {};
+  let deadlineHit = false;
+  let currentPhase = "plan";
+  let exhausted = false;
+
+  deps.db
+    .prepare(
+      `INSERT INTO jobs (id, created_at, tier, cap_micro, spent_micro, status, request_json)
+       VALUES (?, ?, ?, ?, '0', 'running', ?)`,
+    )
+    .run(requestId, new Date().toISOString(), planned.tier, capMicro.toString(), JSON.stringify(req));
+
+  const guard = createSpendGuard({
+    db: deps.db,
+    jobId: requestId,
+    capMicro,
+    reserveMicro: planned.reserveMicro,
+  });
+  const store = createEvidenceStore(deps.db, requestId);
+  const controller = new AbortController();
+  const abortAt = planned.deadlineAt - SYNTHESIS_MS;
+
+  const fireDeadline = (): void => {
+    if (deadlineHit) return;
+    deadlineHit = true;
+    warnings.push({
+      code: "deadline_hit",
+      message: `Deadline cut the ${currentPhase} phase; the report uses evidence collected so far.`,
+    });
+    controller.abort();
+  };
+
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  if (Date.now() >= abortAt) fireDeadline();
+  else timer = setTimeout(fireDeadline, abortAt - Date.now());
+
+  const tools = wrapTools(
+    createTools({
+      jobId: requestId,
+      client: deps.client,
+      guard,
+      store,
+      allowedTools: planned.allowedTools,
+      signal: controller.signal,
+      concurrency: deps.concurrency ?? 4,
+    }),
+    () => {
+      if (!exhausted) {
+        exhausted = true;
+        warnings.push({
+          code: "budget_exhausted",
+          message: "Remaining headroom is below the cheapest live quote among the allowed tools.",
+        });
+      }
+    },
+  );
+
+  let phaseWork: Promise<unknown> = Promise.resolve();
+
+  const runPhase = async (name: string, fn: () => Promise<void>): Promise<void> => {
+    if (controller.signal.aborted) return;
+    currentPhase = name;
+    const t0 = Date.now();
+    const work = fn();
+    phaseWork = work.catch(() => undefined);
+    try {
+      await work;
+    } catch (err) {
+      if (!controller.signal.aborted) {
+        deps.log.warn({ err, phase: name, requestId }, "phase failed");
+      }
+    }
+    phases[name] = Date.now() - t0;
+  };
+
+  const ctx = (extra?: Partial<AgentContext>) =>
+    agentCtx(req, planned.tier, planned.allowedTools, tools, guard, controller.signal, extra);
+
+  await runPhase("resolve", () => deps.agent.resolve(ctx()));
+
+  let evidence = candidatesFromSources(store.forJob());
+  let identity = decideIdentity(subjectOf(req), evidence);
+  let adverseOnly = identity.status === "ambiguous";
+  const skipResearch = identity.status === "not_found";
+
+  if (!skipResearch && identity.status === "ambiguous" && !controller.signal.aborted) {
+    await runPhase("disambiguate", async () => {
+      const [lead, runner] = identity.candidates;
+      const before = guard.snapshot();
+      guard.unlockReserve();
+      await deps.agent.disambiguate(
+        ctx({
+          lead: lead ? `${lead.id} ${lead.confidence}` : "",
+          runner: runner ? `${runner.id} ${runner.confidence}` : "",
+        }),
+      );
+      const after = guard.snapshot();
+      guard.relockAfterUnlock(after.spentMicro - before.spentMicro, before.headroomMicro);
+      evidence = candidatesFromSources(store.forJob());
+      identity = decideIdentity(subjectOf(req), evidence);
+      adverseOnly = identity.status === "ambiguous";
+    });
+  }
+
+  if (!skipResearch && !adverseOnly) {
+    await runPhase("enrich", () => deps.agent.enrich(ctx()));
+    evidence = candidatesFromSources(store.forJob());
+    identity = decideIdentity(subjectOf(req), evidence);
+  }
+
+  let classifications: RiskClassification[] = [];
+  let watchlistScreened = false;
+  let watchlistHits = false;
+
+  if (!skipResearch) {
+    await runPhase("screen", async () => {
+      const fullName = `${req.firstName} ${req.lastName}`;
+      const query = adverseMediaQuery(fullName);
+      if (tools.search_news) await tools.search_news.execute({ query });
+      if (tools.search_web) await tools.search_web.execute({ query });
+      if (tools.screen_watchlist) {
+        const result = await tools.screen_watchlist.execute({
+          fullName,
+          dateOfBirth: req.dateOfBirth,
+          country: req.address?.country,
+        });
+        if (result.outcome === "unavailable") {
+          warnings.push({
+            code: "pep_not_screened",
+            message: "PEP screening not available: no payable watchlist vendor in the Perflo catalog at run time.",
+          });
+          warnings.push({
+            code: "sanctions_not_screened",
+            message:
+              "Sanctions screening not available: no payable watchlist vendor in the Perflo catalog at run time.",
+          });
+        } else if (result.outcome === "ok" && result.sourceId) {
+          watchlistScreened = true;
+          const source = store.byId(result.sourceId);
+          const facts = source?.extracted as { facts?: { hits?: unknown[] } } | undefined;
+          watchlistHits = (facts?.facts?.hits?.length ?? 0) > 0;
+        }
+      }
+      const hits: RiskHit[] = [];
+      for (const source of store.forJob()) {
+        if (source.status !== "succeeded") continue;
+        if (source.capability !== "search_news" && source.capability !== "search_web") continue;
+        const facts = source.extracted as { facts?: { articles?: Array<{ title?: string }>; results?: Array<{ title?: string }> } };
+        const items = facts.facts?.articles ?? facts.facts?.results ?? [];
+        for (const item of items) {
+          if (item.title) hits.push({ sourceId: source.id, title: item.title });
+        }
+      }
+      classifications = [...(await Promise.resolve(deps.agent.classifyRisk(hits)))];
+    });
+  }
+
+  if (deadlineHit) {
+    await Promise.race([phaseWork, new Promise((resolve) => setTimeout(resolve, DRAIN_MS))]);
+  }
+  if (timer) clearTimeout(timer);
+
+  if (identity.status === "not_found") {
+    warnings.push({ code: "identity_not_found", message: "No candidates were returned for the subject." });
+  }
+  if (identity.status === "ambiguous") {
+    warnings.push({
+      code: "identity_ambiguous",
+      message: "Two or more candidates remain too close to select a primary; profile sections are empty.",
+    });
+  }
+  for (const message of identity.warnings) {
+    warnings.push({ code: "identity_input", message });
+  }
+
+  currentPhase = "report";
+  const tReport = Date.now();
+  let narrative = {
+    candidateSummaries: {} as Record<string, string>,
+    reputationalSummaries: {} as Record<string, string>,
+    rationale: "narrative unavailable",
+  };
+  if (!controller.signal.aborted) {
+    const notes = store
+      .forJob()
+      .map((s) => `${s.id} ${s.capability} ${s.status}`)
+      .join("\n");
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        narrative = await deps.agent.narrate({ ...ctx(), evidenceNotes: notes });
+        break;
+      } catch {
+        if (attempt === 1) {
+          warnings.push({
+            code: "narrative_unavailable",
+            message: "Narrative pass failed after two retries; summaries use the fallback string.",
+          });
+        }
+      }
+    }
+  }
+  phases.report = Date.now() - tReport;
+
+  const ledgerRows = deps.db
+    .prepare(`SELECT id, vendor, capability, charged_micro, transaction_id, state FROM ledger WHERE job_id = ?`)
+    .all(requestId) as LedgerRow[];
+  const byLedger = new Map(ledgerRows.map((row) => [row.id, row]));
+  const calls: CostCall[] = [];
+  for (const source of store.forJob()) {
+    if (!source.ledgerId) continue;
+    const row = byLedger.get(source.ledgerId);
+    if (!row || row.state !== "settled") continue;
+    calls.push({
+      sourceId: source.id,
+      vendor: source.vendor,
+      capability: source.capability,
+      status: source.status,
+      chargedMicro: BigInt(row.charged_micro ?? "0") as Micro,
+      transactionId: row.transaction_id,
+    });
+  }
+
+  const report = buildRunReport({
+    requestId,
+    request: req,
+    tier: planned.tier,
+    identity,
+    sources: store.forJob(),
+    calls,
+    capMicro,
+    warnings,
+    timing: {
+      totalMs: Math.max(0, Date.now() - started),
+      deadlineHit,
+      phases,
+    },
+    narrative,
+    classifications,
+    watchlistScreened,
+    watchlistHits,
+  });
+
+  const spent = guard.snapshot().spentMicro;
+  deps.db
+    .prepare(`UPDATE jobs SET finished_at = ?, spent_micro = ?, status = 'succeeded', report_json = ? WHERE id = ?`)
+    .run(new Date().toISOString(), spent.toString(), JSON.stringify(report), requestId);
+
+  await reconcileHeld(deps.db, requestId, guard, deps.client, deps.log);
+  return report;
 }

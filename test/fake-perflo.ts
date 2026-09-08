@@ -36,6 +36,7 @@ export interface FakePerflo {
   setContract(slug: string, patch: Partial<VendorContract>): void;
   setPayable(slug: string, payable: boolean): void;
   setSearchResults(query: string, results: VendorSearchResult[]): void;
+  setPayOutput(slug: string, output: unknown): void;
   close(): Promise<void>;
 }
 
@@ -94,7 +95,7 @@ function searchRow(slug: string): VendorSearchResult {
   };
 }
 
-function payOk(slug: string, status: "succeeded" | "failed", transactionId: string): PayResult {
+function payOk(slug: string, status: "succeeded" | "failed", transactionId: string, output?: unknown): PayResult {
   const result: PayResult = {
     transactionId,
     slug,
@@ -106,7 +107,7 @@ function payOk(slug: string, status: "succeeded" | "failed", transactionId: stri
     remaining: { amount: "4.720000", currency: "USD" },
     upstream: { httpStatus: status === "succeeded" ? 200 : 500 },
   };
-  if (status === "succeeded") return { ...result, output: { results: [] } };
+  if (status === "succeeded") return { ...result, output: output ?? { results: [] } };
   return { ...result, failure: { reason: "vendor_failed", message: "vendor answered and failed" } };
 }
 
@@ -140,6 +141,7 @@ export async function startFakePerflo(): Promise<FakePerflo> {
   const contractPatches = new Map<string, Partial<VendorContract>>();
   const payableBySlug = new Map<string, boolean>();
   const searchByQuery = new Map<string, VendorSearchResult[]>();
+  const payOutputs = new Map<string, unknown>();
   const payCalls: FakePayCall[] = [];
   const idempotency = new Map<string, { status: number; body: unknown; headers?: Record<string, string> }>();
   const transactions = new Map<string, Transaction>();
@@ -237,7 +239,7 @@ export async function startFakePerflo(): Promise<FakePerflo> {
       if (scenario === "SETTLEMENT_RECORDING_FAILED") {
         return remember(500, { error: { code: "SETTLEMENT_RECORDING_FAILED", message: "bookkeeping failed" }, meta: { requestId: "fake-req" } });
       }
-      return remember(200, { data: payOk(slug, status, id), meta: { requestId: "fake-req" } });
+      return remember(200, { data: payOk(slug, status, id, payOutputs.get(slug)), meta: { requestId: "fake-req" } });
     }
 
     switch (scenario) {
@@ -294,6 +296,9 @@ export async function startFakePerflo(): Promise<FakePerflo> {
     },
     setSearchResults(query, results) {
       searchByQuery.set(query, results);
+    },
+    setPayOutput(slug, output) {
+      payOutputs.set(slug, output);
     },
     close() {
       for (const t of hangTimers) clearTimeout(t);

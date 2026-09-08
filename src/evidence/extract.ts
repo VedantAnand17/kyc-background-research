@@ -52,18 +52,53 @@ function personItems(raw: Record<string, unknown>): unknown[] {
   return list(raw, ["people", "candidates", "results", "data", "matches"]);
 }
 
+function splitLocation(location?: string): { city?: string; country?: string } {
+  if (!location) return {};
+  const parts = location
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean);
+  const city = parts[0];
+  if (!city) return {};
+  if (parts.length === 1) return { city };
+  const last = parts[parts.length - 1]!;
+  if (last.length === 2) return { city, country: last.toUpperCase() };
+  return { city };
+}
+
 function findPeople(raw: unknown): Extraction {
   const rec = asRecord(raw) ?? {};
   const people = personItems(rec).map((item) => {
-    const row = asRecord(item) ?? {};
     const name = textOf(item, ["name", "fullName", "full_name"]) ?? "unknown";
-    const location = textOf(item, ["location", "city"]);
-    return location ? { name, location } : { name };
+    const dateOfBirth = textOf(item, ["dateOfBirth", "dob", "birth_date"]);
+    const city = textOf(item, ["city"]);
+    const country = textOf(item, ["country"]);
+    const location = textOf(item, ["location"]);
+    const company = textOf(item, ["company", "employer", "org"]);
+    const profileUrl = textOf(item, ["profileUrl", "profile_url", "linkedinUrl", "url"]);
+    const split = !city && location ? splitLocation(location) : {};
+    const resolvedCity = city ?? split.city;
+    const resolvedCountry = country ?? split.country;
+    return {
+      name,
+      ...(dateOfBirth ? { dateOfBirth } : {}),
+      ...(resolvedCity ? { city: resolvedCity } : {}),
+      ...(resolvedCountry ? { country: resolvedCountry.toUpperCase() } : {}),
+      ...(location ? { location } : {}),
+      ...(company ? { company } : {}),
+      ...(profileUrl ? { profileUrl } : {}),
+    };
   });
   return {
     facts: { people },
     candidateEvidence: people,
-    summary: joinLines(people.map((p) => ("location" in p ? `${p.name} (${p.location})` : p.name))) || "no people",
+    summary:
+      joinLines(
+        people.map((p) => {
+          const place = p.location ?? [p.city, p.country].filter(Boolean).join(", ");
+          return place ? `${p.name} (${place})` : p.name;
+        }),
+      ) || "no people",
   };
 }
 

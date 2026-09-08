@@ -310,7 +310,7 @@ export function createTools(ctx: ToolContext): ResearchTools {
           signal: ctx.signal,
         });
         const chargedMicro = parseMoney(paid.charged.amount);
-        ctx.guard.settle(reserved.id, chargedMicro, paid.transactionId);
+        ctx.guard.settle(reserved.id, chargedMicro, paid.transactionId, paid.status);
         const extracted = extractFor(name, paid.output);
         const failed = paid.status === "failed";
         const source = ctx.store.insert({
@@ -347,7 +347,7 @@ export function createTools(ctx: ToolContext): ResearchTools {
         }
         const action = ledgerActionForError(err);
         if (action === "hold") ctx.guard.hold(reserved.id, err.code);
-        else if (action === "settle_at_reserved") ctx.guard.settle(reserved.id, selected.quote, null);
+        else if (action === "settle_at_reserved") ctx.guard.settle(reserved.id, selected.quote, null, err.code);
         else ctx.guard.release(reserved.id, err.code);
         const chargedMicro = action === "settle_at_reserved" ? selected.quote : 0n;
         const source = ctx.store.insert({
