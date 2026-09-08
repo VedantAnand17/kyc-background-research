@@ -26,7 +26,8 @@ export class ResearchUnavailableError extends Error {
   }
 }
 
-const SYNTHESIS_MS = 8_000;
+/** Wall-clock reserved for the narrative pass. Fresh timeout per attempt; generateText finishes in ~20s. */
+export const SYNTHESIS_MS = 35_000;
 const DRAIN_MS = 5_000;
 
 export interface OrchestratorDeps {
@@ -295,7 +296,7 @@ export async function runResearch(req: ResearchRequest, deps: OrchestratorDeps):
         if (item.title) hits.push({ sourceId: source.id, title: item.title });
       }
     }
-    classifications = [...(await Promise.resolve(deps.agent.classifyRisk(hits)))];
+    classifications = [...(await Promise.resolve(deps.agent.classifyRisk(hits, controller.signal)))];
   };
 
   if (!skipResearch && !adverseOnly) {
@@ -332,21 +333,35 @@ export async function runResearch(req: ResearchRequest, deps: OrchestratorDeps):
     reputationalSummaries: {} as Record<string, string>,
     rationale: "narrative unavailable",
   };
-  const notes = store
-    .forJob()
-    .map((s) => `${s.id} ${s.capability} ${s.status}`)
-    .join("\n");
-  const synthesis = AbortSignal.timeout(SYNTHESIS_MS);
+  const notes = [
+    `identity ${identity.status} primary=${identity.primaryCandidateId ?? "none"}`,
+    ...identity.candidates.map(
+      (c) => `candidate ${c.id} ${c.label} ${c.confidence} matched=${c.matchedOn.join(",")} conflicts=${c.conflicts.join(",")}`,
+    ),
+    ...store.forJob().map((s) => {
+      const extracted = s.extracted as { summary?: unknown } | undefined;
+      const summary = typeof extracted?.summary === "string" ? extracted.summary : "";
+      return `${s.id} ${s.capability} ${s.status}${summary ? `: ${summary}` : ""}`;
+    }),
+  ].join("\n");
+  const reportBudgetEnds = Date.now() + SYNTHESIS_MS;
   for (let attempt = 0; attempt < 2; attempt++) {
+    const remaining = reportBudgetEnds - Date.now();
+    if (remaining < 3_000) break;
     try {
-      narrative = await deps.agent.narrate({ ...ctx(), signal: synthesis, evidenceNotes: notes });
+      narrative = await deps.agent.narrate({
+        ...ctx(),
+        signal: AbortSignal.timeout(remaining),
+        evidenceNotes: notes,
+      });
       break;
     } catch {
-      if (attempt === 1) {
+      if (attempt === 1 || reportBudgetEnds - Date.now() < 3_000) {
         warnings.push({
           code: "narrative_unavailable",
           message: "Narrative pass failed after two retries; summaries use the fallback string.",
         });
+        break;
       }
     }
   }

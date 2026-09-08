@@ -83,7 +83,27 @@ function attachedToPrimary(source: SourceRecord, primaryId: string): boolean {
   return source.candidateId === primaryId || source.candidateId === null;
 }
 
-function profileFrom(sources: readonly SourceRecord[], primaryId: string | null): ResearchReport["profile"] {
+function titlesMatch(a: string, b: string): boolean {
+  return a.trim().toLowerCase() === b.trim().toLowerCase();
+}
+
+function newsAboutPrimary(
+  sourceId: string,
+  title: string,
+  classifications: readonly RiskClassification[],
+): boolean {
+  const withTitles = classifications.filter((row) => row.title);
+  if (withTitles.length > 0) {
+    return withTitles.some((row) => titlesMatch(row.title!, title) && row.aboutPrimary);
+  }
+  return classifications.some((row) => row.sourceId === sourceId && row.aboutPrimary);
+}
+
+function profileFrom(
+  sources: readonly SourceRecord[],
+  primaryId: string | null,
+  classifications: readonly RiskClassification[],
+): ResearchReport["profile"] {
   const profile = emptyProfile();
   if (!primaryId) return profile;
 
@@ -126,6 +146,7 @@ function profileFrom(sources: readonly SourceRecord[], primaryId: string | null)
         const row = article && typeof article === "object" ? (article as Record<string, unknown>) : {};
         const title = asString(row.title);
         if (!title) continue;
+        if (!newsAboutPrimary(source.id, title, classifications)) continue;
         profile.news.push({
           title,
           ...(asString(row.url) ? { url: asString(row.url) } : {}),
@@ -226,7 +247,7 @@ export function assembleReport(input: AssembleReportInput): ResearchReport {
         sourceIds: [...c.sourceIds],
       })),
     },
-    profile: confirmed ? profileFrom(input.sources, input.identity.primaryCandidateId) : emptyProfile(),
+    profile: confirmed ? profileFrom(input.sources, input.identity.primaryCandidateId, input.classifications) : emptyProfile(),
     risk: {
       pep: watch,
       sanctions: watch,

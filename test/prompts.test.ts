@@ -40,6 +40,7 @@ describe("prompts", () => {
     expect(text).toMatch(/summary/i);
     expect(text).toMatch(/rationale/i);
     expect(text).toMatch(/never invent/i);
+    expect(text).toMatch(/candidateSummaries/);
   });
 
   it("builds the fixed adverse-media query from the subject name", () => {
@@ -52,5 +53,6 @@ describe("prompts", () => {
     const text = enrichUserPrompt();
     expect(text).toMatch(/already resolved/i);
     expect(text).toMatch(/do not call find_people/i);
+    expect(text).toMatch(/do not take a second turn/i);
   });
 });

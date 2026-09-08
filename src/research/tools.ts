@@ -7,6 +7,7 @@ import type { EvidenceStore } from "../evidence/store.js";
 import type { PerfloClient } from "../perflo/client.js";
 import { ledgerActionForError, PerfloError } from "../perflo/errors.js";
 import type { VendorContract } from "../perflo/types.js";
+import { normalizeName } from "../identity/normalize.js";
 import { capabilityOf, preferredVendors, type ToolName } from "./capabilities.js";
 
 export interface ToolContext {
@@ -153,6 +154,31 @@ export function canonicalizeArgs(args: Record<string, unknown>): string {
   return JSON.stringify(sortDeep(args));
 }
 
+const PERSON_TOOLS = new Set<ToolName>([
+  "enrich_person",
+  "skip_trace",
+  "screen_watchlist",
+  "search_filings",
+  "get_professional_profile",
+]);
+
+/** Cache key for a paid call. Person tools key on the subject, not optional extra fields. */
+export function dedupeKeyFor(tool: ToolName, args: Record<string, unknown>): string {
+  if (tool === "get_social_profile") {
+    const network = typeof args.network === "string" ? args.network : "";
+    const handle = typeof args.handleOrName === "string" ? args.handleOrName.trim().toLowerCase() : "";
+    return JSON.stringify({ subject: `${network}:${handle}` });
+  }
+  if (PERSON_TOOLS.has(tool)) {
+    const name = typeof args.fullName === "string" ? normalizeName(args.fullName) : "";
+    if (name) return JSON.stringify({ subject: name });
+    if (typeof args.profileUrl === "string" && args.profileUrl.trim()) {
+      return JSON.stringify({ profileUrl: args.profileUrl.trim() });
+    }
+  }
+  return canonicalizeArgs(args);
+}
+
 function readArg(field: string, args: Record<string, unknown>): unknown {
   if (args[field] !== undefined) return args[field];
   for (const alias of ALIASES[field] ?? []) {
@@ -261,7 +287,7 @@ export function createTools(ctx: ToolContext): ResearchTools {
     }
     if (exhausted) return { outcome: "budget_exhausted", remaining: remainingOf(ctx.guard) };
 
-    const canonical = canonicalizeArgs(args);
+    const canonical = dedupeKeyFor(name, args);
     const cached = ctx.store.findDuplicate(name, canonical);
     if (cached) {
       return {

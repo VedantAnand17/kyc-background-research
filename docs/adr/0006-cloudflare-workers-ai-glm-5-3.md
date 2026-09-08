@@ -26,9 +26,14 @@ glm-5.3 also stopped calling tools and said it was finishing when handed a `budg
 ## Decision
 
 - Default provider: Cloudflare Workers AI via the AI SDK `@ai-sdk/openai-compatible` provider, `LLM_PROVIDER=cloudflare`, base URL derived from `CLOUDFLARE_ACCOUNT_ID`.
-- Default model: `@cf/zai-org/glm-5.3` for both the agent loop and the narrative pass.
-- Documented fallback: `@cf/openai/gpt-oss-120b`, only with `max_tokens` at least 1500, `reasoning_effort: low`, and the stricter no-invention prompt; use it when speed matters more than prose faithfulness.
-- Every LLM call sets `max_tokens` explicitly (1500 for the agent loop, 1200 for narrative) so reasoning models never return an empty completion.
+- Default model for the tool loop, risk classification, and narrative: `@cf/zai-org/glm-5.3`.
+- The enrich loop is capped at three steps (one fan-out turn, then finish) and the narrative allowance is 35 seconds.
+  A live glm-5.3 run against the fake Perflo server spent 85 seconds in an uncapped enrich loop and timed out an 8 second, then a 20 second, narrative pass.
+- `LLM_LOOP_MODEL` can override the tool-loop model.
+  `@cf/openai/gpt-oss-120b` is not the default: Workers AI returns 400 on its second tool-calling turn (`messages[].content` shape), so a live resolve called `find_people` and then died.
+- Classification and narrative use `generateText` plus a JSON parse, not `generateObject`.
+  glm-5.3's json_schema mode spends the token budget on `reasoning_content` and returns empty `content`.
+- Every LLM call sets `max_tokens` explicitly (1500) so reasoning models never return an empty completion.
 - `openai` and `openai-compatible` remain selectable so an interviewer can run with their own key.
 
 ## Consequences
@@ -41,5 +46,6 @@ glm-5.3 also stopped calling tools and said it was finishing when handed a `budg
 
 - AWS Bedrock: not reachable with the current IAM user.
 - DeepSeek V4 Pro: structured output far too slow for the deadline.
-- gpt-oss-120b as default: fastest and cheapest, but embellished facts in the narrative test.
+- gpt-oss-120b as the narrative default: fastest and cheapest, but embellished facts in the narrative test.
+  It is the Cloudflare tool-loop default only.
 - Kimi K2.6: 17 second steps.

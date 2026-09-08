@@ -45,6 +45,7 @@ export function narrativePrompt(facts: PromptFacts): string {
     preamble(facts),
     "Fill only these narrative fields from the supplied evidence notes:",
     "each candidate summary, each reputational-hit summary, and the overall risk rationale.",
+    'JSON shape: {"candidateSummaries":[{"id":"c1","summary":"..."}],"reputationalSummaries":[{"sourceId":"s1","summary":"..."}],"rationale":"..."}.',
     "If a fact is missing, say so plainly. Never invent.",
   ].join("\n");
 }
@@ -57,9 +58,9 @@ export function enrichUserPrompt(): string {
   return [
     "The primary candidate is already resolved.",
     "Do not call find_people again.",
-    "Enrich the primary candidate with the allowed tools.",
-    "Prefer several calls in one turn.",
-    "Call finish when done.",
+    "In one turn, call every allowed enrich tool you still need for that one person.",
+    "Do not take a second turn.",
+    "Then call finish.",
   ].join(" ");
 }
 
@@ -67,6 +68,7 @@ export function riskClassifyPrompt(hits: string): string {
   return [
     "Classify each news or web hit.",
     "Say whether it is about the primary candidate and assign severity low, medium, or high.",
+    'JSON shape: {"hits":[{"sourceId":"...","aboutPrimary":true,"severity":"low","summary":"..."}]}.',
     "Never invent hits that are not listed.",
     hits,
   ].join("\n");

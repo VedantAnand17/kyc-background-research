@@ -28,6 +28,10 @@ The orchestrator runs the five phases, honors the deadline, and returns a schema
 `POST /research` returns that report over HTTP.
 `GET /docs` renders the OpenAPI explorer.
 A skipped risk screen marks every category `not_screened` with warnings and forces overall risk `unknown`.
+The default model is `@cf/zai-org/glm-5.3` for the tool loop and the narrative.
+Person-targeted tools cache by the subject so a second `enrich_person` with different optional fields does not pay twice.
+News in the profile uses the same about-primary filter as reputational hits.
+A `Dockerfile` builds the API image.
 M7 (live verification and README polish) remains.
 
 ## Run
@@ -43,8 +47,14 @@ pnpm check                # typecheck
 ```
 
 Fixture mode (`FIXTURE_MODE=true`) serves recorded vendor responses from `test/fixtures/` and spends nothing.
-Live mode needs a Perflo agent key plus a Cloudflare account id and an API token with Workers AI read; the default model is `@cf/zai-org/glm-5.3` (ADR-0006).
+Live mode needs a Perflo agent key plus a Cloudflare account id and an API token with Workers AI read.
+The default model is `@cf/zai-org/glm-5.3` (ADR-0006).
 See `.env.example` and PRD section 13.
+
+```bash
+docker build -t kyc-background-research .
+docker run --env-file .env -p 3000:3000 kyc-background-research
+```
 
 ## Layout
 
