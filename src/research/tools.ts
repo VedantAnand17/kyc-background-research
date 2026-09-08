@@ -199,10 +199,12 @@ async function selectVendor(
   client: PerfloClient,
   cache: ContractCache,
   headroom: Micro,
+  skip: ReadonlySet<string> = new Set(),
 ): Promise<SelectedVendor> {
   const entry = capabilityOf(tool);
   let sawPayable = false;
   const trySlug = async (slug: string): Promise<SelectedVendor | undefined> => {
+    if (skip.has(slug)) return undefined;
     try {
       const contract = await cache.get(slug);
       if (!contract.payable) return undefined;
@@ -274,7 +276,8 @@ export function createTools(ctx: ToolContext): ResearchTools {
 
     return limit.run(async () => {
       if (exhausted) return { outcome: "budget_exhausted", remaining: remainingOf(ctx.guard) };
-      const selected = await selectVendor(name, args, ctx.client, cache, ctx.guard.snapshot().headroomMicro);
+      const skip = new Set(ctx.store.failedVendors(name, canonical));
+      const selected = await selectVendor(name, args, ctx.client, cache, ctx.guard.snapshot().headroomMicro, skip);
       if (selected.status === "unaffordable") {
         const headroom = ctx.guard.snapshot().headroomMicro;
         await markGlobalIfTight(headroom);

@@ -34,6 +34,8 @@ export interface EvidenceStore {
   forJob(): SourceRecord[];
   forCandidate(id: string): SourceRecord[];
   findDuplicate(tool: string, canonicalArgs: string): SourceRecord | undefined;
+  /** Vendors that already failed this capability+args pair; a retry must skip them. */
+  failedVendors(tool: string, canonicalArgs: string): readonly string[];
 }
 
 interface StoredExtracted {
@@ -94,6 +96,13 @@ export function createEvidenceStore(db: Db, jobId: string): EvidenceStore {
     `SELECT * FROM sources WHERE job_id = ? AND candidate_id = ? ORDER BY retrieved_at, id`,
   );
 
+  function* matchingDedupe(tool: string, canonicalArgs: string): Generator<SourceRow> {
+    for (const row of selectJob.all(jobId) as SourceRow[]) {
+      if (row.capability !== tool) continue;
+      if (readExtracted(row.extracted_json).dedupeKey === canonicalArgs) yield row;
+    }
+  }
+
   return {
     insert(input) {
       const id = randomUUID();
@@ -137,11 +146,17 @@ export function createEvidenceStore(db: Db, jobId: string): EvidenceStore {
     },
     findDuplicate(tool, canonicalArgs) {
       // ponytail: O(n) scan of one job's sources; add a dedupe_key column if jobs grow large.
-      for (const row of selectJob.all(jobId) as SourceRow[]) {
-        if (row.capability !== tool) continue;
-        if (readExtracted(row.extracted_json).dedupeKey === canonicalArgs) return toRecord(row);
+      for (const row of matchingDedupe(tool, canonicalArgs)) {
+        if (row.status === "succeeded") return toRecord(row);
       }
       return undefined;
+    },
+    failedVendors(tool, canonicalArgs) {
+      const slugs: string[] = [];
+      for (const row of matchingDedupe(tool, canonicalArgs)) {
+        if (row.status === "failed") slugs.push(row.vendor);
+      }
+      return slugs;
     },
   };
 }

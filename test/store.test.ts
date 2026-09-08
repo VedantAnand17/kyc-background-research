@@ -50,4 +50,12 @@ describe("evidence store", () => {
     expect(store.findDuplicate("find_people", '{"fullName":"Other"}')).toBeUndefined();
     expect(store.findDuplicate("search_news", '{"fullName":"Ada Okonkwo"}')).toBeUndefined();
   });
+
+  it("findDuplicate ignores failed sources so a retry can pay again", () => {
+    const store = createEvidenceStore(tracked(), "job-1");
+    store.insert(sample({ status: "failed", extracted: { facts: {}, summary: "upstream" } }));
+    expect(store.findDuplicate("find_people", '{"fullName":"Ada Okonkwo"}')).toBeUndefined();
+    const ok = store.insert(sample());
+    expect(store.findDuplicate("find_people", '{"fullName":"Ada Okonkwo"}')?.id).toBe(ok.id);
+  });
 });

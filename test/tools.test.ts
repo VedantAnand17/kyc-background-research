@@ -128,6 +128,22 @@ describe("tool layer", () => {
     expect(server.payCalls[0]?.slug).toBe("stableenrich-fullenrich-people-search");
   });
 
+  it("retry after a released VENDOR_ERROR pays the fallback vendor instead of serving the failure from cache", async () => {
+    const { server, tools } = await harness();
+    server.setScenario("stableenrich-minerva-resolve", "VENDOR_ERROR");
+    const first = await call(tools, "find_people", { fullName: "Ada Okonkwo" });
+    expect(first.outcome).toBe("failed");
+    if (first.outcome === "failed") {
+      expect(first.reason).toMatch(/upstream/i);
+    }
+    const second = await call(tools, "find_people", { fullName: "Ada Okonkwo" });
+    expect(second).toMatchObject({ outcome: "ok", cached: false });
+    expect(server.payCalls.map((c) => c.slug)).toEqual([
+      "stableenrich-minerva-resolve",
+      "stableenrich-fullenrich-people-search",
+    ]);
+  });
+
   it("returns budget_exhausted when the quote does not fit headroom", async () => {
     const { tools, server } = await harness({ capMicro: 1_000n });
     const result = await call(tools, "find_people");
