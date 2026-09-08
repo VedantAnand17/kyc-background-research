@@ -373,6 +373,7 @@ Error code handling, matched on `error.code` never on message text:
 | `500 SETTLEMENT_RECORDING_FAILED` | yes | settle at reserved amount | never retry, never fail over; look up transaction, warning |
 | `429 RATE_LIMITED` | no | release | back off per `RateLimit-*` headers if the deadline allows, else skip |
 | timeout or connection error | unknown | hold | look up by transaction; settle or release from the answer; never re-pay blind |
+| unrecognized 5xx on pay (HTML gateway page, `HTTP_5xx`, unknown shape) | unknown | hold | same as timeout; do not treat as free. Documented 5xx codes in this table still win (`VENDOR_ERROR` is release; `SETTLEMENT_RECORDING_FAILED` settles at reserved) |
 
 ## 11. LLM integration
 
