@@ -135,13 +135,21 @@ describe("spend guard", () => {
     expect(row.charged_micro).toBeNull();
     expect(row.idempotency_key).toBe(reserved.idempotencyKey);
 
-    g.settle(reserved.id, 40000n, "tx-persist");
-    const settled = db.prepare(`SELECT state, charged_micro, transaction_id FROM ledger WHERE id = ?`).get(reserved.id) as {
+    g.settle(reserved.id, 40000n, "tx-persist", "failed");
+    const settled = db.prepare(`SELECT state, charged_micro, transaction_id, perflo_code FROM ledger WHERE id = ?`).get(
+      reserved.id,
+    ) as {
       state: string;
       charged_micro: string;
       transaction_id: string;
+      perflo_code: string;
     };
-    expect(settled).toEqual({ state: "settled", charged_micro: "40000", transaction_id: "tx-persist" });
+    expect(settled).toEqual({
+      state: "settled",
+      charged_micro: "40000",
+      transaction_id: "tx-persist",
+      perflo_code: "failed",
+    });
 
     const reloaded = guard(db);
     expect(reloaded.snapshot()).toEqual(g.snapshot());
@@ -157,5 +165,26 @@ describe("spend guard", () => {
     g.unlockReserve();
     expect(g.snapshot().headroomMicro).toBe(100_000n);
     expect(reserve(g, 100_000n).ok).toBe(true);
+  });
+
+  it("relocks unused reserve after a disambiguation spend", () => {
+    const db = tracked();
+    const g = guard(db, "job-1", CAP, 100_000n);
+    const first = reserve(g, 700_000n);
+    expect(first.ok).toBe(true);
+    if (!first.ok) throw new Error("expected reservation");
+    g.settle(first.id, 700_000n, "tx-1", "succeeded");
+    const before = g.snapshot().headroomMicro;
+    expect(before).toBe(200_000n);
+    g.unlockReserve();
+    expect(g.snapshot().headroomMicro).toBe(300_000n);
+    const disc = reserve(g, 150_000n);
+    expect(disc.ok).toBe(true);
+    if (!disc.ok) throw new Error("expected reservation");
+    g.settle(disc.id, 150_000n, "tx-2", "succeeded");
+    g.relockAfterUnlock(150_000n, before);
+    expect(g.snapshot().headroomMicro).toBe(50_000n);
+    expect(reserve(g, 60_000n).ok).toBe(false);
+    expect(reserve(g, 50_000n).ok).toBe(true);
   });
 });

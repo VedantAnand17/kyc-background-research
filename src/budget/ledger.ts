@@ -4,9 +4,8 @@
 // reserve() checks and updates in one synchronous SQLite transaction. Every transition is written
 // to the `ledger` table before the caller makes its next network call.
 //
-// TODO(M5): copy snapshot.spentMicro onto jobs.spent_micro when the job finishes.
-// TODO(M5): pass the pay outcome (succeeded/failed, or the Perflo code) into settle;
-// the row currently stores the constant SETTLED.
+// Job finish writes snapshot.spentMicro onto jobs.spent_micro (orchestrator).
+// settle() records the pay outcome (succeeded/failed, or the Perflo code) in perflo_code.
 import { randomUUID } from "node:crypto";
 import type { Db } from "../db/sqlite.js";
 import type { Micro } from "./money.js";
@@ -32,13 +31,15 @@ export interface LedgerSnapshot {
 
 export interface SpendGuard {
   reserve(req: ReservationRequest): ReserveResult;
-  settle(id: ReservationId, chargedMicro: Micro, transactionId: string | null): void;
+  settle(id: ReservationId, chargedMicro: Micro, transactionId: string | null, perfloCode?: string): void;
   release(id: ReservationId, perfloCode: string): void;
   hold(id: ReservationId, perfloCode: string): void;
   /** Resolve a held reservation once GET /v1/transactions answers. */
   resolveHold(id: ReservationId, outcome: { readonly chargedMicro: Micro; readonly transactionId: string } | null): void;
   /** Release the planner's 10 percent disambiguation hold so later phases can spend it. */
   unlockReserve(): void;
+  /** After the one discriminator call, lock whatever reserve was not needed. */
+  relockAfterUnlock(spentWhileUnlocked: Micro, headroomBeforeUnlock: Micro): void;
   snapshot(): LedgerSnapshot;
 }
 
@@ -133,18 +134,20 @@ export function createSpendGuard(opts: LedgerOptions): SpendGuard {
     return { ok: true, id, idempotencyKey };
   });
 
-  const settleTx = db.transaction((id: ReservationId, chargedMicro: Micro, transactionId: string | null): void => {
-    if (chargedMicro < 0n) throw new RangeError(`negative charge: ${chargedMicro}`);
-    const row = loadRow(id);
-    if (row.state !== "reserved" && row.state !== "held") {
-      throw new Error(`cannot settle reservation ${id} in state ${row.state}`);
-    }
-    const reserved = BigInt(row.reserved_micro);
-    if (chargedMicro > reserved) {
-      throw new RangeError(`charged ${chargedMicro} exceeds reserved ${reserved}`);
-    }
-    updateRow.run("settled", chargedMicro.toString(), transactionId, "SETTLED", nowIso(), id, jobId);
-  });
+  const settleTx = db.transaction(
+    (id: ReservationId, chargedMicro: Micro, transactionId: string | null, perfloCode: string): void => {
+      if (chargedMicro < 0n) throw new RangeError(`negative charge: ${chargedMicro}`);
+      const row = loadRow(id);
+      if (row.state !== "reserved" && row.state !== "held") {
+        throw new Error(`cannot settle reservation ${id} in state ${row.state}`);
+      }
+      const reserved = BigInt(row.reserved_micro);
+      if (chargedMicro > reserved) {
+        throw new RangeError(`charged ${chargedMicro} exceeds reserved ${reserved}`);
+      }
+      updateRow.run("settled", chargedMicro.toString(), transactionId, perfloCode, nowIso(), id, jobId);
+    },
+  );
 
   const releaseTx = db.transaction((id: ReservationId, perfloCode: string): void => {
     const row = loadRow(id);
@@ -166,8 +169,8 @@ export function createSpendGuard(opts: LedgerOptions): SpendGuard {
     reserve(req) {
       return reserveTx(req);
     },
-    settle(id, chargedMicro, transactionId) {
-      settleTx(id, chargedMicro, transactionId);
+    settle(id, chargedMicro, transactionId, perfloCode = "succeeded") {
+      settleTx(id, chargedMicro, transactionId, perfloCode);
     },
     release(id, perfloCode) {
       releaseTx(id, perfloCode);
@@ -177,10 +180,15 @@ export function createSpendGuard(opts: LedgerOptions): SpendGuard {
     },
     resolveHold(id, outcome) {
       if (outcome === null) releaseTx(id, "UNRECONCILED");
-      else settleTx(id, outcome.chargedMicro, outcome.transactionId);
+      else settleTx(id, outcome.chargedMicro, outcome.transactionId, "succeeded");
     },
     unlockReserve() {
       lockedReserve = 0n;
+    },
+    relockAfterUnlock(spentWhileUnlocked, headroomBeforeUnlock) {
+      const usedFromReserve =
+        spentWhileUnlocked > headroomBeforeUnlock ? spentWhileUnlocked - headroomBeforeUnlock : 0n;
+      lockedReserve = usedFromReserve >= opts.reserveMicro ? 0n : opts.reserveMicro - usedFromReserve;
     },
     snapshot() {
       return snapshotFrom(loadRows());

@@ -1,13 +1,6 @@
 // Phase 0: budget -> tier, allowed tools, reserve, deadline. Pure code. PRD.md section 6.1.
-//
-// TODO(M5): implement.
-//   basic:    cap <  0.500000 USD
-//   standard: 0.500000 <= cap <= 2.000000 USD
-//   deep:     cap >  2.000000 USD
-//   reserveMicro = ceilFraction(capMicro, 1n, 10n)
-//   deadlineAt   = now + (request.options?.deadlineMs ?? config.RESEARCH_DEADLINE_MS)
-import type { Micro } from "../budget/money.js";
-import type { Tier, ToolName } from "./capabilities.js";
+import { ceilFraction, type Micro } from "../budget/money.js";
+import { toolsForTier, type Tier, type ToolName } from "./capabilities.js";
 
 export interface Plan {
   readonly tier: Tier;
@@ -17,6 +10,24 @@ export interface Plan {
   readonly deadlineAt: number;
 }
 
-export function plan(_capMicro: Micro, _deadlineMs: number, _now: number = Date.now()): Plan {
-  throw new Error("TODO(M5): implement plan() per PRD.md section 6.1");
+const BASIC_MAX = 499_999n;
+const STANDARD_MAX = 2_000_000n;
+
+export function tierForCap(capMicro: Micro): Tier {
+  if (capMicro < 0n) throw new RangeError(`negative cap: ${capMicro}`);
+  if (capMicro <= BASIC_MAX) return "basic";
+  if (capMicro <= STANDARD_MAX) return "standard";
+  return "deep";
+}
+
+export function plan(capMicro: Micro, deadlineMs: number, now: number = Date.now()): Plan {
+  if (deadlineMs <= 0) throw new RangeError(`deadline must be positive: ${deadlineMs}`);
+  const tier = tierForCap(capMicro);
+  return {
+    tier,
+    allowedTools: toolsForTier(tier).map((c) => c.tool),
+    capMicro,
+    reserveMicro: ceilFraction(capMicro, 1n, 10n),
+    deadlineAt: now + deadlineMs,
+  };
 }
