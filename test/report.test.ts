@@ -224,6 +224,64 @@ describe("report invariants", () => {
     expect(() => assertReportInvariants(broken, parseMoney("0.025200"))).toThrow(/sourceIds/);
   });
 
+  it("keeps news that is not about the primary candidate out of the profile", () => {
+    const newsSource = source("s-news", "search_news", {
+      candidateId: null,
+      extracted: {
+        facts: {
+          articles: [
+            { title: "Ada Okonkwo joins Paystack in Lagos", outlet: "TechCabal" },
+            { title: "Houston Ada Okonkwo charged in wire fraud", outlet: "Houston Chronicle" },
+          ],
+        },
+        summary: "two articles",
+      },
+    });
+    const report = assembleReport(
+      input({
+        sources: [source("s1", "find_people"), newsSource],
+        classifications: [
+          {
+            sourceId: "s-news",
+            title: "Ada Okonkwo joins Paystack in Lagos",
+            aboutPrimary: true,
+            severity: "low",
+            summary: "Employment announcement about the Lagos candidate.",
+          },
+          {
+            sourceId: "s-news",
+            title: "Houston Ada Okonkwo charged in wire fraud",
+            aboutPrimary: false,
+            severity: "high",
+            summary: "Different person in Houston.",
+          },
+        ],
+        calls: [
+          {
+            sourceId: "s1",
+            vendor: "v",
+            capability: "find_people",
+            status: "succeeded",
+            chargedMicro: parseMoney("0.01"),
+            transactionId: "tx-1",
+          },
+          {
+            sourceId: "s-news",
+            vendor: "v",
+            capability: "search_news",
+            status: "succeeded",
+            chargedMicro: parseMoney("0.01"),
+            transactionId: "tx-2",
+          },
+        ],
+        ledgerSpentMicro: parseMoney("0.02"),
+      }),
+    );
+    expect(report.profile.news.map((row) => row.title)).toEqual(["Ada Okonkwo joins Paystack in Lagos"]);
+    expect(report.risk.reputational.hits).toHaveLength(1);
+    expect(report.risk.reputational.hits[0]?.summary).toMatch(/Lagos/);
+  });
+
   it("marks every risk category not_screened and overall unknown when the screen did not run", () => {
     const report = assembleReport(
       input({

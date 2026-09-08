@@ -56,6 +56,7 @@ export function createScriptedAgent(
       if (over.classify) return over.classify(hits);
       return hits.map((hit) => ({
         sourceId: hit.sourceId,
+        title: hit.title,
         aboutPrimary: true,
         severity: "low" as const,
         summary: hit.title,

@@ -101,6 +101,28 @@ describe("tool layer", () => {
     expect(ctx.store.forJob()).toHaveLength(1);
   });
 
+  it("dedupes enrich_person by the person, not by optional argument text", async () => {
+    const { server, tools, ctx } = await harness();
+    const first = await call(tools, "enrich_person", {
+      fullName: "Ada Okonkwo",
+      location: "Lagos",
+    });
+    const second = await call(tools, "enrich_person", {
+      fullName: "Ada Okonkwo",
+      company: "Paystack",
+      location: "Lagos, Nigeria",
+    });
+    expect(first.outcome).toBe("ok");
+    expect(second).toMatchObject({
+      outcome: "ok",
+      cached: true,
+      charged: "0.000000",
+      sourceId: first.outcome === "ok" ? first.sourceId : "",
+    });
+    expect(server.payCalls).toHaveLength(1);
+    expect(ctx.guard.snapshot().spentMicro).toBe(25_200n);
+  });
+
   it("places fields from the vendor contract in, never by guessing", async () => {
     const { server, tools } = await harness();
     server.setContract("ottoai-filtered-news", {

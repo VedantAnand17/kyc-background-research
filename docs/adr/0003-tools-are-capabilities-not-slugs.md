@@ -11,7 +11,7 @@ Exposing raw slugs to a model invites hallucinated slugs, gives no fallback, and
 ## Decision
 
 The LLM sees about a dozen capability tools with Zod argument schemas.
-The tool layer maps each capability to an ordered vendor list, quotes the live contract, picks the first payable vendor that fits remaining headroom, dedupes on `(tool, canonical args)`, and places fields per the contract's `in`.
+The tool layer maps each capability to an ordered vendor list, quotes the live contract, picks the first payable vendor that fits remaining headroom, dedupes on `(tool, subject)` for person-targeted tools and `(tool, canonical args)` otherwise, and places fields per the contract's `in`.
 `web_search` and `screen_watchlist` vendors are discovered at run time through `POST /v1/search`.
 `POST /v1/tasks` is not used in the must-have release.
 

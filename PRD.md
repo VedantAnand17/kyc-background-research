@@ -91,7 +91,7 @@ Field rules:
 - `address`: optional; every subfield optional; `country` is ISO 3166-1 alpha-2 when present.
 - `maxBudget.amount`: required, decimal string matching `^\d+(\.\d{1,6})?$`, greater than zero, at most `1000.000000`.
 - `maxBudget.currency`: required, MUST be `USD` in this release.
-- `options.deadlineMs`: optional, 5000 to 120000, default 60000 for basic and standard, 90000 for deep, or `RESEARCH_DEADLINE_MS` when that variable is set.
+- `options.deadlineMs`: optional, 5000 to 120000, default 90000 for basic and standard, 120000 for deep, or `RESEARCH_DEADLINE_MS` when that variable is set.
 
 Responses:
 
@@ -244,9 +244,10 @@ The final object is validated against the report schema.
 
 ### 6.7 Deadline behavior
 
-The orchestrator holds an `AbortSignal` derived from `deadlineAt` minus a synthesis allowance of 8 seconds.
+The orchestrator holds an `AbortSignal` derived from `deadlineAt` minus a synthesis allowance of 35 seconds.
 When it fires: tool calls not yet started are dropped, in-flight calls are awaited for up to 5 more seconds, then phase 5 runs with whatever exists.
-The narrative pass still runs inside the 8 second synthesis allowance; it does not inherit the aborted tool-phase signal.
+The narrative pass still runs inside the 35 second synthesis allowance; it does not inherit the aborted tool-phase signal.
+Each narrative attempt gets a fresh timeout for the time still left in that allowance.
 If the screen phase never started, every risk category is `not_screened` with a warning and `risk.overall.level` is `unknown`.
 `timing.deadlineHit` is true and a warning names the phase that was cut.
 After the response is sent, any in-flight call that was abandoned is reconciled against `GET /v1/transactions` so the ledger row never stays a phantom reservation.
@@ -384,13 +385,18 @@ Error code handling, matched on `error.code` never on message text:
 
 Use the Vercel AI SDK so the provider is an environment choice.
 The default is Cloudflare Workers AI through its OpenAI-compatible endpoint with `@cf/zai-org/glm-5.3`, chosen on live evidence in [ADR-0006](docs/adr/0006-cloudflare-workers-ai-glm-5-3.md).
-`LLM_PROVIDER` is `cloudflare` (base URL derived from `CLOUDFLARE_ACCOUNT_ID`), `openai`, or `openai-compatible` with `LLM_BASE_URL`; `LLM_MODEL` names the model.
+`LLM_PROVIDER` is `cloudflare` (base URL derived from `CLOUDFLARE_ACCOUNT_ID`), `openai`, or `openai-compatible` with `LLM_BASE_URL`.
+`LLM_MODEL` names the narrative and risk-classification model.
+`LLM_LOOP_MODEL` names the tool-loop model and defaults to `LLM_MODEL`.
 Use the `@ai-sdk/openai-compatible` provider for `cloudflare` and `openai-compatible`, and `@ai-sdk/openai` for `openai`.
-Every LLM call sets `maxOutputTokens` explicitly: 1500 for agent steps, 1200 for the narrative pass.
+Every LLM call sets `maxOutputTokens` explicitly to 1500.
+Classification and the narrative pass use plain text generation plus a JSON parse.
+`generateObject` / json_schema mode on glm-5.3 spends the token budget on hidden reasoning and returns no object.
 Reasoning models on Workers AI otherwise spend the default budget on thinking and return an empty completion.
-The agent loop uses tool calling with a step limit of 12.
+The agent loop uses tool calling with a step limit of 4 on resolve, 2 on disambiguate, and 3 on enrich (one fan-out turn, then finish).
 The narrative pass uses structured output against a Zod schema containing only the narrative fields.
-The documented fallback model is `@cf/openai/gpt-oss-120b` with `reasoning_effort: low`; it is faster and cheaper but embellished facts in testing, so it is not the default.
+`@cf/openai/gpt-oss-120b` with `reasoning_effort: low` is a documented override via `LLM_LOOP_MODEL`.
+Workers AI rejects its second tool-calling turn, so it is not the default.
 System prompts live in `src/research/prompts.ts` as plain template strings and MUST state: the subject, the tier, the remaining budget in dollars, the list of allowed tools, and the rule that the model never invents facts not present in tool results.
 The model never receives raw vendor payloads.
 
@@ -416,10 +422,11 @@ Missing required values fail startup with a message naming the variable.
 | `PERFLO_BASE_URL` | no | `https://pay-per-use-api.perflo.ai` | override for tests |
 | `LLM_PROVIDER` | no | `cloudflare` | `cloudflare`, `openai`, `openai-compatible` |
 | `CLOUDFLARE_ACCOUNT_ID` | when `cloudflare` | | 32-hex account id; base URL is derived from it |
-| `LLM_MODEL` | no | `@cf/zai-org/glm-5.3` | model name |
+| `LLM_MODEL` | no | `@cf/zai-org/glm-5.3` | narrative and risk-classification model |
+| `LLM_LOOP_MODEL` | no | `LLM_MODEL` | tool-loop override |
 | `LLM_API_KEY` | yes | | provider key; for Cloudflare, an API token with Workers AI read |
 | `LLM_BASE_URL` | when `openai-compatible` | | endpoint |
-| `RESEARCH_DEADLINE_MS` | no | unset: `60000` basic/standard, `90000` deep | operator override for the default deadline |
+| `RESEARCH_DEADLINE_MS` | no | unset: `90000` basic/standard, `120000` deep | operator override for the default deadline |
 | `TOOL_CONCURRENCY` | no | `4` | parallel paid calls |
 | `VENDOR_TIMEOUT_MS` | no | `15000` | per paid call |
 | `DATABASE_PATH` | no | `./data/research.db` | SQLite file |

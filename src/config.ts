@@ -15,10 +15,11 @@ const schema = z
     PERFLO_BASE_URL: z.url().default("https://pay-per-use-api.perflo.ai"),
     LLM_PROVIDER: z.enum(["cloudflare", "openai", "openai-compatible"]).default("cloudflare"),
     LLM_MODEL: z.string().min(1).default("@cf/zai-org/glm-5.3"),
+    LLM_LOOP_MODEL: z.string().min(1).optional(),
     LLM_API_KEY: z.string().min(1),
     LLM_BASE_URL: z.url().optional(),
     CLOUDFLARE_ACCOUNT_ID: z.string().regex(/^[0-9a-f]{32}$/).optional(),
-    RESEARCH_DEADLINE_MS: intInRange(5_000, 120_000, 60_000),
+    RESEARCH_DEADLINE_MS: intInRange(5_000, 120_000, 90_000),
     TOOL_CONCURRENCY: intInRange(1, 16, 4),
     VENDOR_TIMEOUT_MS: intInRange(1_000, 60_000, 15_000),
     DATABASE_PATH: z.string().default("./data/research.db"),
@@ -40,6 +41,11 @@ const schema = z
   });
 
 export type Config = z.infer<typeof schema>;
+
+/** Tool-loop model. Defaults to LLM_MODEL; Workers AI rejects gpt-oss-120b on the second tool turn. */
+export function loopModelName(c: Config): string {
+  return c.LLM_LOOP_MODEL ?? c.LLM_MODEL;
+}
 
 /** The OpenAI-compatible base URL the AI SDK provider should use. PRD.md section 11. */
 export function llmBaseUrl(c: Config): string | undefined {
