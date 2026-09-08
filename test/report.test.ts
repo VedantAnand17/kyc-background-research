@@ -62,7 +62,7 @@ function source(id: string, capability: string, extras: Partial<SourceRecord> = 
     id,
     jobId: "req_1",
     ledgerId: `led_${id}`,
-    vendor: "stableenrich-minerva-resolve",
+    vendor: "stableenrich-exa-search",
     capability,
     purpose: "resolve candidates",
     candidateId: "c1",
@@ -78,7 +78,7 @@ function input(over: Partial<AssembleReportInput> = {}): AssembleReportInput {
   const calls = over.calls ?? [
     {
       sourceId: "s1",
-      vendor: "stableenrich-minerva-resolve",
+      vendor: "stableenrich-exa-search",
       capability: "find_people",
       status: "succeeded" as const,
       chargedMicro: parseMoney("0.025200"),
@@ -130,6 +130,28 @@ describe("report invariants", () => {
     for (const row of report.profile.employment) {
       for (const id of row.sourceIds) expect(ids.has(id)).toBe(true);
     }
+  });
+
+  it("a hit keeps the classifier's per-article summary when its source yielded several articles", () => {
+    // One news lookup returned a Lagos article about the primary and a Houston namesake. The narrative
+    // summarises the whole source, so borrowing it would attach the namesake to the primary's hit.
+    const report = assembleReport(
+      input({
+        sources: [source("s1", "find_people"), source("n1", "search_news"), source("w1", "screen_watchlist")],
+        narrative: {
+          candidateSummaries: { c1: "Product lead at Paystack, Lagos" },
+          reputationalSummaries: { n1: "Named product lead at Paystack; a Houston namesake was fined in a Shell probe.", w1: "Clean watchlist screen." },
+          rationale: "Low risk.",
+        },
+        classifications: [
+          { sourceId: "n1", aboutPrimary: true, severity: "low", summary: "Paystack names Ada Okonkwo product lead.", title: "Paystack names Ada Okonkwo product lead" },
+          { sourceId: "n1", aboutPrimary: false, severity: "low", summary: "Houston namesake fined.", title: "Ada Okonkwo of Houston fined in Shell expense probe" },
+          { sourceId: "w1", aboutPrimary: true, severity: "low", summary: "No watchlist matches." },
+        ],
+      }),
+    );
+    const summaries = report.risk.reputational.hits.map((hit) => hit.summary);
+    expect(summaries).toEqual(["Paystack names Ada Okonkwo product lead.", "Clean watchlist screen."]);
   });
 
   it("profile is empty when identity is ambiguous or not_found, with a warning", () => {

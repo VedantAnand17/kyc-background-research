@@ -91,7 +91,7 @@ Field rules:
 - `address`: optional; every subfield optional; `country` is ISO 3166-1 alpha-2 when present.
 - `maxBudget.amount`: required, decimal string matching `^\d+(\.\d{1,6})?$`, greater than zero, at most `1000.000000`.
 - `maxBudget.currency`: required, MUST be `USD` in this release.
-- `options.deadlineMs`: optional, 5000 to 120000, default 45000 for every tier, or `RESEARCH_DEADLINE_MS` when that variable is set.
+- `options.deadlineMs`: optional, 5000 to 120000; default 90000 for basic and 120000 for standard and deep (measured Apify actor runs take up to 30 s and Perflo settlement 9 to 11 s), or `RESEARCH_DEADLINE_MS` when that variable is set.
 
 Responses:
 
@@ -244,10 +244,11 @@ The final object is validated against the report schema.
 
 ### 6.7 Deadline behavior
 
-The orchestrator holds an `AbortSignal` derived from `deadlineAt` minus a synthesis allowance of 12 seconds.
+The orchestrator holds an `AbortSignal` derived from `deadlineAt` minus a synthesis allowance: 15 seconds on basic, 25 on standard, 30 on deep.
 When it fires: tool calls not yet started are dropped, in-flight calls are awaited for up to 5 more seconds, then phase 5 runs with whatever exists.
-The narrative pass still runs inside the 12 second synthesis allowance; it does not inherit the aborted tool-phase signal.
-Each narrative attempt gets a fresh timeout for the time still left in that allowance.
+The narrative pass still runs inside that synthesis allowance; it does not inherit the aborted tool-phase signal.
+Each of its two attempts gets a fresh timeout of at most 15 seconds, bounded by the time still left, so a request that stalls on the richer tiers leaves room for a second attempt (a funded deep run on 2026-09-08 lost its narrative to one such stall).
+Independently, every model HTTP request is capped at `LLM_REQUEST_TIMEOUT_MS` (default 30 seconds) so a hung connection in any phase fails fast rather than running to the deadline.
 If the screen phase never started, every risk category is `not_screened` with a warning and `risk.overall.level` is `unknown`.
 `timing.deadlineHit` is true and a warning names the phase that was cut.
 After the response is sent, any in-flight call that was abandoned is reconciled against `GET /v1/transactions` so the ledger row never stays a phantom reservation.
@@ -271,6 +272,9 @@ Per request, the ledger tracks `capMicro`, `reservedMicro`, `spentMicro`.
   The check and update are one synchronous step under a per-request mutex, so concurrent reservations cannot both pass on the same headroom.
 - `settle(reservationId, chargedMicro)`: `reservedMicro -= amount; spentMicro += chargedMicro`.
   Called for every `200` from the pay route, including `status: "failed"`, because Perflo charges for a vendor that answered and failed.
+  `chargedMicro` is what Perflo debited, not always the `charged` field: a successful pay whose `settlement.status` is `not_required` (the per-item Apify actors) posts the whole authorization, so it settles at the reserved quote.
+  Verified 2026-09-08: `GET /v1/key` `spent` equals the sum of posted transaction amounts, which carry the cap (`-0.05`) while the pay response meters `0.0065`.
+  A `finalized` settlement debits exactly `charged`, and a failed run is voided.
 - `release(reservationId)`: `reservedMicro -= amount`.
   Called for every refusal that Perflo documents as free.
 - `hold(reservationId)`: leaves the reservation in place until a transaction lookup resolves it, used after a timeout or a `500`.
@@ -362,7 +366,7 @@ Endpoints used:
 - `POST /v1/search` for runtime discovery of `web_search` and watchlist vendors.
 - `POST /v1/pay/{slug}` for every paid call, always with `Idempotency-Key` (a fresh UUID stored on the ledger row) and `maxCharge`.
 - `GET /v1/transactions/{id}` and `GET /v1/transactions` for reconciliation after a timeout or a `500`.
-- `GET /v1/balance` once at startup to fail fast on a bad key.
+- `GET /v1/key` once per request before the first lookup to fail fast on a bad key; it returns the agent key's own envelope. `GET /v1/balance` is account-key only and answers `ACCOUNT_KEY_REQUIRED` to an agent key.
 
 Error code handling, matched on `error.code` never on message text:
 
@@ -430,9 +434,10 @@ Missing required values fail startup with a message naming the variable.
 | `LLM_LOOP_MODEL` | no | `LLM_MODEL` | tool-loop override |
 | `LLM_API_KEY` | yes | | provider key; for Cloudflare, an API token with Workers AI read |
 | `LLM_BASE_URL` | when `openai-compatible` | | endpoint |
-| `RESEARCH_DEADLINE_MS` | no | unset: `45000` for every tier | operator override for the default deadline |
+| `RESEARCH_DEADLINE_MS` | no | unset: `90000` basic, `120000` standard and deep | operator override for the default deadline |
+| `LLM_REQUEST_TIMEOUT_MS` | no | `30000` | cap on one model HTTP request; a stalled connection fails fast instead of consuming the deadline |
 | `TOOL_CONCURRENCY` | no | `4` | parallel paid calls |
-| `VENDOR_TIMEOUT_MS` | no | `15000` | per paid call |
+| `VENDOR_TIMEOUT_MS` | no | `45000` | per paid call, including polling of a running vendor task |
 | `DATABASE_PATH` | no | `./data/research.db` | SQLite file |
 | `FIXTURE_MODE` | no | `false` | serve recorded vendor responses, spend nothing |
 | `PORT` | no | `3000` | listen port |
@@ -450,8 +455,10 @@ Never log the agent key, the LLM key, or raw vendor payloads at info level.
 ## 15. Performance targets
 
 - Fixture mode with the scripted agent stays fast: basic, standard, and deep complete well under 5 seconds in the existing suite.
-- Live Workers AI `@cf/zai-org/glm-5.3`, measured 2026-09-08: a constrained `json_schema` narrative call is 5.8 seconds; a tool step is 3 to 12 seconds.
-- Until a five-run sample exists, live p50 targets are basic under 30 seconds, standard under 45 seconds, deep under 45 seconds.
+- Live Workers AI `@cf/zai-org/glm-5.3`, measured 2026-09-08: a constrained `json_schema` narrative call is 5.8 seconds on basic and overran 12 seconds on deep; a tool-loop turn at `reasoning_effort: low` is 3 to 6 seconds, and 15 to 20 seconds at the default effort.
+- Every model call therefore sends `reasoning_effort: low`, and each tool loop stops as soon as a turn's tool calls are all accepted by code, so resolve and enrich are one model turn each when the model behaves.
+- Live p50 targets are basic under 30 seconds, standard under 45 seconds, deep under 45 seconds.
+- Five-run sample on 2026-09-08 (`pnpm test:perf`): p50 total 12.4 s basic, 12.3 s standard, 13.2 s deep; every run under 16 s, none hit the deadline.
 - The default wall-clock deadline is 45 seconds for every tier.
 - Raise a target or the default deadline only after a measured sample says the p50 is higher.
 - Independent tool calls run concurrently; no phase serializes calls that do not depend on each other.
@@ -469,11 +476,23 @@ Required before the must-have release is considered done:
 - `matcher.test.ts`: fixtures for exact match, nickname match, same name other city, DOB conflict cap, missing DOB renormalization, corroboration bonus, ambiguity gap.
 - `report.test.ts`: every invariant in section 5.4 asserted against a generated report; schema validation failure path.
 - `perflo-client.test.ts`: every error code in section 10 mapped to the documented ledger action, using the fake Perflo server in `test/fake-perflo.ts`.
-- `orchestrator.test.ts`: end-to-end in fixture mode for one basic, one standard, one deep request; a deadline-hit request; a budget-exhausted request; an ambiguous-identity request.
+- `orchestrator.test.ts`: end-to-end in fixture mode for one basic, one standard, one deep request; a deadline-hit request; a budget-exhausted request; an ambiguous-identity request; a tight-cap parallel enrich that never exceeds the cap.
+- `failure-injection.test.ts`: model auth failure and model timeout, Perflo unreachable, vendor `200 failed` (charged), vendor timeout (held then reconciled), and `GUARDRAIL_DENIED`.
+  Each case asserts the report or `503` this document specifies, including the warning code.
+- `live-model.test.ts` (`pnpm test:live`, skipped without Workers AI credentials): real `@cf/zai-org/glm-5.3` against the fake Perflo server for basic, standard, and deep.
+  Asserts narrative present, `deadlineHit` false, total within cap, each person-tool paid once, the Houston article excluded from the Lagos candidate, and per-phase timings under the section-15 targets.
+- `logger.test.ts`: keys and `Authorization` headers never reach the log line.
+- `fixture-mode.test.ts`: `POST /research` with `FIXTURE_MODE=true` and no network, served from the fixtures M7 recorded.
+- `live-paid.test.ts` (`pnpm test:paid`, skipped without a funded Perflo agent key and Workers AI credentials): the M7 gate below; it spends real money and is never part of `pnpm test`.
+- CI on a clean clone: `pnpm install --frozen-lockfile && pnpm test && pnpm check && docker build`.
+- `pnpm test:perf` samples five live runs per tier and prints p50 per phase.
+  Raise the default deadline only from that evidence.
+
+Do not spend real Perflo money until those gates are green.
 
 Fixture mode is a first-class feature, not a test hack: `FIXTURE_MODE=true` makes the Perflo client serve recorded responses from `test/fixtures/` so the interviewer can run the whole flow without a funded account.
-Those recordings are M7 work.
-Until then, `FIXTURE_MODE=true` at runtime has no recorded vendor payloads; tests inject the in-process fake server instead.
+M7 recorded them on 2026-09-08 from the funded runs, scrubbed of contact details; `pnpm test:paid` records any fixture path that is still missing.
+Unit tests still inject the in-process fake server so they can script failures the recordings do not contain.
 
 ## 17. Documentation deliverables
 
@@ -525,6 +544,8 @@ A milestone is accepted when its criteria pass in CI and the README section it t
 - Run against a funded Perflo account with three real subjects at three tiers; record the fixtures from those runs.
 - README complete.
 - Accept: live totals equal ledger totals equal Perflo's `GET /v1/transactions` for the run; no run exceeds its cap.
+- Done 2026-09-08 (`pnpm test:paid`, 5 of 5): basic $0.10, standard about $0.17, deep about $0.50 against a `kyc-research` sub-account capped at $10 per hour; a $0.05 cap refuses without spending, and a nonexistent person returns `not_found`.
+  Each run's ledger equalled the posted Perflo transactions once settlement followed the debit rule in section 7, including a run whose vendor task was still running at report time.
 
 ## 19. Working rules for agents building this
 

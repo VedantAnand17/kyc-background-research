@@ -4,7 +4,7 @@ import { openDatabase, type Db } from "../src/db/sqlite.js";
 import { createLogger } from "../src/logger.js";
 import { createPerfloClient } from "../src/perflo/client.js";
 import type { ResearchRequest } from "../src/api/schemas.js";
-import { runResearch } from "../src/research/orchestrator.js";
+import { NARRATIVE_ATTEMPT_MS, runResearch, synthesisMs } from "../src/research/orchestrator.js";
 import { startFakePerflo, type FakePerflo } from "./fake-perflo.js";
 import { createScriptedAgent } from "./scripted-agent.js";
 
@@ -54,7 +54,7 @@ const AMBIGUOUS = {
 async function harness() {
   const server = await startFakePerflo();
   fakes.push(server);
-  server.setPayOutput("stableenrich-minerva-resolve", CONFIRMED);
+  server.setPayOutput("stableenrich-exa-search", CONFIRMED);
   server.setSearchResults("PEP sanctions watchlist screening", []);
   server.setSearchResults("web search", []);
   const db = openDatabase(":memory:");
@@ -123,6 +123,36 @@ describe("orchestrator (fixture mode)", () => {
     expectValidCosts(report, "3.00");
   });
 
+  it("standard and deep reserve room for two narrative attempts; basic keeps the 15 s report target", () => {
+    expect(synthesisMs("basic")).toBe(15_000);
+    // The loop skips an attempt with under 3 s left, so a first attempt that stalls for the whole cap must
+    // still leave at least that much for the second one.
+    for (const tier of ["standard", "deep"] as const) {
+      expect(synthesisMs(tier)).toBeGreaterThanOrEqual(NARRATIVE_ATTEMPT_MS + 3_000);
+    }
+  });
+
+  it("a narrative request that times out once is retried within the report window", async () => {
+    const { deps } = await harness();
+    const agent = createScriptedAgent();
+    let attempts = 0;
+    const report = await runResearch(request("1.50"), {
+      ...deps,
+      agent: {
+        ...agent,
+        narrate: async (ctx) => {
+          attempts += 1;
+          expect(ctx.signal).toBeInstanceOf(AbortSignal);
+          if (attempts === 1) throw new DOMException("The operation was aborted due to timeout", "TimeoutError");
+          return agent.narrate(ctx);
+        },
+      },
+    });
+    expect(attempts).toBe(2);
+    expect(report.risk.overall.rationale).not.toBe("narrative unavailable");
+    expect(report.warnings.some((w) => w.code === "narrative_unavailable")).toBe(false);
+  });
+
   it("deadline hit cuts phases and still produces a report with timing.deadlineHit", async () => {
     const { deps } = await harness();
     const report = await runResearch(request("1.50", 5_000), { ...deps, now: 0 });
@@ -136,7 +166,7 @@ describe("orchestrator (fixture mode)", () => {
 
   it("a skipped screen marks every risk category not_screened and overall unknown", async () => {
     const { server, deps } = await harness();
-    server.setPayOutput("stableenrich-minerva-resolve", { people: [] });
+    server.setPayOutput("stableenrich-exa-search", { people: [] });
     const report = await runResearch(request("1.50"), deps);
     expect(report.identity.status).toBe("not_found");
     expect(report.risk.pep.status).toBe("not_screened");
@@ -166,7 +196,7 @@ describe("orchestrator (fixture mode)", () => {
 
   it("ambiguous identity yields empty profile and overall risk unknown", async () => {
     const { server, deps } = await harness();
-    server.setPayOutput("stableenrich-minerva-resolve", AMBIGUOUS);
+    server.setPayOutput("stableenrich-exa-search", AMBIGUOUS);
     const report = await runResearch(request("0.40"), {
       ...deps,
       agent: createScriptedAgent({ disambiguate: "skip" }),
@@ -215,7 +245,7 @@ describe("orchestrator (fixture mode)", () => {
 
   it("keeps unclassified news off the primary when classification fails", async () => {
     const { server, deps } = await harness();
-    server.setPayOutput("ottoai-filtered-news", {
+    server.setPayOutput("stableenrich-serper-news", {
       articles: [
         { title: "Paystack names Ada Okonkwo product lead", url: "https://news.example/1" },
         { title: "Ada Okonkwo of Houston fined in Shell expense probe", url: "https://news.example/2" },
@@ -232,5 +262,50 @@ describe("orchestrator (fixture mode)", () => {
     expect(report.risk.reputational.hits).toEqual([]);
     expect(report.risk.reputational.status).not.toBe("hits");
     expectValidCosts(report, "1.50");
+  });
+
+  it("offers the enrich turn only person-enrichment tools; code owns find_people and screening", async () => {
+    const { deps } = await harness();
+    let offered: string[] = [];
+    await runResearch(request("3.00"), {
+      ...deps,
+      agent: {
+        ...createScriptedAgent(),
+        async enrich(ctx) {
+          offered = Object.keys(ctx.tools).sort();
+          expect(ctx.allowedTools).toEqual(expect.arrayContaining(offered));
+        },
+      },
+    });
+    expect(offered).toEqual(["enrich_person", "fetch_page", "finish", "get_professional_profile", "get_social_profile", "search_filings", "skip_trace"]);
+  });
+
+  it("hands the classifier the subject plus the primary candidate's city and employer", async () => {
+    const { server, deps } = await harness();
+    server.setPayOutput("stableenrich-serper-news", {
+      articles: [{ title: "Ada Okonkwo of Houston fined in Shell expense probe", url: "https://news.example/2" }],
+    });
+    let seenPrimary = "";
+    await runResearch(request("0.40"), {
+      ...deps,
+      agent: {
+        ...createScriptedAgent(),
+        classifyRisk(_hits, primary) {
+          seenPrimary = primary;
+          return { classifications: [], failed: false };
+        },
+      },
+    });
+    expect(seenPrimary).toContain("Ada Okonkwo");
+    expect(seenPrimary).toContain("Lagos");
+    expect(seenPrimary).toContain("Paystack");
+  });
+
+  it("parallel enrich under a tight cap never exceeds it and shows the refusal", async () => {
+    const { deps } = await harness();
+    const report = await runResearch(request("0.04"), { ...deps, concurrency: 4 });
+    expect(parseMoney(report.costs.total.amount)).toBeLessThanOrEqual(parseMoney("0.04"));
+    expect(report.warnings.some((w) => w.code === "budget_exhausted")).toBe(true);
+    expectValidCosts(report, "0.04");
   });
 });

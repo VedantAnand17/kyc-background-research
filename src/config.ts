@@ -19,9 +19,11 @@ const schema = z
     LLM_API_KEY: z.string().min(1),
     LLM_BASE_URL: z.url().optional(),
     CLOUDFLARE_ACCOUNT_ID: z.string().regex(/^[0-9a-f]{32}$/).optional(),
-    RESEARCH_DEADLINE_MS: intInRange(5_000, 120_000, 45_000),
+    RESEARCH_DEADLINE_MS: intInRange(5_000, 120_000, 90_000),
+    /** Cap on one model HTTP request; a stalled upstream connection otherwise runs until the research deadline. */
+    LLM_REQUEST_TIMEOUT_MS: intInRange(1_000, 120_000, 30_000),
     TOOL_CONCURRENCY: intInRange(1, 16, 4),
-    VENDOR_TIMEOUT_MS: intInRange(1_000, 60_000, 15_000),
+    VENDOR_TIMEOUT_MS: intInRange(1_000, 120_000, 45_000),
     DATABASE_PATH: z.string().default("./data/research.db"),
     FIXTURE_MODE: bool,
     PORT: intInRange(1, 65_535, 3_000),

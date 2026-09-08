@@ -1,0 +1,103 @@
+{
+  "runId": "run_res_5403cc0d-e1d9-4793-a783-beabebd19e93",
+  "transactionId": "b033a766-e7c6-4de4-b32b-6ffb9cc54728",
+  "slug": "apify-anchor-linkedin-profile-enrichment",
+  "status": "succeeded",
+  "terminal": true,
+  "charged": {
+    "amount": "0.0091",
+    "currency": "USD"
+  },
+  "charges": [
+    {
+      "step": "buy",
+      "slug": "apify-anchor-linkedin-profile-enrichment",
+      "amount": {
+        "amount": "0.0091",
+        "currency": "USD"
+      },
+      "transactionId": "b033a766-e7c6-4de4-b32b-6ffb9cc54728"
+    }
+  ],
+  "chargeIsFinal": true,
+  "chargedTo": "credit",
+  "subAccount": "kyc-research",
+  "remaining": {
+    "amount": "13.8617",
+    "currency": "USD"
+  },
+  "subAccountRemaining": {
+    "amount": "8.4708",
+    "currency": "USD"
+  },
+  "createdAt": "2026-09-08T16:18:10.004Z",
+  "endedAt": "2026-09-08T16:18:37.296Z",
+  "settlement": {
+    "status": "not_required",
+    "flow": "authorization",
+    "chain": "base",
+    "txHash": null,
+    "explorer": null
+  },
+  "upstream": {
+    "httpStatus": 200
+  },
+  "output": [
+    {
+      "url": "https://www.linkedin.com/in/sundarpichai",
+      "city": "Mountain View",
+      "skills": [],
+      "country": "United States of America",
+      "summary": "CEO of Google and Alphabet. Focused on organizing the world's information and making it universally accessible and useful, building great products, and developing advanced technologies, including AI, to help people everywhere.",
+      "headline": "CEO at Google",
+      "education": [
+        {
+          "school": "The Wharton School",
+          "degree_name": "MBA",
+          "school_linkedin_profile_url": "https://www.linkedin.com/school/the-wharton-school/"
+        },
+        {
+          "school": "Stanford University",
+          "degree_name": "MS",
+          "field_of_study": "Materials Science and Engineering",
+          "school_linkedin_profile_url": "https://www.linkedin.com/school/stanford-university/"
+        },
+        {
+          "school": "Indian Institute of Technology, Kharagpur",
+          "degree_name": "B. Tech",
+          "school_linkedin_profile_url": "https://www.linkedin.com/school/indian-institute-of-technology-kharagpur/"
+        }
+      ],
+      "full_name": "Sundar Pichai",
+      "languages": [],
+      "last_name": "Pichai",
+      "first_name": "Sundar",
+      "experiences": [
+        {
+          "title": "CEO",
+          "company": "Google",
+          "starts_at": "2015",
+          "company_linkedin_profile_url": "https://www.linkedin.com/company/google/"
+        },
+        {
+          "title": "Product Management + Leadership",
+          "company": "Google",
+          "ends_at": "2015",
+          "starts_at": "2004",
+          "company_linkedin_profile_url": "https://www.linkedin.com/company/google/"
+        }
+      ],
+      "company_name": "Google",
+      "open_to_work": false,
+      "certifications": [],
+      "follower_count": 5061660,
+      "personal_emails": [],
+      "profile_pic_url": "https://storage.googleapis.com/linkedin_profile_picture/sundarpichai.jpeg",
+      "company_linkedin": "https://www.linkedin.com/company/google/",
+      "personal_numbers": [],
+      "public_identifier": "sundarpichai",
+      "show_verification_badge": false,
+      "live": "4d"
+    }
+  ]
+}

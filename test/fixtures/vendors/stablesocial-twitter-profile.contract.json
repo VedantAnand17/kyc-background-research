@@ -1,0 +1,42 @@
+{
+  "slug": "stablesocial-twitter-profile",
+  "name": "Scrape Creators · Twitter / X — Profile",
+  "description": "Get the X (Twitter) profile of a specific account by handle — display name, bio, follower and following counts, and verification. Use it to look up an @handle's profile and stats. Requires `handle` (e.g. mkbhd).",
+  "capability": "twitter",
+  "keywords": [
+    "twitter",
+    "x",
+    "profile",
+    "account",
+    "handle",
+    "bio",
+    "followers",
+    "user",
+    "stats"
+  ],
+  "price": {
+    "amount": "0.06",
+    "currency": "USD"
+  },
+  "maxChargePerCall": {
+    "amount": "0.06",
+    "currency": "USD"
+  },
+  "pricingUnit": "call",
+  "latencyMsP50": 74,
+  "payable": true,
+  "schemaConfidence": "high",
+  "input": {
+    "fields": [
+      {
+        "name": "handle",
+        "in": "body",
+        "type": "string",
+        "required": true,
+        "description": "Twitter handle"
+      }
+    ],
+    "example": null
+  },
+  "docsUrl": "https://stablesocial.dev"
+}

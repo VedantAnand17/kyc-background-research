@@ -179,11 +179,16 @@ export function assembleReport(input: AssembleReportInput): ResearchReport {
   const confirmed = input.identity.status === "confirmed" || input.identity.status === "probable";
   const warnings = [...input.warnings];
 
+  // The narrative summarises a source; a hit is one article. When one news lookup yielded several articles,
+  // the source-level summary can describe an excluded namesake, so only a source with exactly one
+  // classification may borrow it and the others keep the classifier's per-article summary.
+  const perSource = new Map<string, number>();
+  for (const row of input.classifications) perSource.set(row.sourceId, (perSource.get(row.sourceId) ?? 0) + 1);
   const reputationalHits = input.screenRan
     ? input.classifications
         .filter((row) => row.aboutPrimary)
         .map((row) => ({
-          summary: input.narrative.reputationalSummaries[row.sourceId] ?? row.summary,
+          summary: (perSource.get(row.sourceId) === 1 ? input.narrative.reputationalSummaries[row.sourceId] : undefined) ?? row.summary,
           severity: row.severity,
           sourceIds: [row.sourceId],
           candidateId: input.identity.primaryCandidateId ?? "c1",

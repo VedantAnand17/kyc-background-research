@@ -110,6 +110,34 @@ function scoreName(subject: SubjectInput, candidate: CandidateEvidence): number 
   return Math.max(...candidate.names.map((n) => nameSimilarity(subject.fullName, n)));
 }
 
+/** Jaro-Winkler on a full name rates "Satya Rapelly" 0.91 against "Satya Nadella"; the surname settles it. */
+const SURNAME_MIN = 0.85;
+
+function surnameTokens(name: string): string[] {
+  return name
+    .normalize("NFKD")
+    .replace(/\p{M}/gu, "")
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}\s]/gu, " ")
+    .split(/\s+/)
+    .filter((token) => token.length > 1);
+}
+
+/**
+ * A candidate must carry the subject's surname (any token, so hyphenated and three-part names pass).
+ * Live people-search vendors return semantically similar profiles even when nobody matches, and a
+ * different surname is not a same-name person, so it is not a candidate at all (M7, 2026-09-08).
+ */
+export function sharesSurname(subject: SubjectInput, candidate: CandidateEvidence): boolean {
+  const subjectTokens = surnameTokens(subject.fullName);
+  const surname = subjectTokens[subjectTokens.length - 1];
+  if (!surname) return true;
+  // Jaro-Winkler rewards shared prefixes, so "quarnstrom" would pass against "quarnstromfeldt"; a surname
+  // spelling variant is about the same length, a different surname is not.
+  const close = (token: string) => Math.abs(token.length - surname.length) <= 2 && nameSimilarity(token, surname) >= SURNAME_MIN;
+  return candidate.names.some((name) => surnameTokens(name).some(close));
+}
+
 function scoreDob(
   subjectDob: string | undefined,
   candidate: CandidateEvidence,
@@ -276,5 +304,6 @@ export function decideIdentity(
   subject: SubjectInput,
   candidates: readonly CandidateEvidence[],
 ): IdentityDecision {
-  return selectPrimary(scoreCandidates(subject, candidates), subject);
+  const sameSurname = candidates.filter((candidate) => sharesSurname(subject, candidate));
+  return selectPrimary(scoreCandidates(subject, sameSurname), subject);
 }

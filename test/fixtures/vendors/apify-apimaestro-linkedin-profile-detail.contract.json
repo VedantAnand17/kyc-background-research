@@ -1,0 +1,49 @@
+{
+  "slug": "apify-apimaestro-linkedin-profile-detail",
+  "name": "Profile Details Scraper for LinkedIn + EMAIL (No Cookies)",
+  "description": "Enrich ONE known person from their LinkedIn profile — name, headline, current role, company, education, and contact email. For a single known individual, not filtered prospecting.",
+  "capability": "people_enrich",
+  "keywords": [
+    "linkedin",
+    "profile",
+    "enrich",
+    "person",
+    "email",
+    "role",
+    "company",
+    "lookup",
+    "detail"
+  ],
+  "price": {
+    "amount": "0.005",
+    "currency": "USD"
+  },
+  "maxChargePerCall": {
+    "amount": "0.05",
+    "currency": "USD"
+  },
+  "pricingUnit": "item",
+  "latencyMsP50": 30,
+  "payable": true,
+  "schemaConfidence": "high",
+  "input": {
+    "fields": [
+      {
+        "name": "username",
+        "in": "body",
+        "type": "string",
+        "required": true,
+        "description": "LinkedIn profile username (e.g., 'neal-mohan' from linkedin.com/in/neal-mohan) or URL or Urn (e.g: ACoAAAPCNL4BRjB2mlrFKePwdFvNMtb2ekzpEWw)"
+      },
+      {
+        "name": "includeEmail",
+        "in": "body",
+        "type": "boolean",
+        "required": false,
+        "description": "Whether to include email address in the profile data extraction if available"
+      }
+    ],
+    "example": null
+  },
+  "docsUrl": "https://docs.apify.com/platform/integrations/x402"
+}

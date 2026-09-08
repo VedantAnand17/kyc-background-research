@@ -1,0 +1,42 @@
+{
+  "slug": "apify-anchor-linkedin-profile-enrichment",
+  "name": "LinkedIn Profile Scraper for cheap lead enrichment",
+  "description": "Enrich supplied LinkedIn profile URLs into full person records — role, company, and email — for cheap lead enrichment of known people.",
+  "capability": "people_enrich",
+  "keywords": [
+    "linkedin",
+    "profile",
+    "enrich",
+    "person",
+    "email",
+    "lead",
+    "role",
+    "company",
+    "lookup"
+  ],
+  "price": {
+    "amount": "0.006",
+    "currency": "USD"
+  },
+  "maxChargePerCall": {
+    "amount": "0.06",
+    "currency": "USD"
+  },
+  "pricingUnit": "item",
+  "latencyMsP50": 33,
+  "payable": true,
+  "schemaConfidence": "high",
+  "input": {
+    "fields": [
+      {
+        "name": "startUrls",
+        "in": "body",
+        "type": "array",
+        "required": false,
+        "description": "LinkedIn URLs you want to enrich. You can upload a CSV file if you want, in the format: url,id (id is useful for reference to re-import in"
+      }
+    ],
+    "example": null
+  },
+  "docsUrl": "https://docs.apify.com/platform/integrations/x402"
+}

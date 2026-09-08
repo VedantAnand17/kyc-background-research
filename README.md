@@ -32,7 +32,9 @@ The default model is `@cf/zai-org/glm-5.3` for the tool loop and the narrative.
 Person-targeted tools cache by the subject so a second `enrich_person` with different optional fields does not pay twice.
 News in the profile uses the same about-primary filter as reputational hits.
 A `Dockerfile` builds the API image.
-M7 (live verification and README polish) remains.
+CI builds that image on a clean clone.
+`pnpm test:live` is the real-model harness that must stay green before `pnpm test:paid` spends Perflo money.
+M7 is done: `pnpm test:paid` passed 5 of 5 on 2026-09-08 against a funded sub-account, and the ledger equalled Perflo's posted transactions on every run.
 
 ## Run
 
@@ -42,14 +44,24 @@ Requires Node 22 and pnpm 11.
 pnpm install
 cp .env.example .env      # fill in keys, or set FIXTURE_MODE=true to run without money
 pnpm dev                  # http://localhost:3000/health, /docs, /openapi.json, POST /research
-pnpm test
+pnpm test                 # unit and fake-server suite; skips live-model and funded Perflo tests
+pnpm test:live            # real glm-5.3 against the fake Perflo server; skipped without Workers AI credentials
+pnpm test:perf            # five live runs per tier; prints p50 per phase
 pnpm check                # typecheck
 ```
 
-Fixture mode (`FIXTURE_MODE=true`) is meant to serve recorded vendor responses from `test/fixtures/` and spend nothing.
-Those recordings do not exist yet; they are M7 work.
-Until then, setting `FIXTURE_MODE=true` at runtime will fail on the first lookup with `missing fixture`.
-Tests inject the in-process fake Perflo server and do not use those files.
+CI on every push runs `pnpm install --frozen-lockfile`, `pnpm test`, `pnpm check`, and `docker build`.
+Do not spend real Perflo money until `pnpm test` and `pnpm test:live` are green.
+`pnpm test:live` is the gate; it went green on 2026-09-08 once every model call sent `reasoning_effort: low`, the tool loop stopped after its first accepted turn, and the model was shown real tool argument schemas.
+Measured the same day with `pnpm test:perf`: p50 total 12.4s basic, 12.3s standard, 13.2s deep; 15 of 15 runs finished under 16s with no deadline hit.
+Raise a target only after `pnpm test:perf` prints a p50 above it.
+Note that a `wrangler login` OAuth token works as `LLM_API_KEY` for about an hour; use a Workers AI API token for anything longer than a test session.
+
+Fixture mode (`FIXTURE_MODE=true`) serves the vendor responses recorded under `test/fixtures/` on 2026-09-08 and spends nothing.
+A lookup with no recording fails with `missing fixture`; `pnpm test:paid` records any path that is still missing.
+Unit tests inject the in-process fake Perflo server instead so they can script failures.
+`pnpm test:paid` needs a Perflo agent key that can spend (an account key gets `ACCOUNT_KEY_CANNOT_SPEND`; mint one pinned to a capped sub-account) and costs under $1 per full run.
+Perflo debits the whole authorization for per-item vendors whose settlement is `not_required`, so the ledger settles those at the reserved quote rather than the smaller metered `charged` figure; PRD section 7 has the evidence.
 Live mode needs a Perflo agent key plus a Cloudflare account id and an API token with Workers AI read.
 The default model is `@cf/zai-org/glm-5.3` (ADR-0006).
 See `.env.example` and PRD section 13.

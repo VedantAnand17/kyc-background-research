@@ -21,7 +21,11 @@ export type FakePayScenario =
   | "RATE_LIMITED"
   | "hang"
   | "html-502"
-  | "opaque-502";
+  | "opaque-502"
+  /** 202 running with a poll URL; GET /v1/tasks/:id answers running once, then succeeded. */
+  | "running"
+  /** 202 running whose task never finishes: the client must time out and hold against the run id. */
+  | "running-forever";
 
 export interface FakePayCall {
   readonly slug: string;
@@ -32,6 +36,10 @@ export interface FakePayCall {
 export interface FakePerflo {
   readonly baseUrl: string;
   readonly payCalls: FakePayCall[];
+  /** Run ids read through GET /v1/tasks/:id, in order. */
+  readonly taskReads: string[];
+  /** Let a `running-forever` task finish, so a later reconcile read sees the recorded outcome. */
+  finishTask(runId: string): void;
   setScenario(slug: string, scenario: FakePayScenario): void;
   setContract(slug: string, patch: Partial<VendorContract>): void;
   setPayable(slug: string, payable: boolean): void;
@@ -81,12 +89,12 @@ function contract(slug: string, patches: Map<string, Partial<VendorContract>>, p
   };
 }
 
-function searchRow(slug: string): VendorSearchResult {
+function searchRow(slug: string, capability = "web_search"): VendorSearchResult {
   return {
     slug,
     name: `Fake ${slug}`,
     description: "In-process fake vendor.",
-    capability: "web_search",
+    capability,
     price: MONEY,
     maxChargePerCall: MONEY,
     pricingUnit: "call",
@@ -95,23 +103,25 @@ function searchRow(slug: string): VendorSearchResult {
   };
 }
 
-function payOk(slug: string, status: "succeeded" | "failed", transactionId: string, output?: unknown): PayResult {
+/** Live shape: per-item Apify actors settle `not_required` and post the authorization; everything else finalizes at `charged`. */
+function payOk(slug: string, status: "succeeded" | "failed", transactionId: string, output?: unknown, charged: PerfloMoney = MONEY): PayResult {
   const result: PayResult = {
     transactionId,
     slug,
     status,
     terminal: true,
-    charged: MONEY,
+    charged,
     chargeIsFinal: true,
     chargedTo: "credit",
     remaining: { amount: "4.720000", currency: "USD" },
+    settlement: { status: slug.startsWith("apify-") ? "not_required" : "finalized", flow: "authorization", chain: "base" },
     upstream: { httpStatus: status === "succeeded" ? 200 : 500 },
   };
   if (status === "succeeded") return { ...result, output: output ?? { results: [] } };
   return { ...result, failure: { reason: "vendor_failed", message: "vendor answered and failed" } };
 }
 
-function transactionRow(id: string, slug: string, status: string): Transaction {
+function transactionRow(id: string, slug: string, status: string, idempotencyKey?: string | null): Transaction {
   return {
     id,
     kind: "payment",
@@ -122,6 +132,7 @@ function transactionRow(id: string, slug: string, status: string): Transaction {
     capability: "web_search",
     amount: { amount: "-0.025200", currency: "USD" },
     createdAt: "2026-09-08T10:00:00.000Z",
+    ...(idempotencyKey ? { idempotencyKey } : {}),
   };
 }
 
@@ -145,6 +156,8 @@ export async function startFakePerflo(): Promise<FakePerflo> {
   const payCalls: FakePayCall[] = [];
   const idempotency = new Map<string, { status: number; body: unknown; headers?: Record<string, string> }>();
   const transactions = new Map<string, Transaction>();
+  const tasks = new Map<string, { slug: string; pollsLeft: number; output: unknown }>();
+  const taskReads: string[] = [];
   const hangTimers: ReturnType<typeof setTimeout>[] = [];
   let paySeq = 0;
 
@@ -163,14 +176,24 @@ export async function startFakePerflo(): Promise<FakePerflo> {
     const body = (await c.req.json().catch(() => ({}))) as { query?: unknown };
     const query = typeof body.query === "string" ? body.query : "";
     const override = searchByQuery.get(query);
-    const data = override ?? [searchRow("demo-vendor")];
+    // Unless a test overrides the query, discovery finds one fitting vendor: a "compliance" row for the
+    // watchlist query (the live catalog has none; tests that assert not_screened override with []), web_search otherwise.
+    const data = override ?? [searchRow("demo-vendor", /watchlist|sanction/i.test(query) ? "compliance" : "web_search")];
     return c.json({ data, meta: { requestId: "fake-req", total: data.length } });
   });
 
-  app.get("/v1/balance", (c) => {
+  app.get("/v1/key", (c) => {
     if (!c.req.header("Authorization")?.startsWith("Bearer ")) return fail(c, 401, "UNAUTHENTICATED");
     return c.json({
-      data: { spendable: { amount: "4.72", currency: "USD" }, asOf: "2026-09-08T10:00:00.000Z" },
+      data: {
+        id: "key_fake",
+        name: "fake",
+        scope: "agent",
+        subAccount: { id: "sub_fake", label: "default" },
+        limits: {
+          hourly: { cap: { amount: "10.00", currency: "USD" }, spent: { amount: "0.00", currency: "USD" }, remaining: { amount: "10.00", currency: "USD" }, resetsAt: null },
+        },
+      },
       meta: { requestId: "fake-req" },
     });
   });
@@ -187,6 +210,24 @@ export async function startFakePerflo(): Promise<FakePerflo> {
     const limit = Number(c.req.query("limit") ?? "50");
     const rows = [...transactions.values()].slice(0, Number.isFinite(limit) ? limit : 50);
     return c.json({ data: rows, meta: { requestId: "fake-req", total: transactions.size } });
+  });
+
+  app.get("/v1/tasks/:id", (c) => {
+    if (!c.req.header("Authorization")?.startsWith("Bearer ")) return fail(c, 401, "UNAUTHENTICATED");
+    const runId = c.req.param("id");
+    const task = tasks.get(runId);
+    if (!task) return fail(c, 404, "TASK_NOT_FOUND");
+    taskReads.push(runId);
+    if (task.pollsLeft > 0) {
+      task.pollsLeft -= 1;
+      return c.json({
+        data: { runId, status: "running", terminal: false, chargeIsFinal: false, createdAt: new Date().toISOString(), poll: { url: `/v1/tasks/${runId}`, afterMs: 20 } },
+        meta: { requestId: "fake-req" },
+      });
+    }
+    const txId = `tx-${runId}`;
+    if (!transactions.has(txId)) transactions.set(txId, transactionRow(txId, task.slug, "succeeded"));
+    return c.json({ data: { runId, ...payOk(task.slug, "succeeded", txId, task.output) }, meta: { requestId: "fake-req" } });
   });
 
   app.post("/v1/pay/:slug", async (c) => {
@@ -224,10 +265,23 @@ export async function startFakePerflo(): Promise<FakePerflo> {
     }
 
     if (scenario === "hang") {
+      paySeq += 1;
+      const id = `tx-${paySeq}`;
+      transactions.set(id, transactionRow(id, slug, "succeeded", idempotencyKey));
       await new Promise<void>((resolve) => {
         hangTimers.push(setTimeout(resolve, 30_000));
       });
-      return remember(200, { data: payOk(slug, "succeeded", "tx-late"), meta: { requestId: "fake-req" } });
+      return remember(200, { data: payOk(slug, "succeeded", id, payOutputs.get(slug)), meta: { requestId: "fake-req" } });
+    }
+
+    if (scenario === "running" || scenario === "running-forever") {
+      paySeq += 1;
+      const runId = `run_res_${paySeq}`;
+      tasks.set(runId, { slug, pollsLeft: scenario === "running" ? 1 : Number.POSITIVE_INFINITY, output: payOutputs.get(slug) });
+      return remember(202, {
+        data: { runId, status: "running", terminal: false, chargeIsFinal: false, createdAt: new Date().toISOString(), poll: { url: `/v1/tasks/${runId}`, afterMs: 20 } },
+        meta: { requestId: "fake-req" },
+      });
     }
 
     const charged: FakePayScenario[] = ["succeeded", "failed", "SETTLEMENT_RECORDING_FAILED"];
@@ -235,11 +289,12 @@ export async function startFakePerflo(): Promise<FakePerflo> {
       paySeq += 1;
       const id = `tx-${paySeq}`;
       const status = scenario === "failed" ? "failed" : "succeeded";
-      transactions.set(id, transactionRow(id, slug, status));
+      transactions.set(id, transactionRow(id, slug, status, idempotencyKey));
       if (scenario === "SETTLEMENT_RECORDING_FAILED") {
         return remember(500, { error: { code: "SETTLEMENT_RECORDING_FAILED", message: "bookkeeping failed" }, meta: { requestId: "fake-req" } });
       }
-      return remember(200, { data: payOk(slug, status, id, payOutputs.get(slug)), meta: { requestId: "fake-req" } });
+      const charge = contractPatches.get(slug)?.price ?? MONEY;
+      return remember(200, { data: payOk(slug, status, id, payOutputs.get(slug), charge), meta: { requestId: "fake-req" } });
     }
 
     switch (scenario) {
@@ -285,6 +340,11 @@ export async function startFakePerflo(): Promise<FakePerflo> {
   return {
     baseUrl: `http://127.0.0.1:${addr.port}`,
     payCalls,
+    taskReads,
+    finishTask(runId) {
+      const task = tasks.get(runId);
+      if (task) task.pollsLeft = 0;
+    },
     setScenario(slug, scenario) {
       scenarios.set(slug, scenario);
     },

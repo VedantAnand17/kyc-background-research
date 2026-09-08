@@ -1,0 +1,56 @@
+{
+  "id": "key_a3e7a2a2-2981-4974-8794-6f37995ce4fc",
+  "name": "kyc-research-m7",
+  "scope": "agent",
+  "subAccount": {
+    "id": "sub_ce5575f9-a3f0-4d5d-93dd-51ebc8a540eb",
+    "label": "kyc-research"
+  },
+  "limits": {
+    "hourly": {
+      "cap": {
+        "amount": "10.00",
+        "currency": "USD"
+      },
+      "spent": {
+        "amount": "0.00",
+        "currency": "USD"
+      },
+      "remaining": {
+        "amount": "10.00",
+        "currency": "USD"
+      },
+      "resetsAt": null
+    },
+    "daily": {
+      "cap": {
+        "amount": "10.00",
+        "currency": "USD"
+      },
+      "spent": {
+        "amount": "0.00",
+        "currency": "USD"
+      },
+      "remaining": {
+        "amount": "10.00",
+        "currency": "USD"
+      },
+      "resetsAt": null
+    },
+    "monthly": {
+      "cap": {
+        "amount": "15.00",
+        "currency": "USD"
+      },
+      "spent": {
+        "amount": "0.00",
+        "currency": "USD"
+      },
+      "remaining": {
+        "amount": "15.00",
+        "currency": "USD"
+      },
+      "resetsAt": null
+    }
+  }
+}

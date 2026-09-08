@@ -1,0 +1,141 @@
+{
+  "slug": "stableenrich-exa-search",
+  "name": "StableEnrich: Exa Search",
+  "description": "Neural web search that finds relevant pages by meaning, not just keywords. Use it to research a topic, find current information, discover sources, and gather competitive intelligence across the web.",
+  "capability": "web_search",
+  "keywords": [
+    "web",
+    "search",
+    "research",
+    "find",
+    "information",
+    "news",
+    "results",
+    "exa",
+    "neural",
+    "current"
+  ],
+  "price": {
+    "amount": "0.01",
+    "currency": "USD"
+  },
+  "maxChargePerCall": {
+    "amount": "0.01",
+    "currency": "USD"
+  },
+  "pricingUnit": "call",
+  "latencyMsP50": 77,
+  "payable": true,
+  "schemaConfidence": "high",
+  "input": {
+    "fields": [
+      {
+        "name": "numResults",
+        "in": "body",
+        "type": "number",
+        "required": false,
+        "description": null
+      },
+      {
+        "name": "includeDomains",
+        "in": "body",
+        "type": "array",
+        "required": false,
+        "description": null
+      },
+      {
+        "name": "excludeDomains",
+        "in": "body",
+        "type": "array",
+        "required": false,
+        "description": null
+      },
+      {
+        "name": "startCrawlDate",
+        "in": "body",
+        "type": "string",
+        "required": false,
+        "description": null
+      },
+      {
+        "name": "endCrawlDate",
+        "in": "body",
+        "type": "string",
+        "required": false,
+        "description": null
+      },
+      {
+        "name": "startPublishedDate",
+        "in": "body",
+        "type": "string",
+        "required": false,
+        "description": null
+      },
+      {
+        "name": "endPublishedDate",
+        "in": "body",
+        "type": "string",
+        "required": false,
+        "description": null
+      },
+      {
+        "name": "includeText",
+        "in": "body",
+        "type": "array",
+        "required": false,
+        "description": null
+      },
+      {
+        "name": "excludeText",
+        "in": "body",
+        "type": "array",
+        "required": false,
+        "description": null
+      },
+      {
+        "name": "contents",
+        "in": "body",
+        "type": "object",
+        "required": false,
+        "description": null
+      },
+      {
+        "name": "query",
+        "in": "body",
+        "type": "string",
+        "required": true,
+        "description": "The query string for the search"
+      },
+      {
+        "name": "additionalQueries",
+        "in": "body",
+        "type": "array",
+        "required": false,
+        "description": null
+      },
+      {
+        "name": "type",
+        "in": "body",
+        "type": "string",
+        "required": false,
+        "description": null
+      },
+      {
+        "name": "category",
+        "in": "body",
+        "type": "string",
+        "required": false,
+        "description": null
+      },
+      {
+        "name": "userLocation",
+        "in": "body",
+        "type": "string",
+        "required": false,
+        "description": null
+      }
+    ],
+    "example": null
+  },
+  "docsUrl": "https://stableenrich.dev"
+}

@@ -1,0 +1,69 @@
+{
+  "slug": "apify-harvestapi-linkedin-profile-scraper",
+  "name": "LinkedIn Profile Scraper + Email No Cookies",
+  "description": "LinkedIn Profile Scraper + Email No Cookies by HarvestAPI — Apify actor for Automation. Choose the mode for scraping LinkedIn profiles. 'Profile details' scrapes detailed profile information, while 'Profile details + email sear List of LinkedIn profile URLs or Public Identifiers (last part in the URL) to scrape. List of LinkedIn profile URLs to scrape. Provide at least one of the 3 fields: URLs or Public Identifiers or Profile IDs List of LinkedIn Public Identifiers. Provide at least one of the 3 fields: URLs or Public Identifiers or Profile IDs List of LinkedIn profile IDs to scrape. Provide at least one of the 3 fields: URLs or Public Identifiers or Profile IDs",
+  "capability": "people_enrich",
+  "keywords": [
+    "linkedin",
+    "profile",
+    "scraper",
+    "email",
+    "cookies",
+    "automation",
+    "apify",
+    "scrape"
+  ],
+  "price": {
+    "amount": "0.004",
+    "currency": "USD"
+  },
+  "maxChargePerCall": {
+    "amount": "0.05",
+    "currency": "USD"
+  },
+  "pricingUnit": "item",
+  "latencyMsP50": 37,
+  "payable": true,
+  "schemaConfidence": "high",
+  "input": {
+    "fields": [
+      {
+        "name": "profileScraperMode",
+        "in": "body",
+        "type": "string",
+        "required": false,
+        "description": "Choose the mode for scraping LinkedIn profiles. 'Profile details' scrapes detailed profile information, while 'Profile details + email sear"
+      },
+      {
+        "name": "queries",
+        "in": "body",
+        "type": "array",
+        "required": false,
+        "description": "List of LinkedIn profile URLs or Public Identifiers (last part in the URL) to scrape."
+      },
+      {
+        "name": "urls",
+        "in": "body",
+        "type": "array",
+        "required": false,
+        "description": "List of LinkedIn profile URLs to scrape. Provide at least one of the 3 fields: URLs or Public Identifiers or Profile IDs"
+      },
+      {
+        "name": "publicIdentifiers",
+        "in": "body",
+        "type": "array",
+        "required": false,
+        "description": "List of LinkedIn Public Identifiers. Provide at least one of the 3 fields: URLs or Public Identifiers or Profile IDs"
+      },
+      {
+        "name": "profileIds",
+        "in": "body",
+        "type": "array",
+        "required": false,
+        "description": "List of LinkedIn profile IDs to scrape. Provide at least one of the 3 fields: URLs or Public Identifiers or Profile IDs"
+      }
+    ],
+    "example": null
+  },
+  "docsUrl": "https://docs.apify.com/platform/integrations/x402"
+}

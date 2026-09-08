@@ -5,7 +5,8 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 RUN corepack enable
-COPY package.json pnpm-lock.yaml ./
+# pnpm-workspace.yaml carries the allowBuilds list; without it pnpm refuses better-sqlite3's native build.
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile
 
 FROM deps AS build
@@ -20,7 +21,7 @@ ENV NODE_ENV=production
 RUN corepack enable \
   && groupadd --system app \
   && useradd --system --gid app --home /app app
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY --from=deps /app/node_modules ./node_modules
 RUN pnpm prune --prod
 COPY --from=build /app/dist ./dist

@@ -27,7 +27,10 @@ glm-5.3 also stopped calling tools and said it was finishing when handed a `budg
 
 - Default provider: Cloudflare Workers AI via the AI SDK `@ai-sdk/openai-compatible` provider, `LLM_PROVIDER=cloudflare`, base URL derived from `CLOUDFLARE_ACCOUNT_ID`.
 - Default model for the tool loop, risk classification, and narrative: `@cf/zai-org/glm-5.3`.
-- The enrich loop is capped at three steps (one fan-out turn, then finish) and the narrative allowance is 12 seconds.
+- Every glm-5.3 call sends `reasoning_effort: low`, including the tool loop; at the default effort a single loop turn took 15 to 20 seconds and blew the 45 second deadline.
+- Each tool loop stops as soon as a turn's tool calls were all accepted by code (`toolCallsAccepted`), or on `finish`, or at its step cap; the trailing finish turn was pure latency.
+  The enrich loop is capped at three steps; the narrative allowance is 15 seconds on basic and 25 or 30 on standard and deep, with each attempt capped at 15 seconds, because a single Workers AI request can stall without answering (PRD section 6.7).
+  For the same reason every model request carries `LLM_REQUEST_TIMEOUT_MS` (default 30 seconds).
   A raw `response_format: json_schema` call on glm-5.3 returned valid narrative JSON in 5.8 seconds.
   The AI SDK openai-compatible path without that constraint spent the token budget on reasoning and returned empty `content`.
 - `LLM_LOOP_MODEL` can override the tool-loop model.

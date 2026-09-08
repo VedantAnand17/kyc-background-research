@@ -3,7 +3,12 @@ import { randomUUID } from "node:crypto";
 import { parseMoney, formatMoney, type Micro } from "../budget/money.js";
 import { createSpendGuard, type SpendGuard } from "../budget/ledger.js";
 import { createEvidenceStore } from "../evidence/store.js";
-import { decideIdentity, type SubjectInput } from "../identity/matcher.js";
+import {
+  decideIdentity,
+  type CandidateEvidence,
+  type IdentityDecision,
+  type SubjectInput,
+} from "../identity/matcher.js";
 import type { ResearchRequest, ResearchReport } from "../api/schemas.js";
 import type { Db } from "../db/sqlite.js";
 import type { Logger } from "../logger.js";
@@ -12,9 +17,10 @@ import type { ResearchAgent, AgentContext, ClassificationResult, RiskClassificat
 import { assembleReport, type CostCall, type Warning } from "../evidence/report.js";
 import { PerfloError } from "../perflo/errors.js";
 import { candidatesFromSources } from "./candidates.js";
+import type { Tier } from "./capabilities.js";
 import { defaultDeadlineMs, plan } from "./planner.js";
-import { adverseMediaQuery } from "./prompts.js";
-import { createTools, type ResearchTools, type ToolOutcome } from "./tools.js";
+import { adverseMediaQuery, describeSubject } from "./prompts.js";
+import { createTools, debitedMicro, type ResearchTools, type ToolOutcome } from "./tools.js";
 
 export class ResearchUnavailableError extends Error {
   constructor(
@@ -26,8 +32,17 @@ export class ResearchUnavailableError extends Error {
   }
 }
 
-/** Wall-clock reserved for the narrative pass. Constrained json_schema on glm-5.3 measured at 5.8 s. */
-export const SYNTHESIS_MS = 12_000;
+/**
+ * Wall-clock reserved for the narrative pass, per tier. Constrained json_schema on glm-5.3 measured 5.8 s on
+ * basic and 7.4 s on a live deep run, but a single request can stall: a funded deep run on 2026-09-08 got no
+ * answer inside 15 s and shipped "narrative unavailable". The richer tiers therefore reserve room for two
+ * attempts of at most NARRATIVE_ATTEMPT_MS each; basic keeps the 15 s live report target.
+ */
+const SYNTHESIS_MS: Readonly<Record<Tier, number>> = { basic: 15_000, standard: 25_000, deep: 30_000 };
+export const NARRATIVE_ATTEMPT_MS = 15_000;
+export function synthesisMs(tier: Tier): number {
+  return SYNTHESIS_MS[tier] ?? NARRATIVE_ATTEMPT_MS;
+}
 const DRAIN_MS = 5_000;
 
 export interface OrchestratorDeps {
@@ -58,7 +73,77 @@ function subjectOf(req: ResearchRequest): SubjectInput {
   };
 }
 
-function wrapTools(tools: ResearchTools, onExhausted: () => void): ResearchTools {
+/** Tools the orchestrator drives itself: resolve owns find_people, the screen phase owns news, web, and watchlist. */
+const CODE_OWNED_TOOLS: ReadonlySet<string> = new Set(["find_people", "search_news", "search_web", "screen_watchlist"]);
+
+/**
+ * The enrich turn sees only person-enrichment tools. Offered the full set, glm-5.3 re-ran news and web searches
+ * with its own queries in parallel with the code-owned screen phase: a second news payment, duplicate rows, and
+ * one more model turn (2026-09-08 live trace).
+ */
+export function enrichCtx(base: AgentContext): AgentContext {
+  return {
+    ...base,
+    allowedTools: base.allowedTools.filter((name) => !CODE_OWNED_TOOLS.has(name)),
+    tools: Object.fromEntries(
+      Object.entries(base.tools).filter(([name]) => !CODE_OWNED_TOOLS.has(name)),
+    ) as ResearchTools,
+  };
+}
+
+/** One candidate as the model needs to see it: who, where, employer, and the LinkedIn URL the profile tools take. */
+export function describeCandidate(row: CandidateEvidence): string {
+  const parts = [row.names[0] ?? row.id];
+  const place = [row.city, row.country].filter(Boolean).join(" ");
+  if (place) parts.push(place);
+  const employers = [...new Set(row.employers.map((fact) => fact.value))];
+  if (employers.length > 0) parts.push(`employer ${employers.join(" / ")}`);
+  if (row.dateOfBirth) parts.push(`born ${row.dateOfBirth}`);
+  const url = row.profileUrls[0]?.value;
+  if (url) parts.push(`profileUrl ${url}`);
+  return parts.join(", ");
+}
+
+function primaryOf(identity: IdentityDecision, evidence: readonly CandidateEvidence[]): CandidateEvidence | undefined {
+  return identity.primaryCandidateId ? evidence.find((row) => row.id === identity.primaryCandidateId) : undefined;
+}
+
+/** Subject facts plus what the resolve phase learned about the primary candidate, for risk classification. */
+export function describePrimary(
+  req: ResearchRequest,
+  identity: IdentityDecision,
+  evidence: readonly CandidateEvidence[],
+): string {
+  const parts = [
+    describeSubject({
+      firstName: req.firstName,
+      lastName: req.lastName,
+      ...(req.dateOfBirth ? { dateOfBirth: req.dateOfBirth } : {}),
+      ...(req.address
+        ? {
+            address: {
+              ...(req.address.city ? { city: req.address.city } : {}),
+              ...(req.address.country ? { country: req.address.country } : {}),
+            },
+          }
+        : {}),
+    }),
+  ];
+  const primary = primaryOf(identity, evidence);
+  if (primary) {
+    const place = [primary.city, primary.country].filter(Boolean).join(" ");
+    if (place) parts.push(`based in ${place}`);
+    const employers = [...new Set(primary.employers.map((row) => row.value))];
+    if (employers.length > 0) parts.push(`employer ${employers.join(" / ")}`);
+  }
+  return parts.join(", ");
+}
+
+function wrapTools(
+  tools: ResearchTools,
+  onExhausted: () => void,
+  onFailed: (result: Extract<ToolOutcome, { outcome: "failed" }>) => void,
+): ResearchTools {
   const out: ResearchTools = {};
   for (const [name, row] of Object.entries(tools)) {
     if (!row) continue;
@@ -67,6 +152,7 @@ function wrapTools(tools: ResearchTools, onExhausted: () => void): ResearchTools
       async execute(args: Record<string, unknown>): Promise<ToolOutcome> {
         const result = await row.execute(args);
         if (result.outcome === "budget_exhausted") onExhausted();
+        if (result.outcome === "failed") onFailed(result);
         return result;
       },
     };
@@ -109,16 +195,34 @@ function agentCtx(
 
 async function reconcileHeld(db: Db, jobId: string, guard: SpendGuard, client: PerfloClient, log: Logger): Promise<void> {
   const held = db
-    .prepare(`SELECT id, transaction_id FROM ledger WHERE job_id = ? AND state = 'held'`)
-    .all(jobId) as Array<{ id: string; transaction_id: string | null }>;
+    .prepare(`SELECT id, transaction_id, idempotency_key, reserved_micro FROM ledger WHERE job_id = ? AND state = 'held'`)
+    .all(jobId) as Array<{ id: string; transaction_id: string | null; idempotency_key: string; reserved_micro: string }>;
   for (const row of held) {
     try {
-      if (!row.transaction_id) {
-        guard.resolveHold(row.id, null);
+      if (row.transaction_id?.startsWith("run_")) {
+        // A vendor task that was still running at the vendor timeout. Its recorded outcome is the truth;
+        // one still running at report time is settled at the reserved quote so the cap can never be
+        // exceeded by a charge that lands after the report (a failed task can still leave a debit).
+        const task = await client.getTask(row.transaction_id);
+        const chargedMicro = task.terminal
+          ? debitedMicro(
+              { status: task.status, charged: task.charged ?? { amount: "0", currency: "USD" }, ...(task.settlement ? { settlement: task.settlement } : {}) },
+              BigInt(row.reserved_micro),
+            )
+          : BigInt(row.reserved_micro);
+        if (!task.terminal) log.warn({ jobId, reservationId: row.id, runId: row.transaction_id }, "vendor task still running at report; settled at quote");
+        if (chargedMicro > 0n) guard.resolveHold(row.id, { chargedMicro, transactionId: task.transactionId ?? row.transaction_id });
+        else guard.resolveHold(row.id, null);
         continue;
       }
-      const tx = await client.getTransaction(row.transaction_id);
-      if (tx.ledgerState === "posted" && tx.amount.amount.startsWith("-")) {
+      let tx = null;
+      if (row.transaction_id) {
+        tx = await client.getTransaction(row.transaction_id);
+      } else {
+        const listed = await client.listTransactions({ limit: 50 });
+        tx = listed.find((item) => item.idempotencyKey === row.idempotency_key) ?? null;
+      }
+      if (tx && tx.ledgerState === "posted" && tx.amount.amount.startsWith("-")) {
         guard.resolveHold(row.id, {
           chargedMicro: parseMoney(tx.amount.amount.slice(1)),
           transactionId: tx.id,
@@ -135,7 +239,7 @@ async function reconcileHeld(db: Db, jobId: string, guard: SpendGuard, client: P
 
 export async function runResearch(req: ResearchRequest, deps: OrchestratorDeps): Promise<ResearchReport> {
   try {
-    await deps.client.getBalance();
+    await deps.client.getKey();
   } catch (err) {
     const code = err instanceof PerfloError ? err.code : "NETWORK_ERROR";
     const message = err instanceof Error ? err.message : "Perflo is unreachable.";
@@ -168,7 +272,7 @@ export async function runResearch(req: ResearchRequest, deps: OrchestratorDeps):
   });
   const store = createEvidenceStore(deps.db, requestId);
   const controller = new AbortController();
-  const abortAt = planned.deadlineAt - SYNTHESIS_MS;
+  const abortAt = planned.deadlineAt - synthesisMs(planned.tier);
 
   const fireDeadline = (): void => {
     if (deadlineHit) return;
@@ -201,6 +305,11 @@ export async function runResearch(req: ResearchRequest, deps: OrchestratorDeps):
           code: "budget_exhausted",
           message: "Remaining headroom is below the cheapest live quote among the allowed tools.",
         });
+      }
+    },
+    (result) => {
+      if (!warnings.some((w) => w.code === result.code && w.message === result.reason)) {
+        warnings.push({ code: result.code, message: result.reason });
       }
     },
   );
@@ -252,14 +361,14 @@ export async function runResearch(req: ResearchRequest, deps: OrchestratorDeps):
   if (!skipResearch && identity.status === "ambiguous" && !controller.signal.aborted) {
     await runPhase("disambiguate", async () => {
       const [lead, runner] = identity.candidates;
+      const describe = (scored: { id: string; confidence: number } | undefined): string => {
+        if (!scored) return "";
+        const row = evidence.find((c) => c.id === scored.id);
+        return row ? describeCandidate(row) : scored.id;
+      };
       const before = guard.snapshot();
       guard.unlockReserve();
-      await deps.agent.disambiguate(
-        ctx({
-          lead: lead ? `${lead.id} ${lead.confidence}` : "",
-          runner: runner ? `${runner.id} ${runner.confidence}` : "",
-        }),
-      );
+      await deps.agent.disambiguate(ctx({ lead: describe(lead), runner: describe(runner) }));
       const after = guard.snapshot();
       guard.relockAfterUnlock(after.spentMicro - before.spentMicro, before.headroomMicro);
       evidence = candidatesFromSources(store.forJob());
@@ -313,7 +422,7 @@ export async function runResearch(req: ResearchRequest, deps: OrchestratorDeps):
       }
     }
     const classified: ClassificationResult = await Promise.resolve(
-      deps.agent.classifyRisk(hits, controller.signal),
+      deps.agent.classifyRisk(hits, describePrimary(req, identity, evidence), controller.signal),
     );
     if (classified.failed) {
       classifications = [];
@@ -329,7 +438,11 @@ export async function runResearch(req: ResearchRequest, deps: OrchestratorDeps):
 
   if (!skipResearch && !adverseOnly) {
     currentPhase = "enrich";
-    await Promise.all([runPhase("enrich", () => deps.agent.enrich(ctx())), runPhase("screen", screenPhase)]);
+    const primary = primaryOf(identity, evidence);
+    await Promise.all([
+      runPhase("enrich", () => deps.agent.enrich(enrichCtx(ctx(primary ? { primary: describeCandidate(primary) } : {})))),
+      runPhase("screen", screenPhase),
+    ]);
     evidence = candidatesFromSources(store.forJob());
     identity = decideIdentity(subjectOf(req), evidence);
   } else if (!skipResearch) {
@@ -372,14 +485,14 @@ export async function runResearch(req: ResearchRequest, deps: OrchestratorDeps):
       return `${s.id} ${s.capability} ${s.status}${summary ? `: ${summary}` : ""}`;
     }),
   ].join("\n");
-  const reportBudgetEnds = Date.now() + SYNTHESIS_MS;
+  const reportBudgetEnds = Date.now() + synthesisMs(planned.tier);
   for (let attempt = 0; attempt < 2; attempt++) {
     const remaining = reportBudgetEnds - Date.now();
     if (remaining < 3_000) break;
     try {
       narrative = await deps.agent.narrate({
         ...ctx(),
-        signal: AbortSignal.timeout(remaining),
+        signal: AbortSignal.timeout(Math.min(remaining, NARRATIVE_ATTEMPT_MS)),
         evidenceNotes: notes,
       });
       break;
@@ -395,6 +508,8 @@ export async function runResearch(req: ResearchRequest, deps: OrchestratorDeps):
     }
   }
   phases.report = Date.now() - tReport;
+
+  await reconcileHeld(deps.db, requestId, guard, deps.client, deps.log);
 
   const ledgerRows = deps.db
     .prepare(`SELECT id, vendor, capability, charged_micro, transaction_id, state FROM ledger WHERE job_id = ?`)
@@ -442,6 +557,5 @@ export async function runResearch(req: ResearchRequest, deps: OrchestratorDeps):
     .prepare(`UPDATE jobs SET finished_at = ?, spent_micro = ?, status = 'succeeded', report_json = ? WHERE id = ?`)
     .run(new Date().toISOString(), spent.toString(), JSON.stringify(report), requestId);
 
-  await reconcileHeld(deps.db, requestId, guard, deps.client, deps.log);
   return report;
 }

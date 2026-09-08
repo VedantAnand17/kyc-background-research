@@ -25,7 +25,14 @@ export interface PerfloClient {
   pay(slug: string, args: PayArgs): Promise<PayResult>;
   getTransaction(id: string): Promise<Transaction>;
   listTransactions(opts?: { readonly limit?: number }): Promise<Transaction[]>;
-  getBalance(): Promise<unknown>;
+  /** GET /v1/tasks/:runId: the recorded outcome of a pay that answered 202 running. Same shape as a pay result. */
+  getTask(runId: string): Promise<PayResult>;
+  /**
+   * GET /v1/key: the agent key's own envelope and remaining windows. The pre-flight uses this, not
+   * GET /v1/balance, because Perflo answers `/v1/balance` with ACCOUNT_KEY_REQUIRED for an agent key
+   * (2026-09-08 funded run) and the service always runs on an agent key.
+   */
+  getKey(): Promise<unknown>;
 }
 
 export interface PerfloClientOptions {
@@ -47,6 +54,45 @@ function isAbortLike(err: unknown): boolean {
   return err instanceof Error && (err.name === "AbortError" || err.name === "TimeoutError");
 }
 
+/**
+ * The 202 body a slow vendor returns from POST /v1/pay and GET /v1/tasks/:id while still running.
+ * Observed live 2026-09-08: `{runId, status: "running", terminal: false, chargeIsFinal: false, createdAt}`;
+ * some deployments spell the id `id` and add `poll`, so both are accepted.
+ */
+interface RunningTask {
+  readonly runId?: string;
+  readonly id?: string;
+  readonly status: "running" | "indeterminate" | string;
+  readonly terminal: false;
+  readonly poll?: { readonly url: string; readonly afterMs?: number };
+}
+
+function isRunning(value: PayResult | RunningTask): value is RunningTask {
+  if (value.terminal !== false) return false;
+  const task = value as RunningTask;
+  return typeof (task.runId ?? task.id) === "string" && !("transactionId" in value && (value as PayResult).charged);
+}
+
+function runIdOf(task: RunningTask): string {
+  return (task.runId ?? task.id)!;
+}
+
+/** Abort while polling still names the run, so the caller holds the reservation against it instead of losing the charge. */
+function sleep(ms: number, signal: AbortSignal | undefined, runId: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const onAbort = () => {
+      clearTimeout(timer);
+      reject(new PerfloError("TIMEOUT", `pay aborted while vendor task ${runId} was still running.`, 0, { runId }, undefined));
+    };
+    const timer = setTimeout(() => {
+      signal?.removeEventListener("abort", onAbort);
+      resolve();
+    }, ms);
+    if (signal?.aborted) onAbort();
+    else signal?.addEventListener("abort", onAbort, { once: true });
+  });
+}
+
 export function createPerfloClient(opts: PerfloClientOptions): PerfloClient {
   const baseUrl = opts.baseUrl.replace(/\/+$/, "");
   const timeoutMs = opts.timeoutMs;
@@ -55,7 +101,12 @@ export function createPerfloClient(opts: PerfloClientOptions): PerfloClient {
     method: string,
     path: string,
     body?: unknown,
-    extra?: { readonly idempotencyKey?: string; readonly signal?: AbortSignal; readonly auth?: boolean },
+    extra?: {
+      readonly idempotencyKey?: string;
+      readonly signal?: AbortSignal;
+      readonly auth?: boolean;
+      readonly pollable?: boolean;
+    },
   ): Promise<T> {
     const headers: Record<string, string> = {};
     if (extra?.auth !== false) headers.Authorization = `Bearer ${opts.agentKey}`;
@@ -107,6 +158,11 @@ export function createPerfloClient(opts: PerfloClientOptions): PerfloClient {
 
     const env = parsed as Envelope<T>;
     const requestId = env.meta?.requestId;
+    // A slow vendor answers { runId, status: "running", terminal: false } with nothing charged yet, as a 200
+    // or a 202; that is a task to poll, not a confirm-first pause (2026-09-08 funded run).
+    if (extra?.pollable && env.data && isRunning(env.data as unknown as PayResult | RunningTask)) {
+      return env.data as T;
+    }
     const pending = res.status === 202 || env.status === "pending_confirmation";
     if (pending || !res.ok || env.error) {
       const details = { ...(env.error?.details ?? {}) };
@@ -135,18 +191,41 @@ export function createPerfloClient(opts: PerfloClientOptions): PerfloClient {
       if (searchOpts?.limit !== undefined) body.limit = searchOpts.limit;
       return envelope<VendorSearchResult[]>("POST", "/v1/search", body);
     },
-    pay(slug, args) {
+    async pay(slug, args) {
       const body: Record<string, unknown> = { maxCharge: args.maxCharge };
       if (args.input !== undefined) body.input = args.input;
       if (args.query !== undefined) body.query = args.query;
-      return envelope<PayResult>(
-        "POST",
-        `/v1/pay/${encodeURIComponent(slug)}`,
-        body,
-        args.signal
-          ? { idempotencyKey: args.idempotencyKey, signal: args.signal }
-          : { idempotencyKey: args.idempotencyKey },
-      );
+      const started = Date.now();
+      const signalOf = () => (args.signal ? { signal: args.signal } : {});
+      let result = await envelope<PayResult | RunningTask>("POST", `/v1/pay/${encodeURIComponent(slug)}`, body, {
+        idempotencyKey: args.idempotencyKey,
+        pollable: true,
+        ...signalOf(),
+      });
+      // The whole pay, initial call plus polling, shares one timeoutMs budget. Past it the caller holds the
+      // reservation against the run id and reconciles through getTask, exactly as for a transport timeout.
+      while (isRunning(result)) {
+        const remaining = started + timeoutMs - Date.now();
+        const wait = Math.min(Math.max(result.poll?.afterMs ?? 3_000, 1_000), Math.max(remaining, 0));
+        if (remaining <= 0 || wait <= 0) {
+          throw new PerfloError(
+            "TIMEOUT",
+            `POST /v1/pay/${slug} is still running after ${timeoutMs}ms; poll ${runIdOf(result)}.`,
+            0,
+            { runId: runIdOf(result) },
+            undefined,
+          );
+        }
+        await sleep(wait, args.signal, runIdOf(result));
+        result = await envelope<PayResult | RunningTask>("GET", result.poll?.url ?? `/v1/tasks/${runIdOf(result)}`, undefined, {
+          pollable: true,
+          ...signalOf(),
+        });
+      }
+      return result;
+    },
+    getTask(runId) {
+      return envelope<PayResult>("GET", `/v1/tasks/${encodeURIComponent(runId)}`);
     },
     getTransaction(id) {
       return envelope<Transaction>("GET", `/v1/transactions/${encodeURIComponent(id)}`);
@@ -157,8 +236,8 @@ export function createPerfloClient(opts: PerfloClientOptions): PerfloClient {
       const suffix = q.size > 0 ? `?${q.toString()}` : "";
       return envelope<Transaction[]>("GET", `/v1/transactions${suffix}`);
     },
-    getBalance() {
-      return envelope<unknown>("GET", "/v1/balance");
+    getKey() {
+      return envelope<unknown>("GET", "/v1/key");
     },
   };
 }
@@ -192,11 +271,14 @@ export function createFixturePerfloClient(root: string): PerfloClient {
     async getTransaction(id) {
       return unwrap<Transaction>(read(`transactions/${id}.json`));
     },
+    async getTask(runId) {
+      return unwrap<PayResult>(read(`tasks/${runId}.json`));
+    },
     async listTransactions() {
       return unwrap<Transaction[]>(read("transactions/list.json"));
     },
-    async getBalance() {
-      return unwrap<unknown>(read("balance.json"));
+    async getKey() {
+      return unwrap<unknown>(read("key.json"));
     },
   };
 }

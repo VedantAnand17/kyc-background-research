@@ -1,0 +1,1010 @@
+{
+  "runId": "run_res_173a7aa9-596f-43fb-a274-8a297dc3b4b1",
+  "transactionId": "585f3c43-f29b-4fc5-adf2-c7425f735c6c",
+  "slug": "stableenrich-exa-search",
+  "status": "succeeded",
+  "terminal": true,
+  "charged": {
+    "amount": "0.01",
+    "currency": "USD"
+  },
+  "charges": [
+    {
+      "step": "buy",
+      "slug": "stableenrich-exa-search",
+      "amount": {
+        "amount": "0.01",
+        "currency": "USD"
+      },
+      "transactionId": "585f3c43-f29b-4fc5-adf2-c7425f735c6c"
+    }
+  ],
+  "chargeIsFinal": true,
+  "chargedTo": "credit",
+  "subAccount": "kyc-research",
+  "remaining": {
+    "amount": "14.2241",
+    "currency": "USD"
+  },
+  "subAccountRemaining": {
+    "amount": "9.0908",
+    "currency": "USD"
+  },
+  "createdAt": "2026-09-08T16:03:07.602Z",
+  "endedAt": "2026-09-08T16:03:17.434Z",
+  "settlement": {
+    "status": "finalized",
+    "flow": "authorization",
+    "chain": "tempo",
+    "txHash": "0x276bacd129e146eddfd7c6deb1977196673d0e92ee454505815df9a947aab27d",
+    "explorer": null
+  },
+  "upstream": {
+    "httpStatus": 200
+  },
+  "output": {
+    "requestId": "4ee26d6b15df0bb0bc62cbce12ffa376",
+    "resolvedSearchType": "",
+    "results": [
+      {
+        "id": "https://exa.ai/library/person/v59z31k3gks",
+        "title": "Satya Nadella",
+        "url": "https://www.linkedin.com/in/satyanadella",
+        "publishedDate": "2026-08-22T10:42:19.000Z",
+        "text": "# Satya Nadella\n\nChairman and CEO at Microsoft\n\nRedmond, Washington, United States (US)\n\n500 connections • 12,128,861 followers\n\n## About\n\nSatya Nadella (télugu: సత్య నాదెళ్ల), (Hyderabad, Andhra Pradesh, India, 19 de agosto de 1967) es un Ingeniero eléctrico, informático y administrador de empresas estadounidense de origen indio. Empezó a trabajar como ingeniero en la empresa informática Sun Micr",
+        "image": "https://media.licdn.com/dms/image/v2/C5603AQHHUuOSlRVA1w/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1579726625398?e=2147483647&v=beta&t=Rr7WT9uBM0byOij0oT_KirejIMVE4HK4r8NGIp0zjdI",
+        "entities": [
+          {
+            "id": "https://exa.ai/library/person/v59z31k3gks",
+            "type": "person",
+            "version": 1,
+            "properties": {
+              "name": "Satya Nadella",
+              "firstName": "Satya",
+              "lastName": "Nadella",
+              "location": "Redmond, Washington, United States",
+              "workHistory": [
+                {
+                  "title": "Chairman and CEO",
+                  "location": "Greater Seattle Area",
+                  "dates": {
+                    "from": "2014-02-01",
+                    "to": null
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/gxl16rnpqtq",
+                    "name": "Microsoft"
+                  }
+                },
+                {
+                  "title": "Member Board Of Trustees",
+                  "location": null,
+                  "dates": {
+                    "from": "2018-01-01",
+                    "to": null
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/0tnjhdz181v",
+                    "name": "University of Chicago"
+                  }
+                },
+                {
+                  "title": "Board Member",
+                  "location": null,
+                  "dates": {
+                    "from": "2017-01-01",
+                    "to": "2024-01-01"
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/ygx22pbb3gp",
+                    "name": "Starbucks"
+                  }
+                },
+                {
+                  "title": "Chairman",
+                  "location": null,
+                  "dates": {
+                    "from": "2021-01-01",
+                    "to": "2023-01-01"
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/2ffc9chz0nv",
+                    "name": "The Business Council U.S."
+                  }
+                },
+                {
+                  "title": "Board Member",
+                  "location": null,
+                  "dates": {
+                    "from": "2016-01-01",
+                    "to": "2022-01-01"
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/ktvg8j2583t",
+                    "name": "Fred Hutch"
+                  }
+                }
+              ],
+              "educationHistory": [
+                {
+                  "degree": "Bachelor’s Degree, Electrical Engineering",
+                  "dates": null,
+                  "institution": {
+                    "id": "https://exa.ai/library/organization/86y6p3fcdnx",
+                    "name": "Manipal Institute of Technology, Manipal"
+                  }
+                },
+                {
+                  "degree": "Master’s Degree, Computer Science",
+                  "dates": null,
+                  "institution": {
+                    "id": "https://exa.ai/library/organization/5bx8d7ylvf5",
+                    "name": "University of Wisconsin-Milwaukee"
+                  }
+                },
+                {
+                  "degree": null,
+                  "dates": {
+                    "from": "1994",
+                    "to": "1996"
+                  },
+                  "institution": {
+                    "id": "https://exa.ai/library/organization/l1qx9xkkpqw",
+                    "name": "The University of Chicago Booth School of Business"
+                  }
+                }
+              ],
+              "research": null
+            }
+          }
+        ]
+      },
+      {
+        "id": "https://exa.ai/library/person/cwkl1481cff",
+        "title": "J.D. Meier",
+        "url": "https://www.linkedin.com/in/jdmeier",
+        "publishedDate": "2026-08-30T04:07:20.000Z",
+        "text": "# J.D. Meier\n\nLead Like the Top 1% | Satya Nadella’s Former Head Innovation Coach | Build Your Leadership Advantage | Strategic Advisor & Leadership Coach | 25 Years at Microsoft\n\nGreater Seattle Area (US)\n\n500 connections • 78,371 followers\n\n## About\n\nLead like the top 1%. I help leaders build their AI Leadership Advantage. …\n\nTotal Experience: 28 years and 10 months\n\n## Experience\n\n### Founder &",
+        "image": "https://media.licdn.com/dms/image/v2/D4E03AQH6-ZWDw5qBLQ/profile-displayphoto-scale_200_200/B4EZubi0KGJQAY-/0/1767841156997?e=2147483647&v=beta&t=Vsms8rC-GivYnw7wb4NDV-ohqX3-V9IP3O6GCq3XDCk",
+        "entities": [
+          {
+            "id": "https://exa.ai/library/person/cwkl1481cff",
+            "type": "person",
+            "version": 1,
+            "properties": {
+              "name": "J.D. Meier",
+              "firstName": "J.D.",
+              "lastName": "Meier",
+              "location": "Greater Seattle Area",
+              "workHistory": [
+                {
+                  "title": "Founder & CEO",
+                  "location": null,
+                  "dates": {
+                    "from": "2010-02-01",
+                    "to": null
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/59h4b84hx2n",
+                    "name": "Innovation Playhouse"
+                  }
+                },
+                {
+                  "title": "Co-Founder, Chief Innovation Officer, Chief Strategy Officer",
+                  "location": null,
+                  "dates": {
+                    "from": "2024-04-01",
+                    "to": "2024-10-01"
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/cgf9wmjczpg",
+                    "name": "The AI Solution Group"
+                  }
+                },
+                {
+                  "title": "Director of Innovation & Sustainability, Industry Solutions",
+                  "location": null,
+                  "dates": {
+                    "from": "2021-04-01",
+                    "to": "2022-09-01"
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/gxl16rnpqtq",
+                    "name": "Microsoft"
+                  }
+                },
+                {
+                  "title": "Director of Innovation, Industry Solutions",
+                  "location": null,
+                  "dates": {
+                    "from": "2019-05-01",
+                    "to": "2021-04-01"
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/gxl16rnpqtq",
+                    "name": "Microsoft"
+                  }
+                },
+                {
+                  "title": "Director of Innovation, Microsoft Digital Advisory Services",
+                  "location": null,
+                  "dates": {
+                    "from": "2014-01-01",
+                    "to": "2019-05-01"
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/gxl16rnpqtq",
+                    "name": "Microsoft"
+                  }
+                },
+                {
+                  "title": "Various Leadership Roles (1997 2014)",
+                  "location": null,
+                  "dates": {
+                    "from": "1997-11-01",
+                    "to": "2014-05-01"
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/gxl16rnpqtq",
+                    "name": "Microsoft"
+                  }
+                }
+              ],
+              "educationHistory": [
+                {
+                  "degree": null,
+                  "dates": null,
+                  "institution": {
+                    "id": null,
+                    "name": "Arizona State University"
+                  }
+                }
+              ],
+              "research": null
+            }
+          }
+        ]
+      },
+      {
+        "id": "https://exa.ai/library/person/dqv74jp30cp",
+        "title": "Satya Narlapuram",
+        "url": "https://www.linkedin.com/in/satyanarayananarlapuram-1b5a6632",
+        "publishedDate": "2026-08-06T18:44:09.000Z",
+        "text": "# Satya Narlapuram\n\nPartner Software Engineer\n\nRedmond, Washington, United States (US)\n\n500 connections • 1,448 followers\n\n## About\n\nAn organized, focused and experienced engineer with excellent technical and problem solving skills. Eleven years of working experience at Microsoft Core Engineering Teams (SQL Server - High availability and Disaster Recovery, SQL Azure Availability, SQL Parser, Azure",
+        "image": "https://media.licdn.com/dms/image/v2/C5603AQGy8ArCxlxsoQ/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1524811510842?e=2147483647&v=beta&t=xyLmYvvFK5dSt7g7HDAPYmy9Jb0JrmiUh5zXGmVle8E",
+        "entities": [
+          {
+            "id": "https://exa.ai/library/person/dqv74jp30cp",
+            "type": "person",
+            "version": 1,
+            "properties": {
+              "name": "Satya Narlapuram",
+              "firstName": "Satya",
+              "lastName": "Narlapuram",
+              "location": "Redmond, Washington, United States",
+              "workHistory": [
+                {
+                  "title": "Senior Manager",
+                  "location": "Seattle, Washington, United States",
+                  "dates": {
+                    "from": "2022-03-01",
+                    "to": "2025-03-01"
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/mcz1pvgkv4g",
+                    "name": "Amazon Web Services (AWS)"
+                  }
+                },
+                {
+                  "title": "Senior Software Engineer",
+                  "location": "Seattle, Washington",
+                  "dates": {
+                    "from": "2018-07-01",
+                    "to": "2019-10-01"
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/mcz1pvgkv4g",
+                    "name": "Amazon Web Services"
+                  }
+                },
+                {
+                  "title": "Software Engineer Manager",
+                  "location": "Redmond",
+                  "dates": {
+                    "from": "2015-10-01",
+                    "to": "2018-02-01"
+                  },
+                  "company": {
+                    "id": null,
+                    "name": "Microsoft"
+                  }
+                },
+                {
+                  "title": "Senior Software Engineer",
+                  "location": "Redmond",
+                  "dates": {
+                    "from": "2014-06-01",
+                    "to": "2015-10-01"
+                  },
+                  "company": {
+                    "id": null,
+                    "name": "Microsoft"
+                  }
+                },
+                {
+                  "title": "Partner Software Engineer",
+                  "location": "Redmond, Washington, United States",
+                  "dates": {
+                    "from": "2025-03-01",
+                    "to": null
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/gxl16rnpqtq",
+                    "name": "Microsoft"
+                  }
+                },
+                {
+                  "title": "Principal Software Engineering Manager",
+                  "location": "Redmond",
+                  "dates": {
+                    "from": "2019-10-01",
+                    "to": "2022-03-01"
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/gxl16rnpqtq",
+                    "name": "Microsoft"
+                  }
+                },
+                {
+                  "title": "Software Engineer 2",
+                  "location": "Redmond, washignton",
+                  "dates": {
+                    "from": "2010-09-01",
+                    "to": "2014-08-01"
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/gxl16rnpqtq",
+                    "name": "Microsoft"
+                  }
+                },
+                {
+                  "title": "Software Development Engineer in Test",
+                  "location": null,
+                  "dates": {
+                    "from": "2007-07-01",
+                    "to": "2010-09-01"
+                  },
+                  "company": {
+                    "id": null,
+                    "name": "Microsoft IDC"
+                  }
+                }
+              ],
+              "educationHistory": [
+                {
+                  "degree": "Masters, Computer Science",
+                  "dates": {
+                    "from": "2005",
+                    "to": "2007"
+                  },
+                  "institution": {
+                    "id": null,
+                    "name": "IIT Guwahati"
+                  }
+                },
+                {
+                  "degree": "B.Tech, Information technology",
+                  "dates": {
+                    "from": "2001",
+                    "to": "2005"
+                  },
+                  "institution": {
+                    "id": "https://exa.ai/library/organization/8bh67z1z61d",
+                    "name": "Jawaharlal Nehru Technological University"
+                  }
+                }
+              ],
+              "research": null
+            }
+          }
+        ]
+      },
+      {
+        "id": "https://exa.ai/library/person/bsbkd08b0pm",
+        "title": "Satya Rapelly",
+        "url": "https://www.linkedin.com/in/satyarapelly",
+        "publishedDate": "2026-08-11T22:16:00.000Z",
+        "text": "# Satya Rapelly\n\nSenior Software Engineer | Cloud & Full Stack Developer | Azure | .NET | React | Node.js | DevOps | Solution Architect\n\nRedmond, Washington, United States (US)\n\n408 connections • 407 followers\n\n## About\n\n🔹 Experienced Software Engineer & Solution Architect with 25+ years in building scalable, cloud-native applications. Specialized in Microsoft Azure,.NET Core, React, Node.js, and",
+        "image": "https://media.licdn.com/dms/image/v2/D5603AQETxTLR49Kriw/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1691697113660?e=2147483647&v=beta&t=U-OE0wGcEb8ZtYexSeMHB_oluc1qfr-8-Ja16aUrZk4",
+        "entities": [
+          {
+            "id": "https://exa.ai/library/person/bsbkd08b0pm",
+            "type": "person",
+            "version": 1,
+            "properties": {
+              "name": "Satya Rapelly",
+              "firstName": "Satya",
+              "lastName": "Rapelly",
+              "location": "Redmond, Washington, United States",
+              "workHistory": [
+                {
+                  "title": "Senior Software Engineer",
+                  "location": "Seattle, Washington, United States",
+                  "dates": {
+                    "from": "2015-08-01",
+                    "to": null
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/gxl16rnpqtq",
+                    "name": "Microsoft"
+                  }
+                },
+                {
+                  "title": "Sr. Technical Architect",
+                  "location": "Seattle, Washington, United States",
+                  "dates": {
+                    "from": "2010-04-01",
+                    "to": "2015-08-01"
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/98qk9txnqbg",
+                    "name": "Infosys Technologies Limited"
+                  }
+                },
+                {
+                  "title": "Sr.Associate Projects",
+                  "location": "Chicago, Illinois, United States",
+                  "dates": {
+                    "from": "2007-01-01",
+                    "to": "2010-04-01"
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/rdw6dth51hp",
+                    "name": "Cognizant"
+                  }
+                },
+                {
+                  "title": "Senior Software Engineer",
+                  "location": "Hyderabad, Telangana, India",
+                  "dates": {
+                    "from": "2000-06-01",
+                    "to": "2007-01-01"
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/k5gq9mmgx2h",
+                    "name": "Wipro Technologies"
+                  }
+                },
+                {
+                  "title": "Associate Software Engineer",
+                  "location": "Gurugram, Haryana, India",
+                  "dates": {
+                    "from": "1999-11-01",
+                    "to": "2000-06-01"
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/yrwhnghs7k5",
+                    "name": "CA Technologies"
+                  }
+                }
+              ],
+              "educationHistory": [
+                {
+                  "degree": "MCA, Computers, A",
+                  "dates": {
+                    "from": "1996",
+                    "to": "1999"
+                  },
+                  "institution": {
+                    "id": "https://exa.ai/library/organization/p78npx3strn",
+                    "name": "Kakatiya University, Warangal"
+                  }
+                }
+              ],
+              "research": null
+            }
+          }
+        ]
+      },
+      {
+        "id": "https://exa.ai/library/person/kxfvhsrv7yq",
+        "title": "Satya Aakash Chowdary Obellaneni",
+        "url": "https://www.linkedin.com/in/satyaaakash",
+        "publishedDate": "2026-08-08T02:30:41.000Z",
+        "text": "# Satya Aakash Chowdary Obellaneni\n\nSoftware Engineer at Microsoft\n\nRedmond, Washington, United States (US)\n\n500 connections • 2,926 followers\n\n## About\n\nSoftware Engineer and AI/ML Researcher with expertise in backend microservices, distributed systems, and applied machine learning. Experienced in building cloud-native applications with Java (Spring Boot), Python (FastAPI), React/TypeScript, and ",
+        "image": "https://media.licdn.com/dms/image/v2/D5603AQESI7tBWwv5zQ/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1719987704619?e=2147483647&v=beta&t=MS_Tkr5zNu7XK1NmrhosckINUIHE2m36tqPG5ECMef0",
+        "entities": [
+          {
+            "id": "https://exa.ai/library/person/kxfvhsrv7yq",
+            "type": "person",
+            "version": 1,
+            "properties": {
+              "name": "Satya Aakash Chowdary Obellaneni",
+              "firstName": "Satya",
+              "lastName": "Obellaneni",
+              "location": "Redmond, Washington, United States",
+              "workHistory": [
+                {
+                  "title": "Software Engineer",
+                  "location": "Redmond, Washington, United States",
+                  "dates": {
+                    "from": "2025-11-01",
+                    "to": null
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/gxl16rnpqtq",
+                    "name": "Microsoft"
+                  }
+                },
+                {
+                  "title": "AI Software Engineer",
+                  "location": "Gainesville, Florida, United States",
+                  "dates": {
+                    "from": "2025-06-01",
+                    "to": "2025-11-01"
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/yzpgy6cntsd",
+                    "name": "University of Florida Institute of Food and Agricultural Sciences"
+                  }
+                },
+                {
+                  "title": "AI Software Engineer Intern",
+                  "location": "Gainesville, Florida, United States",
+                  "dates": {
+                    "from": "2025-01-01",
+                    "to": "2025-05-01"
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/gpj0dm15svr",
+                    "name": "University of Florida Department of Agricultural and Biological Engineering"
+                  }
+                },
+                {
+                  "title": "Software Engineer",
+                  "location": "Gainesville, Florida, United States",
+                  "dates": {
+                    "from": "2024-02-01",
+                    "to": "2025-01-01"
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/00r50ly12z0",
+                    "name": "University of Florida"
+                  }
+                },
+                {
+                  "title": "Augmented Reality Development & Digital Storytelling Extern",
+                  "location": "California, United States",
+                  "dates": {
+                    "from": "2024-03-01",
+                    "to": "2024-04-01"
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/mpcttw5m4rq",
+                    "name": "Snap Inc."
+                  }
+                },
+                {
+                  "title": "Software Engineer",
+                  "location": "Bengaluru, Karnataka, India",
+                  "dates": {
+                    "from": "2022-08-01",
+                    "to": "2023-08-01"
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/47g1g40pcwn",
+                    "name": "Shell"
+                  }
+                }
+              ],
+              "educationHistory": [
+                {
+                  "degree": "Master's degree Computer Science",
+                  "dates": {
+                    "from": "2023",
+                    "to": null
+                  },
+                  "institution": {
+                    "id": "https://exa.ai/library/organization/00r50ly12z0",
+                    "name": "University of Florida"
+                  }
+                },
+                {
+                  "degree": "Bachelor of Technology - BTech Information Technology",
+                  "dates": {
+                    "from": "2018",
+                    "to": "2022"
+                  },
+                  "institution": {
+                    "id": "https://exa.ai/library/organization/h8bhzhjzksl",
+                    "name": "Vellore Institute of Technology"
+                  }
+                },
+                {
+                  "degree": "Higher Secondary school Science",
+                  "dates": {
+                    "from": "2016",
+                    "to": "2018"
+                  },
+                  "institution": {
+                    "id": "https://exa.ai/library/organization/8hcsmkbzmb8",
+                    "name": "Sri Chaitanya College of Education"
+                  }
+                }
+              ],
+              "research": null
+            }
+          }
+        ]
+      },
+      {
+        "id": "https://exa.ai/library/person/hfg9y5cxf0t",
+        "title": "Satya Chebolu",
+        "url": "https://www.linkedin.com/in/satya-chebolu-113b975",
+        "publishedDate": "2026-08-10T03:28:10.000Z",
+        "text": "# Satya Chebolu\n\nPrincipal Software Engineering Manager at Microsoft\n\nRedmond, Washington, United States (US)\n\n500 connections • 702 followers\n\n## About\n\nWith over 16 years at Microsoft, I contribute to the Revenue Reporting organization as a…\n\nTotal Experience: 26 years and 3 months\n\n## Experience\n\n### [Microsoft](https://www.linkedin.com/company/microsoft)\n\n#### Principal Software Engineering Ma",
+        "image": "https://media.licdn.com/dms/image/v2/D5603AQGagw2VoSSJcQ/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1702957486409?e=2147483647&v=beta&t=JlsUN54t3IBki6OIuEevW7bwl4OMH7SWxu1IPhOMUgs",
+        "entities": [
+          {
+            "id": "https://exa.ai/library/person/hfg9y5cxf0t",
+            "type": "person",
+            "version": 1,
+            "properties": {
+              "name": "Satya Chebolu",
+              "firstName": "Satya",
+              "lastName": "Chebolu",
+              "location": "Redmond, Washington, United States",
+              "workHistory": [
+                {
+                  "title": "Principal Software Engineering Manager",
+                  "location": "Redmond, Washington, United States",
+                  "dates": {
+                    "from": "2019-12-01",
+                    "to": null
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/gxl16rnpqtq",
+                    "name": "Microsoft"
+                  }
+                },
+                {
+                  "title": "Principle Software Engineer",
+                  "location": null,
+                  "dates": {
+                    "from": "2018-09-01",
+                    "to": "2019-12-01"
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/gxl16rnpqtq",
+                    "name": "Microsoft"
+                  }
+                },
+                {
+                  "title": "Senior Software Engineer",
+                  "location": null,
+                  "dates": {
+                    "from": "2012-09-01",
+                    "to": "2018-09-01"
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/gxl16rnpqtq",
+                    "name": "Microsoft"
+                  }
+                },
+                {
+                  "title": "Software Engineer 2",
+                  "location": null,
+                  "dates": {
+                    "from": "2010-05-01",
+                    "to": "2012-09-01"
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/gxl16rnpqtq",
+                    "name": "Microsoft"
+                  }
+                },
+                {
+                  "title": "Senior Business Intelligence Developer",
+                  "location": "Redmond, Washington, United States",
+                  "dates": {
+                    "from": "2008-01-01",
+                    "to": "2010-01-01"
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/6jjhz774y37",
+                    "name": "DivIHN Integration Inc"
+                  }
+                },
+                {
+                  "title": "Assistant Consultant",
+                  "location": "Redmond, Washington, United States",
+                  "dates": {
+                    "from": "2000-01-01",
+                    "to": "2008-01-01"
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/md2m4278jx2",
+                    "name": "Tata Consultancy Services"
+                  }
+                },
+                {
+                  "title": "Assistant System Engineer",
+                  "location": "Mumbai, Maharashtra, India",
+                  "dates": {
+                    "from": "2000-11-01",
+                    "to": "2003-04-01"
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/md2m4278jx2",
+                    "name": "Tata Consultancy Services"
+                  }
+                }
+              ],
+              "educationHistory": [
+                {
+                  "degree": "Bachelor's degree Computer Science and Engineering",
+                  "dates": {
+                    "from": "1996",
+                    "to": "2000"
+                  },
+                  "institution": {
+                    "id": "https://exa.ai/library/organization/0k494qswskn",
+                    "name": "Osmania University"
+                  }
+                }
+              ],
+              "research": null
+            }
+          }
+        ]
+      },
+      {
+        "id": "https://exa.ai/library/person/wrt2dcnn4s3",
+        "title": "Sathya Narayanan Mahadevan",
+        "url": "https://www.linkedin.com/in/sathya-narayanan-mahadevan",
+        "publishedDate": "2026-07-29T06:34:23.000Z",
+        "text": "# Sathya Narayanan Mahadevan\n\nSoftware Engineer at Microsoft\n\nRedmond, Washington, United States (US)\n\n253 connections • 256 followers\n\n## About\n\n● Experienced software engineer with strong knowledge of data structures and algorithms ● Effective in system design decisions and object-oriented design ● Passionate about Machine Learning with good knowledge of fundamentals ● Critical problem solving s",
+        "image": "https://media.licdn.com/dms/image/v2/C4E03AQGQVCOxaemrog/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1534879579829?e=2147483647&v=beta&t=18VnaFS3BvnsXhXWwK7th2pRp1k1W4iXkd1I5xDORF4",
+        "entities": [
+          {
+            "id": "https://exa.ai/library/person/wrt2dcnn4s3",
+            "type": "person",
+            "version": 1,
+            "properties": {
+              "name": "Sathya Narayanan Mahadevan",
+              "firstName": "Sathya",
+              "lastName": "Mahadevan",
+              "location": "Redmond, Washington, United States",
+              "workHistory": [
+                {
+                  "title": "Software Engineer",
+                  "location": null,
+                  "dates": {
+                    "from": "2020-05-01",
+                    "to": null
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/gxl16rnpqtq",
+                    "name": "Microsoft"
+                  }
+                },
+                {
+                  "title": "Senior Software Engineer",
+                  "location": "Overland Park, Kansas",
+                  "dates": {
+                    "from": "2016-04-01",
+                    "to": "2020-04-01"
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/hgggt0rf4tw",
+                    "name": "RSA Security"
+                  }
+                },
+                {
+                  "title": "College Intern",
+                  "location": "Overland park",
+                  "dates": {
+                    "from": "2015-05-01",
+                    "to": "2015-11-01"
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/hgggt0rf4tw",
+                    "name": "RSA, The Security Division of EMC"
+                  }
+                },
+                {
+                  "title": "Quality Analyst - Student Hourly",
+                  "location": "Lawrence, Kansas Area",
+                  "dates": {
+                    "from": "2014-09-01",
+                    "to": "2015-01-01"
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/c73z5pn4nnf",
+                    "name": "Agile Technology Solutions"
+                  }
+                },
+                {
+                  "title": "IT Analyst",
+                  "location": "Chennai Area, India",
+                  "dates": {
+                    "from": "2009-12-01",
+                    "to": "2014-05-01"
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/md2m4278jx2",
+                    "name": "Tata Consultancy Services"
+                  }
+                }
+              ],
+              "educationHistory": [
+                {
+                  "degree": "Master's degree, Computer Science, 3.9",
+                  "dates": {
+                    "from": "2014",
+                    "to": "2016"
+                  },
+                  "institution": {
+                    "id": "https://exa.ai/library/organization/8rz16q2mpsp",
+                    "name": "University of Kansas - School of Engineering"
+                  }
+                },
+                {
+                  "degree": "BE, Electronics and Communication, 7.65",
+                  "dates": {
+                    "from": "2005",
+                    "to": "2009"
+                  },
+                  "institution": {
+                    "id": null,
+                    "name": "Government College of Technology, Coimbatore"
+                  }
+                }
+              ],
+              "research": null
+            }
+          }
+        ]
+      },
+      {
+        "id": "https://exa.ai/library/person/r0svjgm9fw1",
+        "title": "Sathya Narayanan Ramamirtham",
+        "url": "https://www.linkedin.com/in/sathya-ramamirtham",
+        "publishedDate": "2026-08-13T18:39:10.000Z",
+        "text": "# Sathya Narayanan Ramamirtham\n\nPrincipal Software Engineer at Microsoft\n\nRedmond, Washington, United States (US)\n\n500 connections • 814 followers\n\n## About\n\nI currently work at Microsoft, Redmond, as a software engineer in the Onedrive-Sharepoint org. I previously worked at HPE (Aruba Networks) with the WLAN software team, as part of a team developing proprietary solutions as-a-service for their ",
+        "image": "https://media.licdn.com/dms/image/v2/D5603AQEdIcAOGeaJww/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1700966572981?e=2147483647&v=beta&t=zW-AJoYLqFz_i9hVXhAO6_C2noqbNojL99mwU-b1Z5Y",
+        "entities": [
+          {
+            "id": "https://exa.ai/library/person/r0svjgm9fw1",
+            "type": "person",
+            "version": 1,
+            "properties": {
+              "name": "Sathya Narayanan Ramamirtham",
+              "firstName": "Sathya",
+              "lastName": "Ramamirtham",
+              "location": "Redmond, Washington, United States",
+              "workHistory": [
+                {
+                  "title": "Senior Software Engineer",
+                  "location": "Redmond, Washington, United States",
+                  "dates": {
+                    "from": "2021-04-01",
+                    "to": null
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/gxl16rnpqtq",
+                    "name": "Microsoft"
+                  }
+                },
+                {
+                  "title": "Software Engineer",
+                  "location": "Santa Clara",
+                  "dates": {
+                    "from": "2017-07-01",
+                    "to": "2021-04-01"
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/jgq23vvc77v",
+                    "name": "Aruba, a Hewlett Packard Enterprise company"
+                  }
+                },
+                {
+                  "title": "Intern",
+                  "location": "Sunnyvale",
+                  "dates": {
+                    "from": "2016-06-01",
+                    "to": "2016-09-01"
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/jgq23vvc77v",
+                    "name": "Aruba, a Hewlett Packard Enterprise company"
+                  }
+                },
+                {
+                  "title": "Engineer Staff I - Software Systems",
+                  "location": "Bangalore",
+                  "dates": {
+                    "from": "2014-07-01",
+                    "to": "2015-04-01"
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/35wbvp4jqgk",
+                    "name": "Broadcom"
+                  }
+                },
+                {
+                  "title": "Engineer - Staff I - Device Driver Development",
+                  "location": "Bengaluru Area, India",
+                  "dates": {
+                    "from": "2012-06-01",
+                    "to": "2014-06-01"
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/35wbvp4jqgk",
+                    "name": "Broadcom"
+                  }
+                },
+                {
+                  "title": "Final Year Student Project",
+                  "location": null,
+                  "dates": {
+                    "from": "2012-03-01",
+                    "to": "2012-05-01"
+                  },
+                  "company": {
+                    "id": null,
+                    "name": "National Institute Of Technology Tiruchirappalli"
+                  }
+                },
+                {
+                  "title": "Intern",
+                  "location": null,
+                  "dates": {
+                    "from": "2011-05-01",
+                    "to": "2011-07-01"
+                  },
+                  "company": {
+                    "id": "https://exa.ai/library/organization/tsdfdq12tqj",
+                    "name": "Indian Institute of Technology, Madras"
+                  }
+                }
+              ],
+              "educationHistory": [
+                {
+                  "degree": "Bachelor's degree, Electrical, Electronics and Communications Engineering",
+                  "dates": {
+                    "from": "2008",
+                    "to": "2012"
+                  },
+                  "institution": {
+                    "id": "https://exa.ai/library/organization/16gqynrdm6t",
+                    "name": "National Institute of Technology, Tiruchirappalli"
+                  }
+                },
+                {
+                  "degree": "Master of Science (M.S.), Computer Science",
+                  "dates": {
+                    "from": "2015",
+                    "to": "2017"
+                  },
+                  "institution": {
+                    "id": "https://exa.ai/library/organization/8v7mhm0zvfp",
+                    "name": "UC San Diego"
+                  }
+                }
+              ],
+              "research": null
+            }
+          }
+        ]
+      }
+    ],
+    "searchTime": 1001.9,
+    "costDollars": {
+      "total": 0.007,
+      "search": {
+        "neural": 0.007
+      }
+    }
+  }
+}

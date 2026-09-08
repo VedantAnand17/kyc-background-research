@@ -1,6 +1,9 @@
 // Capability map: tool -> ordered vendor preference. PRD.md section 9, ADR-0003.
-// The LLM never sees these slugs. Listed prices are design-time reference only; the live contract
-// from GET /v1/vendors/{slug} is authoritative and is cached for one hour in tools.ts.
+// The LLM never sees these slugs. The live contract from GET /v1/vendors/{slug} is authoritative and is
+// cached for one hour in tools.ts; src/research/requests.ts owns each vendor's request body.
+// Verified against the funded catalog on 2026-09-08 (M7): the earlier design-time picks were unusable -
+// Minerva Resolve needs an email or phone, FullEnrich has no name filter, ottoai takes a two-word topic,
+// PDL's real price ($0.28) exceeds its listed cap ($0.20), and dev-fusion is blocked on the vendor side.
 
 export type Tier = "basic" | "standard" | "deep";
 
@@ -24,6 +27,8 @@ export interface CapabilityEntry {
   readonly vendors: readonly string[];
   /** Plain-English query for POST /v1/search when `vendors` is empty or every static vendor is unpayable. */
   readonly discoveryQuery?: string;
+  /** Catalog capabilities a discovered vendor must carry; search ranks by text, so an unrelated hit is otherwise bought. */
+  readonly discoveryCapabilities?: readonly string[];
   readonly description: string;
 }
 
@@ -33,19 +38,20 @@ export const CAPABILITIES: readonly CapabilityEntry[] = [
   {
     tool: "find_people",
     tier: "basic",
-    vendors: ["stableenrich-minerva-resolve", "stableenrich-fullenrich-people-search"],
-    description: "Find candidate identities for a full name and optional location hint.",
+    vendors: ["stableenrich-exa-search", "stableenrich-exa-search-tempo"],
+    description:
+      "Find candidate identities for a full name and optional location hint. Each candidate comes with a headline, location, and LinkedIn profile URL to pass to the profile tools.",
   },
   {
     tool: "get_professional_profile",
     tier: "basic",
-    vendors: ["apify-harvestapi-linkedin-profile-scraper", "apify-apimaestro-linkedin-profile-detail"],
-    description: "Employment history, education, headline, and location for one professional profile.",
+    vendors: ["apify-apimaestro-linkedin-profile-detail", "apify-harvestapi-linkedin-profile-scraper"],
+    description: "Employment history, education, headline, and location for one LinkedIn profile URL from find_people.",
   },
   {
     tool: "search_news",
     tier: "basic",
-    vendors: ["ottoai-filtered-news", "stableenrich-serper-news"],
+    vendors: ["stableenrich-serper-news", "stableenrich-serper-news-tempo"],
     description: "News headlines, outlets, dates, and snippets for a query.",
   },
   {
@@ -53,30 +59,27 @@ export const CAPABILITIES: readonly CapabilityEntry[] = [
     tier: "basic",
     vendors: [],
     discoveryQuery: "PEP sanctions watchlist screening",
+    discoveryCapabilities: ["compliance", "screening", "sanctions", "watchlist", "kyc"],
     description: "PEP and sanctions screening. Reports not_screened when no payable vendor exists (ADR-0005).",
   },
   {
     tool: "enrich_person",
     tier: "standard",
-    vendors: ["stableenrich-pdl-people-enrich"],
-    description: "Consolidated contacts, social handles, and employer for a resolved person.",
+    vendors: ["apify-anchor-linkedin-profile-enrichment", "apify-apimaestro-linkedin-profile-detail"],
+    description: "Consolidated contacts, education, employers, and location for one LinkedIn profile URL.",
   },
   {
     tool: "get_social_profile",
     tier: "standard",
-    vendors: [
-      "stablesocial-twitter-profile",
-      "stablesocial-twitter-user-tweets",
-      "stablesocial-instagram-search-profiles",
-      "stablesocial-instagram-profile",
-    ],
-    description: "Public profile and recent posts on X or Instagram. The tool layer picks the vendor by network.",
+    vendors: ["stablesocial-twitter-profile", "stablesocial-instagram-profile"],
+    description: "Public profile bio, follower count, and location on X or Instagram for a handle.",
   },
   {
     tool: "search_web",
     tier: "standard",
-    vendors: [],
+    vendors: ["stableenrich-exa-search", "parallel-search-mpp"],
     discoveryQuery: "web search",
+    discoveryCapabilities: ["web_search"],
     description: "Ranked web pages with excerpts for a query.",
   },
   {

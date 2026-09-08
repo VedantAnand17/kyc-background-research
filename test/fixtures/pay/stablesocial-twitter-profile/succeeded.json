@@ -1,0 +1,214 @@
+{
+  "runId": "run_res_65d544d8-75f9-470b-9afa-a7bf80c6d696",
+  "transactionId": "3bf287fe-39b3-4424-ab16-d4d480b89c33",
+  "slug": "stablesocial-twitter-profile",
+  "status": "succeeded",
+  "terminal": true,
+  "charged": {
+    "amount": "0.06",
+    "currency": "USD"
+  },
+  "charges": [
+    {
+      "step": "buy",
+      "slug": "stablesocial-twitter-profile",
+      "amount": {
+        "amount": "0.06",
+        "currency": "USD"
+      },
+      "transactionId": "3bf287fe-39b3-4424-ab16-d4d480b89c33"
+    }
+  ],
+  "chargeIsFinal": true,
+  "chargedTo": "credit",
+  "subAccount": "kyc-research",
+  "remaining": {
+    "amount": "12.8817",
+    "currency": "USD"
+  },
+  "subAccountRemaining": {
+    "amount": "6.6648",
+    "currency": "USD"
+  },
+  "createdAt": "2026-09-08T16:40:32.362Z",
+  "endedAt": "2026-09-08T16:40:41.934Z",
+  "settlement": {
+    "status": "finalized",
+    "flow": "authorization",
+    "chain": "base",
+    "txHash": "0x93ab55b696135212af5eb8782cacb1f612b3b8064a7f9ce03be222403a6b4af0",
+    "explorer": "https://basescan.org/tx/0x93ab55b696135212af5eb8782cacb1f612b3b8064a7f9ce03be222403a6b4af0"
+  },
+  "upstream": {
+    "httpStatus": 200
+  },
+  "output": {
+    "success": true,
+    "credits_remaining": 6700,
+    "credits_charged": 1,
+    "__typename": "User",
+    "affiliates_highlighted_label": {
+      "label": {
+        "badge": {
+          "url": "https://pbs.twimg.com/profile_images/2049566443096981504/KM_bWQeF_bigger.jpg"
+        },
+        "description": "Salesforce",
+        "url": {
+          "url": "https://twitter.com/salesforce",
+          "urlType": "DeepLink"
+        },
+        "userLabelDisplayType": "Badge",
+        "userLabelType": "BusinessLabel"
+      }
+    },
+    "avatar": {
+      "image_url": "https://pbs.twimg.com/profile_images/1978181723356884992/VIhB1Jru_normal.jpg"
+    },
+    "business_account": {},
+    "core": {
+      "created_at": "Sun Mar 01 04:16:24 +0000 2009",
+      "name": "Marc Benioff",
+      "screen_name": "Benioff"
+    },
+    "creator_subscriptions_count": 6,
+    "dm_permissions": {
+      "can_dm": false
+    },
+    "has_graduated_access": true,
+    "has_hidden_subscriptions_on_profile": false,
+    "highlights_info": {
+      "can_highlight_tweets": true,
+      "highlighted_tweets": "222"
+    },
+    "id": "VXNlcjoyMjMzMDczOQ==",
+    "is_blue_verified": true,
+    "is_profile_translatable": false,
+    "legacy": {
+      "created_at": "Sun Mar 01 04:16:24 +0000 2009",
+      "name": "Marc Benioff",
+      "screen_name": "Benioff",
+      "default_profile": true,
+      "default_profile_image": false,
+      "description": "ceo@salesforce.com chair@time.com",
+      "entities": {
+        "description": {},
+        "url": {
+          "urls": [
+            {
+              "display_url": "1t.org",
+              "expanded_url": "https://www.1t.org/",
+              "indices": [
+                0,
+                23
+              ],
+              "url": "https://t.co/eI93bAKBoh"
+            }
+          ]
+        }
+      },
+      "fast_followers_count": 0,
+      "favourites_count": 27010,
+      "follow_request_sent": false,
+      "followers_count": 5943082,
+      "friends_count": 4413,
+      "has_custom_timelines": true,
+      "is_translator": false,
+      "listed_count": 7346,
+      "media_count": 4974,
+      "needs_phone_verification": false,
+      "normal_followers_count": 5943082,
+      "notifications": false,
+      "pinned_tweet_ids_str": [
+        "2093028886800109914"
+      ],
+      "possibly_sensitive": false,
+      "profile_banner_url": "https://pbs.twimg.com/profile_banners/22330739/1760470261",
+      "profile_interstitial_type": "",
+      "statuses_count": 39121,
+      "time_zone": "",
+      "translator_type": "none",
+      "url": "https://t.co/eI93bAKBoh",
+      "utc_offset": 0,
+      "withheld_description": "",
+      "withheld_scope": "",
+      "location": "San Francisco, CA",
+      "profile_image_url_https": "https://pbs.twimg.com/profile_images/1978181723356884992/VIhB1Jru_normal.jpg"
+    },
+    "legacy_extended_profile": {},
+    "location": {
+      "location": "San Francisco, CA"
+    },
+    "media_permissions": {
+      "can_media_tag": false
+    },
+    "parody_commentary_fan_label": "None",
+    "privacy": {
+      "protected": false
+    },
+    "professional": {
+      "category": [
+        {
+          "icon_name": "IconBriefcaseStroke",
+          "id": 958,
+          "name": "Entrepreneur"
+        }
+      ],
+      "professional_type": "Business",
+      "rest_id": "1502717220715122689"
+    },
+    "profile_image_shape": "Circle",
+    "relationship_perspectives": {
+      "blocked_by": false,
+      "blocking": false,
+      "followed_by": false,
+      "following": false,
+      "muting": false
+    },
+    "rest_id": "22330739",
+    "super_follow_eligible": false,
+    "super_followed_by": false,
+    "super_following": false,
+    "tipjar_settings": {
+      "bandcamp_handle": "",
+      "bitcoin_handle": "",
+      "cash_app_handle": "",
+      "ethereum_handle": "",
+      "gofundme_handle": "",
+      "is_enabled": false,
+      "patreon_handle": "",
+      "pay_pal_handle": "",
+      "venmo_handle": ""
+    },
+    "user_seed_tweet_count": 0,
+    "verification": {
+      "verified": false
+    },
+    "verification_info": {
+      "is_identity_verified": false,
+      "reason": {
+        "description": {
+          "entities": [
+            {
+              "from_index": 54,
+              "ref": {
+                "url": "https://twitter.com/salesforce",
+                "url_type": "ExternalUrl"
+              },
+              "to_index": 65
+            },
+            {
+              "from_index": 72,
+              "ref": {
+                "url": "https://help.twitter.com/en/rules-and-policies/profile-labels",
+                "url_type": "ExternalUrl"
+              },
+              "to_index": 82
+            }
+          ],
+          "text": "This account is verified because it's an affiliate of @salesforce on X. Learn more"
+        },
+        "verified_since_msec": "1421099584979"
+      }
+    }
+  }
+}
