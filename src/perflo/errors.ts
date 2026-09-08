@@ -25,6 +25,18 @@ export function ledgerActionFor(code: PerfloErrorCode): LedgerAction {
     case "TIMEOUT":
     case "INTERNAL_ERROR":
       return "hold";
+    case "MAX_CHARGE_EXCEEDED":
+    case "SCHEMA_VALIDATION_FAILED":
+    case "VALIDATION_ERROR":
+    case "VENDOR_NOT_PAYABLE":
+    case "VENDOR_NOT_FOUND":
+    case "GUARDRAIL_DENIED":
+    case "INSUFFICIENT_BALANCE":
+    case "VENDOR_ERROR":
+    case "RATE_LIMITED":
+    case "CONFIRMATION_REQUIRED":
+    case "pending_confirmation":
+      return "release";
     default:
       return "release";
   }
