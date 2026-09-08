@@ -234,6 +234,43 @@ describe("orchestrator (fixture mode)", () => {
     expectValidCosts(report, "1.50");
   });
 
+  it("offers the enrich turn only person-enrichment tools; code owns find_people and screening", async () => {
+    const { deps } = await harness();
+    let offered: string[] = [];
+    await runResearch(request("3.00"), {
+      ...deps,
+      agent: {
+        ...createScriptedAgent(),
+        async enrich(ctx) {
+          offered = Object.keys(ctx.tools).sort();
+          expect(ctx.allowedTools).toEqual(expect.arrayContaining(offered));
+        },
+      },
+    });
+    expect(offered).toEqual(["enrich_person", "fetch_page", "finish", "get_professional_profile", "get_social_profile", "search_filings", "skip_trace"]);
+  });
+
+  it("hands the classifier the subject plus the primary candidate's city and employer", async () => {
+    const { server, deps } = await harness();
+    server.setPayOutput("ottoai-filtered-news", {
+      articles: [{ title: "Ada Okonkwo of Houston fined in Shell expense probe", url: "https://news.example/2" }],
+    });
+    let seenPrimary = "";
+    await runResearch(request("0.40"), {
+      ...deps,
+      agent: {
+        ...createScriptedAgent(),
+        classifyRisk(_hits, primary) {
+          seenPrimary = primary;
+          return { classifications: [], failed: false };
+        },
+      },
+    });
+    expect(seenPrimary).toContain("Ada Okonkwo");
+    expect(seenPrimary).toContain("Lagos");
+    expect(seenPrimary).toContain("Paystack");
+  });
+
   it("parallel enrich under a tight cap never exceeds it and shows the refusal", async () => {
     const { deps } = await harness();
     const report = await runResearch(request("0.04"), { ...deps, concurrency: 4 });

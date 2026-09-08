@@ -52,7 +52,7 @@ export function createScriptedAgent(
       if (ctx.tools.search_filings) calls.push(call(ctx.tools, "search_filings", { fullName }));
       await Promise.all(calls);
     },
-    classifyRisk(hits) {
+    classifyRisk(hits, _primary) {
       if (over.classify) return over.classify(hits);
       return {
         failed: false,

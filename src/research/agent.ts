@@ -1,7 +1,15 @@
 // Agent loop: Vercel AI SDK tool calling with a 12-step limit. PRD.md sections 6.2 to 6.5 and 11.
 // The model decides which allowed tool to call next. It never writes an amount, never assigns a
 // confidence score, and never sees raw vendor payloads (ADR-0001).
-import { generateText, stepCountIs, tool, type ToolSet } from "ai";
+import {
+  generateText,
+  hasToolCall,
+  jsonSchema,
+  stepCountIs,
+  tool,
+  type StopCondition,
+  type ToolSet,
+} from "ai";
 import { createOpenAI } from "@ai-sdk/openai";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { z } from "zod";
@@ -9,7 +17,7 @@ import { llmBaseUrl, loopModelName, type Config } from "../config.js";
 import { createLogger } from "../logger.js";
 import type { ResearchTools } from "./tools.js";
 import type { ToolName } from "./capabilities.js";
-import { generateStructured, structuredReasoningEffort } from "./structured.js";
+import { generateStructured, jsonSchemaOf, structuredReasoningEffort } from "./structured.js";
 import {
   agentSystemPrompt,
   describeSubject,
@@ -70,8 +78,10 @@ export interface ResearchAgent {
   resolve(ctx: AgentContext): Promise<void>;
   disambiguate(ctx: AgentContext): Promise<void>;
   enrich(ctx: AgentContext): Promise<void>;
+  /** `primary` describes the subject and the resolved primary candidate; without it the model cannot separate same-name people. */
   classifyRisk(
     hits: readonly RiskHit[],
+    primary: string,
     signal?: AbortSignal,
   ): Promise<ClassificationResult> | ClassificationResult;
   narrate(ctx: AgentContext & { readonly evidenceNotes: string }): Promise<NarrativeFields>;
@@ -99,9 +109,10 @@ function languageModel(config: Config, modelName = config.LLM_MODEL) {
   })(modelName);
 }
 
-function reasoningOptions(model: string): { openaiCompatible: { reasoningEffort: string } } | undefined {
-  if (!model.includes("gpt-oss")) return undefined;
-  return { openaiCompatible: { reasoningEffort: "low" } };
+/** Same low-effort rule as structured calls: glm-5.3 at default effort spends 15-20 s thinking per loop turn. */
+export function loopProviderOptions(model: string): { openaiCompatible: { reasoningEffort: string } } | undefined {
+  const effort = structuredReasoningEffort(model);
+  return effort ? { openaiCompatible: { reasoningEffort: effort } } : undefined;
 }
 
 function reasoningEffortOf(model: string): string | undefined {
@@ -125,15 +136,24 @@ const NarrativeSchema = z.object({
   rationale: z.string(),
 });
 
+/**
+ * Stop once a step's tool calls were all accepted by code: the model's job in every phase is to pick tools,
+ * and code owns the results, so the trailing finish turn is pure latency (3-6 s per turn on glm-5.3).
+ * A rejected call (invalid_args) leaves the loop running so the model can repair it.
+ */
+export const toolCallsAccepted: StopCondition<ToolSet> = ({ steps }) => {
+  const last = steps.at(-1);
+  if (!last || last.toolCalls.length === 0) return false;
+  return last.toolResults.every((row) => (row.output as { outcome?: string } | undefined)?.outcome !== "invalid_args");
+};
+
 const RESOLVE_STEPS = 4;
 const DISAMBIGUATE_STEPS = 2;
 const ENRICH_STEPS = 3;
 
-const LooseArgs = z.record(z.string(), z.unknown());
-
 export function createAgent(config: Config): ResearchAgent {
   const loopModel = languageModel(config, loopModelName(config));
-  const loopOptions = reasoningOptions(loopModelName(config));
+  const loopOptions = loopProviderOptions(loopModelName(config));
   const log = createLogger(config.LOG_LEVEL);
 
   function sdkTools(tools: ResearchTools): ToolSet {
@@ -142,7 +162,12 @@ export function createAgent(config: Config): ResearchAgent {
       if (!row) continue;
       out[name] = tool({
         description: row.description,
-        inputSchema: LooseArgs,
+        // The model sees the real argument schema; a loose record made it guess names and cost a repair turn per
+        // phase (2026-09-08 trace: every resolve was two find_people calls). Validation stays in code below so a
+        // bad call still returns invalid_args for self-repair instead of throwing out of the loop.
+        inputSchema: jsonSchema<Record<string, unknown>>(jsonSchemaOf(row.inputSchema) as Parameters<typeof jsonSchema>[0], {
+          validate: (value) => ({ success: true, value: (value ?? {}) as Record<string, unknown> }),
+        }),
         execute: async (args) => {
           const parsed = row.inputSchema.safeParse(args);
           if (!parsed.success) {
@@ -180,7 +205,7 @@ export function createAgent(config: Config): ResearchAgent {
       system,
       prompt,
       tools: sdkTools(ctx.tools),
-      stopWhen: stepCountIs(steps),
+      stopWhen: [stepCountIs(steps), hasToolCall("finish"), toolCallsAccepted],
       maxOutputTokens: 1500,
       abortSignal: ctx.signal,
       ...(loopOptions ? { providerOptions: loopOptions } : {}),
@@ -202,13 +227,13 @@ export function createAgent(config: Config): ResearchAgent {
     enrich(ctx) {
       return loop(ctx, agentSystemPrompt(factsOf(ctx)), enrichUserPrompt(), ENRICH_STEPS);
     },
-    async classifyRisk(hits, signal) {
+    async classifyRisk(hits, primary, signal) {
       if (hits.length === 0) return { classifications: [], failed: false };
       const listed = hits.map((h) => `${h.sourceId}: ${h.title}`).join("\n");
       try {
         const object = await structured(ClassificationSchema, {
           system: "Classify only the listed hits. Never invent facts.",
-          prompt: riskClassifyPrompt(listed),
+          prompt: riskClassifyPrompt(primary, listed),
           name: "classification",
           ...(signal ? { signal } : {}),
         });

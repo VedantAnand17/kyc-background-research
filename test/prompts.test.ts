@@ -5,6 +5,7 @@ import {
   disambiguationPrompt,
   enrichUserPrompt,
   narrativePrompt,
+  riskClassifyPrompt,
 } from "../src/research/prompts.js";
 
 const base = {
@@ -47,6 +48,13 @@ describe("prompts", () => {
     expect(adverseMediaQuery("Ada Okonkwo")).toBe(
       '"Ada Okonkwo" fraud OR scam OR arrested OR indicted OR lawsuit OR sanctions',
     );
+  });
+
+  it("names the primary candidate before asking which hits are about them", () => {
+    const text = riskClassifyPrompt("Ada Okonkwo, born 1991-04-12, Lagos NG, employer Paystack", "s1: Ada of Houston fined");
+    expect(text.indexOf("Lagos")).toBeLessThan(text.indexOf("s1: Ada of Houston"));
+    expect(text).toContain("Paystack");
+    expect(text).toMatch(/different city, employer, or country/i);
   });
 
   it("tells enrich not to call find_people again", () => {

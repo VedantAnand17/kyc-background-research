@@ -52,8 +52,10 @@ pnpm check                # typecheck
 
 CI on every push runs `pnpm install --frozen-lockfile`, `pnpm test`, `pnpm check`, and `docker build`.
 Do not spend real Perflo money until `pnpm test` and `pnpm test:live` are green.
-`pnpm test:live` is the gate: it still fails on live timing as of 2026-09-08 (basic ~40-87s against a 30s target; the 45s default deadline cuts the tool loop).
-Raise a target only after `pnpm test:perf` prints a p50. Do not start M7 until that gate is green.
+`pnpm test:live` is the gate; it went green on 2026-09-08 once every model call sent `reasoning_effort: low`, the tool loop stopped after its first accepted turn, and the model was shown real tool argument schemas.
+Measured the same day with `pnpm test:perf`: p50 total 12.4s basic, 12.3s standard, 13.2s deep; 15 of 15 runs finished under 16s with no deadline hit.
+Raise a target only after `pnpm test:perf` prints a p50 above it.
+Note that a `wrangler login` OAuth token works as `LLM_API_KEY` for about an hour; use a Workers AI API token for anything longer than a test session.
 
 Fixture mode (`FIXTURE_MODE=true`) is meant to serve recorded vendor responses from `test/fixtures/` and spend nothing.
 Those recordings do not exist yet; they are M7 work.

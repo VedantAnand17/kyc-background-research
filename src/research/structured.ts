@@ -43,7 +43,7 @@ function stripAdditionalProperties(value: unknown): unknown {
   return out;
 }
 
-function jsonSchemaOf(schema: z.ZodType): Record<string, unknown> {
+export function jsonSchemaOf(schema: z.ZodType): Record<string, unknown> {
   return stripAdditionalProperties(z.toJSONSchema(schema)) as Record<string, unknown>;
 }
 

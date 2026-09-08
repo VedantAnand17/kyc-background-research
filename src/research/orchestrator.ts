@@ -3,7 +3,12 @@ import { randomUUID } from "node:crypto";
 import { parseMoney, formatMoney, type Micro } from "../budget/money.js";
 import { createSpendGuard, type SpendGuard } from "../budget/ledger.js";
 import { createEvidenceStore } from "../evidence/store.js";
-import { decideIdentity, type SubjectInput } from "../identity/matcher.js";
+import {
+  decideIdentity,
+  type CandidateEvidence,
+  type IdentityDecision,
+  type SubjectInput,
+} from "../identity/matcher.js";
 import type { ResearchRequest, ResearchReport } from "../api/schemas.js";
 import type { Db } from "../db/sqlite.js";
 import type { Logger } from "../logger.js";
@@ -13,7 +18,7 @@ import { assembleReport, type CostCall, type Warning } from "../evidence/report.
 import { PerfloError } from "../perflo/errors.js";
 import { candidatesFromSources } from "./candidates.js";
 import { defaultDeadlineMs, plan } from "./planner.js";
-import { adverseMediaQuery } from "./prompts.js";
+import { adverseMediaQuery, describeSubject } from "./prompts.js";
 import { createTools, type ResearchTools, type ToolOutcome } from "./tools.js";
 
 export class ResearchUnavailableError extends Error {
@@ -26,8 +31,11 @@ export class ResearchUnavailableError extends Error {
   }
 }
 
-/** Wall-clock reserved for the narrative pass. Constrained json_schema on glm-5.3 measured at 5.8 s. */
-export const SYNTHESIS_MS = 12_000;
+/**
+ * Wall-clock reserved for the narrative pass. Constrained json_schema on glm-5.3 measured 5.8 s on basic;
+ * deep-tier notes with eight sources overran 12 s (2026-09-08 live run), so 15 s matches the live report target.
+ */
+export const SYNTHESIS_MS = 15_000;
 const DRAIN_MS = 5_000;
 
 export interface OrchestratorDeps {
@@ -56,6 +64,57 @@ function subjectOf(req: ResearchRequest): SubjectInput {
     ...(req.address?.city ? { city: req.address.city } : {}),
     ...(req.address?.country ? { country: req.address.country } : {}),
   };
+}
+
+/** Tools the orchestrator drives itself: resolve owns find_people, the screen phase owns news, web, and watchlist. */
+const CODE_OWNED_TOOLS: ReadonlySet<string> = new Set(["find_people", "search_news", "search_web", "screen_watchlist"]);
+
+/**
+ * The enrich turn sees only person-enrichment tools. Offered the full set, glm-5.3 re-ran news and web searches
+ * with its own queries in parallel with the code-owned screen phase: a second news payment, duplicate rows, and
+ * one more model turn (2026-09-08 live trace).
+ */
+export function enrichCtx(base: AgentContext): AgentContext {
+  return {
+    ...base,
+    allowedTools: base.allowedTools.filter((name) => !CODE_OWNED_TOOLS.has(name)),
+    tools: Object.fromEntries(
+      Object.entries(base.tools).filter(([name]) => !CODE_OWNED_TOOLS.has(name)),
+    ) as ResearchTools,
+  };
+}
+
+/** Subject facts plus what the resolve phase learned about the primary candidate, for risk classification. */
+export function describePrimary(
+  req: ResearchRequest,
+  identity: IdentityDecision,
+  evidence: readonly CandidateEvidence[],
+): string {
+  const parts = [
+    describeSubject({
+      firstName: req.firstName,
+      lastName: req.lastName,
+      ...(req.dateOfBirth ? { dateOfBirth: req.dateOfBirth } : {}),
+      ...(req.address
+        ? {
+            address: {
+              ...(req.address.city ? { city: req.address.city } : {}),
+              ...(req.address.country ? { country: req.address.country } : {}),
+            },
+          }
+        : {}),
+    }),
+  ];
+  const primary = identity.primaryCandidateId
+    ? evidence.find((row) => row.id === identity.primaryCandidateId)
+    : undefined;
+  if (primary) {
+    const place = [primary.city, primary.country].filter(Boolean).join(" ");
+    if (place) parts.push(`based in ${place}`);
+    const employers = [...new Set(primary.employers.map((row) => row.value))];
+    if (employers.length > 0) parts.push(`employer ${employers.join(" / ")}`);
+  }
+  return parts.join(", ");
 }
 
 function wrapTools(
@@ -325,7 +384,7 @@ export async function runResearch(req: ResearchRequest, deps: OrchestratorDeps):
       }
     }
     const classified: ClassificationResult = await Promise.resolve(
-      deps.agent.classifyRisk(hits, controller.signal),
+      deps.agent.classifyRisk(hits, describePrimary(req, identity, evidence), controller.signal),
     );
     if (classified.failed) {
       classifications = [];
@@ -341,7 +400,7 @@ export async function runResearch(req: ResearchRequest, deps: OrchestratorDeps):
 
   if (!skipResearch && !adverseOnly) {
     currentPhase = "enrich";
-    await Promise.all([runPhase("enrich", () => deps.agent.enrich(ctx())), runPhase("screen", screenPhase)]);
+    await Promise.all([runPhase("enrich", () => deps.agent.enrich(enrichCtx(ctx()))), runPhase("screen", screenPhase)]);
     evidence = candidatesFromSources(store.forJob());
     identity = decideIdentity(subjectOf(req), evidence);
   } else if (!skipResearch) {

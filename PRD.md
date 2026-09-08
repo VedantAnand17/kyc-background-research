@@ -244,9 +244,9 @@ The final object is validated against the report schema.
 
 ### 6.7 Deadline behavior
 
-The orchestrator holds an `AbortSignal` derived from `deadlineAt` minus a synthesis allowance of 12 seconds.
+The orchestrator holds an `AbortSignal` derived from `deadlineAt` minus a synthesis allowance of 15 seconds.
 When it fires: tool calls not yet started are dropped, in-flight calls are awaited for up to 5 more seconds, then phase 5 runs with whatever exists.
-The narrative pass still runs inside the 12 second synthesis allowance; it does not inherit the aborted tool-phase signal.
+The narrative pass still runs inside the 15 second synthesis allowance; it does not inherit the aborted tool-phase signal.
 Each narrative attempt gets a fresh timeout for the time still left in that allowance.
 If the screen phase never started, every risk category is `not_screened` with a warning and `risk.overall.level` is `unknown`.
 `timing.deadlineHit` is true and a warning names the phase that was cut.
@@ -450,8 +450,10 @@ Never log the agent key, the LLM key, or raw vendor payloads at info level.
 ## 15. Performance targets
 
 - Fixture mode with the scripted agent stays fast: basic, standard, and deep complete well under 5 seconds in the existing suite.
-- Live Workers AI `@cf/zai-org/glm-5.3`, measured 2026-09-08: a constrained `json_schema` narrative call is 5.8 seconds; a tool step is 3 to 12 seconds.
-- Until a five-run sample exists, live p50 targets are basic under 30 seconds, standard under 45 seconds, deep under 45 seconds.
+- Live Workers AI `@cf/zai-org/glm-5.3`, measured 2026-09-08: a constrained `json_schema` narrative call is 5.8 seconds on basic and overran 12 seconds on deep; a tool-loop turn at `reasoning_effort: low` is 3 to 6 seconds, and 15 to 20 seconds at the default effort.
+- Every model call therefore sends `reasoning_effort: low`, and each tool loop stops as soon as a turn's tool calls are all accepted by code, so resolve and enrich are one model turn each when the model behaves.
+- Live p50 targets are basic under 30 seconds, standard under 45 seconds, deep under 45 seconds.
+- Five-run sample on 2026-09-08 (`pnpm test:perf`): p50 total 12.4 s basic, 12.3 s standard, 13.2 s deep; every run under 16 s, none hit the deadline.
 - The default wall-clock deadline is 45 seconds for every tier.
 - Raise a target or the default deadline only after a measured sample says the p50 is higher.
 - Independent tool calls run concurrently; no phase serializes calls that do not depend on each other.
