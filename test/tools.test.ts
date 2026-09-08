@@ -137,6 +137,23 @@ describe("tool layer", () => {
     expect(again.outcome).toBe("budget_exhausted");
   });
 
+  it("refuses only the unaffordable tool while a cheaper allowed quote still fits", async () => {
+    const { tools, server } = await harness({ capMicro: 50_000n });
+    server.setContract("stableenrich-pdl-people-enrich", {
+      maxChargePerCall: { amount: "0.280000", currency: "USD" },
+    });
+    const enrich = await call(tools, "enrich_person");
+    expect(enrich).toEqual({ outcome: "budget_exhausted", remaining: "0.050000" });
+    expect(server.payCalls).toHaveLength(0);
+    const news = await call(tools, "search_news");
+    expect(news.outcome).toBe("ok");
+    if (news.outcome !== "ok") return;
+    expect(news.cached).toBe(false);
+    expect(news.charged).toBe("0.025200");
+    expect(server.payCalls).toHaveLength(1);
+    expect(server.payCalls[0]?.slug).toBe("ottoai-filtered-news");
+  });
+
   it("reports unavailable when discovery finds no payable watchlist vendor", async () => {
     const { server, tools } = await harness();
     server.setSearchResults("PEP sanctions watchlist screening", []);

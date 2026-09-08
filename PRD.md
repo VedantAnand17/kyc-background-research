@@ -220,7 +220,7 @@ If still ambiguous, `identity.status = "ambiguous"`, phases 3 and 4 run only adv
 The agent may issue several tool calls in one turn; the tool layer runs them concurrently with a concurrency limit of 4.
 Each tool result returned to the model is a compact summary of at most 1,500 characters plus the `sourceId`, the charged amount, and the remaining budget.
 Raw vendor payloads are stored in SQLite and never enter the model context.
-The agent stops enriching when it judges the file complete, when every allowed tool has been used for the primary candidate, or when a tool returns `budget_exhausted`.
+The agent stops enriching when it judges the file complete, when every allowed tool has been used for the primary candidate, or when remaining headroom is below the cheapest live quote among the allowed tools.
 
 ### 6.5 Phase 4: Screen risk (agent, parallel)
 
@@ -337,7 +337,8 @@ Tool layer rules:
 - Dedupe key is `(tool, canonicalized arguments)`.
   A repeat returns the stored Source and reports `charged: 0` and `cached: true` to the model.
 - A tool not allowed by the tier is not offered to the model at all.
-- Any tool may return `{ "outcome": "budget_exhausted" }`; after that only `finish` is offered.
+- Any tool may return `{ "outcome": "budget_exhausted" }` for that call.
+  Only `finish` is offered once remaining headroom is below the cheapest live quote among the tier's allowed tools.
 - Every tool result to the model is capped at 1,500 characters of summary produced by `src/evidence/extract.ts` for that capability.
 - Field placement follows the vendor contract's `input.fields[].in`: `body` fields go under `input`, `query` fields under `query`.
   Never guess.
