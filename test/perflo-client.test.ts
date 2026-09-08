@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { createPerfloClient } from "../src/perflo/client.js";
-import { ledgerActionFor, PerfloError } from "../src/perflo/errors.js";
+import { ledgerActionFor, ledgerActionForError, PerfloError } from "../src/perflo/errors.js";
 import { startFakePerflo, type FakePayScenario, type FakePerflo } from "./fake-perflo.js";
 
 const maxCharge = { amount: "0.025200", currency: "USD" };
@@ -36,6 +36,13 @@ describe("perflo error code -> ledger action", () => {
     expect(ledgerActionFor("TIMEOUT")).toBe("hold");
     expect(ledgerActionFor("NETWORK_ERROR")).toBe("hold");
     expect(ledgerActionFor("INTERNAL_ERROR")).toBe("hold");
+    expect(ledgerActionFor("VENDOR_ERROR", 502)).toBe("release");
+    expect(ledgerActionFor("SETTLEMENT_RECORDING_FAILED", 500)).toBe("settle_at_reserved");
+    expect(ledgerActionFor("INVALID_REQUEST", 400)).toBe("release");
+    expect(ledgerActionFor("INVALID_REQUEST", 502)).toBe("hold");
+    expect(ledgerActionFor("HTTP_502", 502)).toBe("hold");
+    expect(ledgerActionFor("SOME_NEW_CODE", 500)).toBe("hold");
+    expect(ledgerActionFor("SOME_NEW_CODE", 422)).toBe("release");
   });
 });
 
@@ -106,8 +113,33 @@ describe("perflo client against fake server", () => {
       );
       expect(err).toBeInstanceOf(PerfloError);
       expect(err).toMatchObject({ code: row.code });
-      expect(ledgerActionFor(row.code)).toBe(row.action);
+      expect(ledgerActionForError(err as PerfloError)).toBe(row.action);
     }
+  });
+
+  it("unrecognized 5xx from pay is hold, not a free release", async () => {
+    const server = await fake();
+    const client = await clientAgainst(server);
+
+    const html = await client.pay("scenario-html-502", { maxCharge, idempotencyKey: "idem-html" }).then(
+      () => {
+        throw new Error("expected html 502 to throw");
+      },
+      (e: unknown) => e,
+    );
+    expect(html).toBeInstanceOf(PerfloError);
+    expect(html).toMatchObject({ code: "INTERNAL_ERROR", status: 502 });
+    expect(ledgerActionForError(html as PerfloError)).toBe("hold");
+
+    const opaque = await client.pay("scenario-opaque-502", { maxCharge, idempotencyKey: "idem-opaque" }).then(
+      () => {
+        throw new Error("expected opaque 502 to throw");
+      },
+      (e: unknown) => e,
+    );
+    expect(opaque).toBeInstanceOf(PerfloError);
+    expect(opaque).toMatchObject({ code: "INTERNAL_ERROR", status: 502 });
+    expect(ledgerActionForError(opaque as PerfloError)).toBe("hold");
   });
 
   it("replays the first pay result for a repeated Idempotency-Key and charges once", async () => {

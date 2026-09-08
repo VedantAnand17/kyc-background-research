@@ -19,7 +19,9 @@ export type FakePayScenario =
   | "pending_confirmation"
   | "SETTLEMENT_RECORDING_FAILED"
   | "RATE_LIMITED"
-  | "hang";
+  | "hang"
+  | "html-502"
+  | "opaque-502";
 
 export interface FakePayCall {
   readonly slug: string;
@@ -178,6 +180,13 @@ export async function startFakePerflo(): Promise<FakePerflo> {
       }
       return c.json(payload, status as 200);
     };
+
+    if (scenario === "html-502") {
+      return c.body("<html>Bad Gateway</html>", 502);
+    }
+    if (scenario === "opaque-502") {
+      return remember(502, { message: "upstream blew up" });
+    }
 
     if (scenario === "hang") {
       await new Promise<void>((resolve) => {

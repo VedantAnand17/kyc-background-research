@@ -17,7 +17,12 @@ export class PerfloError extends Error {
 /** What the Spend Guard must do after a failed pay call. PRD.md section 10 table. */
 export type LedgerAction = "settle" | "release" | "hold" | "settle_at_reserved";
 
-export function ledgerActionFor(code: PerfloErrorCode): LedgerAction {
+/**
+ * Documented codes keep the section-10 table.
+ * An unrecognized 5xx (HTML gateway page, HTTP_502, unknown shape) is hold:
+ * Perflo may have charged, so releasing would let the job spend that money again.
+ */
+export function ledgerActionFor(code: PerfloErrorCode, status = 0): LedgerAction {
   switch (code) {
     case "SETTLEMENT_RECORDING_FAILED":
       return "settle_at_reserved";
@@ -38,6 +43,11 @@ export function ledgerActionFor(code: PerfloErrorCode): LedgerAction {
     case "pending_confirmation":
       return "release";
     default:
+      if (status >= 500 || /^HTTP_5\d\d$/.test(code)) return "hold";
       return "release";
   }
+}
+
+export function ledgerActionForError(err: { readonly code: PerfloErrorCode; readonly status: number }): LedgerAction {
+  return ledgerActionFor(err.code, err.status);
 }

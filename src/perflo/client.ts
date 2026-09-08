@@ -94,8 +94,9 @@ export function createPerfloClient(opts: PerfloClientOptions): PerfloClient {
       try {
         parsed = JSON.parse(text);
       } catch {
+        // A 5xx HTML page from a gateway is not a free refusal. Hold and reconcile.
         throw new PerfloError(
-          "INVALID_REQUEST",
+          res.status >= 500 ? "INTERNAL_ERROR" : "INVALID_REQUEST",
           `${method} ${path} returned status ${res.status} and a body that is not JSON.`,
           res.status,
           { body: text.slice(0, 500) },
@@ -111,8 +112,10 @@ export function createPerfloClient(opts: PerfloClientOptions): PerfloClient {
       const details = { ...(env.error?.details ?? {}) };
       const retryAfter = res.headers.get("Retry-After") ?? res.headers.get("RateLimit-Reset");
       if (retryAfter) details.retryAfter = retryAfter;
+      const named = env.error?.code ?? env.code;
+      const fallback = pending ? "CONFIRMATION_REQUIRED" : res.status >= 500 ? "INTERNAL_ERROR" : `HTTP_${res.status}`;
       throw new PerfloError(
-        env.error?.code ?? env.code ?? (pending ? "CONFIRMATION_REQUIRED" : `HTTP_${res.status}`),
+        named ?? fallback,
         env.error?.message ?? env.message ?? `${method} ${path} failed with status ${res.status}.`,
         res.status,
         Object.keys(details).length > 0 ? details : undefined,

@@ -3,6 +3,10 @@
 // Invariant: spentMicro + reservedMicro <= capMicro, always, including under concurrency.
 // reserve() checks and updates in one synchronous SQLite transaction. Every transition is written
 // to the `ledger` table before the caller makes its next network call.
+//
+// TODO(M5): copy snapshot.spentMicro onto jobs.spent_micro when the job finishes.
+// TODO(M5): pass the pay outcome (succeeded/failed, or the Perflo code) into settle;
+// the row currently stores the constant SETTLED.
 import { randomUUID } from "node:crypto";
 import type { Db } from "../db/sqlite.js";
 import type { Micro } from "./money.js";
