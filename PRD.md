@@ -1,6 +1,6 @@
 # PRD: Budget-capped KYC and background-research API
 
-Status: approved design; M1 and M2 implemented.
+Status: approved design; M1 through M4 implemented.
 Owner: Vedant.
 Source brief: [original-assignment.md](original-assignment.md).
 Scope split: [requirements.md](requirements.md).
