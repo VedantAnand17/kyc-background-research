@@ -403,7 +403,7 @@ Reasoning models on Workers AI otherwise spend the default budget on thinking an
 The agent loop uses tool calling with a step limit of 4 on resolve, 2 on disambiguate, and 3 on enrich (one fan-out turn, then finish).
 The narrative pass and risk classification send `response_format: json_schema` on a raw chat-completions request.
 The AI SDK openai-compatible provider does not reliably deliver that constraint to Workers AI glm-5.3.
-When classification fails, hits become an `unclassified` warning and are never attached to the primary candidate.
+When classification fails, hits become an `unclassified` warning and are never attached to the primary candidate; `risk.reputational.status` is `not_screened` and `risk.overall.level` is `unknown`, because an inconclusive screen is never reported as `clear`.
 A failed model call adds `llm_unavailable` naming the phase.
 If that failure happens before the first lookup, the API returns 503 instead of a not-found report.
 `@cf/openai/gpt-oss-120b` with `reasoning_effort: low` is a documented override via `LLM_LOOP_MODEL`.

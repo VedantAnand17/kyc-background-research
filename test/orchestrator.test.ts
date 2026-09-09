@@ -260,7 +260,8 @@ describe("orchestrator (fixture mode)", () => {
     expect(report.warnings.some((w) => w.code === "unclassified")).toBe(true);
     expect(report.profile.news).toEqual([]);
     expect(report.risk.reputational.hits).toEqual([]);
-    expect(report.risk.reputational.status).not.toBe("hits");
+    expect(report.risk.reputational.status).toBe("not_screened");
+    expect(report.risk.overall.level).toBe("unknown");
     expectValidCosts(report, "1.50");
   });
 
