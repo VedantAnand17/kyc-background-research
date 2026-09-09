@@ -304,6 +304,55 @@ describe("report invariants", () => {
     expect(report.risk.reputational.hits[0]?.summary).toMatch(/Lagos/);
   });
 
+  it("keeps non-adverse coverage in the profile but out of reputational hits and the overall level", () => {
+    // Live 2026-09-09: Satya Nadella testified as a witness in Musk v. OpenAI; "lawsuit" matched the adverse
+    // query, every article was about him, and seven medium hits made the CEO of Microsoft "medium" risk.
+    const newsSource = source("s-news", "search_news", {
+      candidateId: null,
+      extracted: {
+        facts: {
+          articles: [
+            { title: "Nadella testifies in OpenAI trial", outlet: "CNBC" },
+            { title: "Ada Okonkwo indicted for wire fraud in Lagos", outlet: "Punch" },
+          ],
+        },
+        summary: "two articles",
+      },
+    });
+    const report = assembleReport(
+      input({
+        sources: [source("s1", "find_people"), newsSource],
+        classifications: [
+          { sourceId: "s-news", title: "Nadella testifies in OpenAI trial", aboutPrimary: true, severity: "none", summary: "Witness testimony; no allegation." },
+          { sourceId: "s-news", title: "Ada Okonkwo indicted for wire fraud in Lagos", aboutPrimary: true, severity: "high", summary: "Indicted for wire fraud." },
+        ],
+        calls: [
+          { sourceId: "s1", vendor: "v", capability: "find_people", status: "succeeded", chargedMicro: parseMoney("0.01"), transactionId: "tx-1" },
+          { sourceId: "s-news", vendor: "v", capability: "search_news", status: "succeeded", chargedMicro: parseMoney("0.01"), transactionId: "tx-2" },
+        ],
+        ledgerSpentMicro: parseMoney("0.02"),
+      }),
+    );
+    expect(report.profile.news.map((row) => row.title)).toEqual([
+      "Nadella testifies in OpenAI trial",
+      "Ada Okonkwo indicted for wire fraud in Lagos",
+    ]);
+    expect(report.risk.reputational.hits.map((hit) => hit.severity)).toEqual(["high"]);
+    expect(report.risk.overall.level).toBe("high");
+  });
+
+  it("reports clear when every article about the primary is non-adverse", () => {
+    const report = assembleReport(
+      input({
+        sources: [source("s1", "find_people"), source("n1", "search_news")],
+        classifications: [{ sourceId: "n1", aboutPrimary: true, severity: "none", summary: "Quoted as an industry expert." }],
+      }),
+    );
+    expect(report.risk.reputational.status).toBe("clear");
+    expect(report.risk.reputational.hits).toEqual([]);
+    expect(report.risk.overall.level).toBe("low");
+  });
+
   it("never treats news as about the primary when classification produced no rows", () => {
     const newsSource = source("s-news", "search_news", {
       candidateId: null,

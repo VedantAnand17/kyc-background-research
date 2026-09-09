@@ -57,6 +57,12 @@ describe("prompts", () => {
     expect(text).toMatch(/different city, employer, or country/i);
   });
 
+  it("lets the classifier mark coverage about the primary as not adverse", () => {
+    const text = riskClassifyPrompt("Satya Nadella, Redmond US, employer Microsoft", "s1: Nadella testifies in OpenAI trial");
+    expect(text).toMatch(/severity none/i);
+    expect(text).toMatch(/witness/i);
+  });
+
   it("tells enrich not to call find_people again", () => {
     const text = enrichUserPrompt();
     expect(text).toMatch(/already resolved/i);

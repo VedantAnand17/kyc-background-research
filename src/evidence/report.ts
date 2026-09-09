@@ -188,7 +188,7 @@ export function assembleReport(input: AssembleReportInput): ResearchReport {
   for (const row of input.classifications) perSource.set(row.sourceId, (perSource.get(row.sourceId) ?? 0) + 1);
   const reputationalHits = input.screenRan
     ? input.classifications
-        .filter((row) => row.aboutPrimary)
+        .filter((row): row is RiskClassification & { severity: "low" | "medium" | "high" } => row.aboutPrimary && row.severity !== "none")
         .map((row) => ({
           summary: (perSource.get(row.sourceId) === 1 ? input.narrative.reputationalSummaries[row.sourceId] : undefined) ?? row.summary,
           severity: row.severity,
