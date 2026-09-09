@@ -6,6 +6,7 @@ import { parseMoney } from "../src/budget/money.js";
 import { createApp } from "../src/api/routes.js";
 import { loadConfig } from "../src/config.js";
 import { createLogger } from "../src/logger.js";
+import { PerfloError } from "../src/perflo/errors.js";
 import { createAgent } from "../src/research/agent.js";
 import { runResearch } from "../src/research/orchestrator.js";
 import { createScriptedAgent } from "./scripted-agent.js";
@@ -228,6 +229,33 @@ describe("failure injection end to end", () => {
       .get("apify-anchor-linkedin-profile-enrichment") as { state: string; reserved_micro: string; charged_micro: string };
     expect(row.state).toBe("settled");
     expect(row.charged_micro).toBe(row.reserved_micro);
+    expectValidCosts(report, "1.50");
+  });
+
+  it("settles a hold at its reserved quote when the reconcile lookup itself fails, never as free", async () => {
+    // Live 2026-09-09: the pay timed out, then GET /v1/tasks timed out too, and the hold was released as $0
+    // while Perflo had posted the full $0.05 authorization. Unknown is never free.
+    const { server, db, deps } = await startResearchHarness({ timeoutMs: 300 });
+    dbs.push(db);
+    closers.push(() => server.close());
+    server.setScenario("apify-anchor-linkedin-profile-enrichment", "running-forever");
+    const client = {
+      ...deps.client,
+      getTask: async () => {
+        throw new PerfloError("TIMEOUT", "GET /v1/tasks timed out", 0, undefined, undefined);
+      },
+    };
+    const report = await runResearch(researchRequest("1.50"), { ...deps, client });
+    expect(warningCodes(report)).toContain("unreconciled");
+    const row = db
+      .prepare(`SELECT state, reserved_micro, charged_micro, perflo_code FROM ledger WHERE vendor = ?`)
+      .get("apify-anchor-linkedin-profile-enrichment") as { state: string; reserved_micro: string; charged_micro: string; perflo_code: string };
+    expect(row.state).toBe("settled");
+    expect(row.charged_micro).toBe(row.reserved_micro);
+    expect(row.perflo_code).toBe("UNRECONCILED");
+    const enrich = report.costs.calls.filter((call) => call.capability === "enrich_person");
+    expect(enrich).toHaveLength(1);
+    expect(parseMoney(enrich[0]!.charged.amount)).toBe(parseMoney("0.025200"));
     expectValidCosts(report, "1.50");
   });
 

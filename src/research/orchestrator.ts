@@ -193,7 +193,14 @@ function agentCtx(
   };
 }
 
-async function reconcileHeld(db: Db, jobId: string, guard: SpendGuard, client: PerfloClient, log: Logger): Promise<void> {
+async function reconcileHeld(
+  db: Db,
+  jobId: string,
+  guard: SpendGuard,
+  client: PerfloClient,
+  log: Logger,
+  warnings: Warning[],
+): Promise<void> {
   const held = db
     .prepare(`SELECT id, transaction_id, idempotency_key, reserved_micro FROM ledger WHERE job_id = ? AND state = 'held'`)
     .all(jobId) as Array<{ id: string; transaction_id: string | null; idempotency_key: string; reserved_micro: string }>;
@@ -231,8 +238,14 @@ async function reconcileHeld(db: Db, jobId: string, guard: SpendGuard, client: P
         guard.resolveHold(row.id, null);
       }
     } catch (err) {
+      // The lookup itself failed, so the charge is unknown. Unknown is never free: settle at the reserved
+      // quote so the cap holds even if Perflo posted the full authorization (live 2026-09-09, $0.05).
       log.error({ jobId, reservationId: row.id, err }, "unreconciled held reservation");
-      guard.resolveHold(row.id, null);
+      guard.settle(row.id, BigInt(row.reserved_micro), row.transaction_id, "UNRECONCILED");
+      warnings.push({
+        code: "unreconciled",
+        message: "A held charge could not be looked up at report time; it is counted at its reserved quote.",
+      });
     }
   }
 }
@@ -514,7 +527,7 @@ export async function runResearch(req: ResearchRequest, deps: OrchestratorDeps):
   }
   phases.report = Date.now() - tReport;
 
-  await reconcileHeld(deps.db, requestId, guard, deps.client, deps.log);
+  await reconcileHeld(deps.db, requestId, guard, deps.client, deps.log, warnings);
 
   const ledgerRows = deps.db
     .prepare(`SELECT id, vendor, capability, charged_micro, transaction_id, state FROM ledger WHERE job_id = ?`)
