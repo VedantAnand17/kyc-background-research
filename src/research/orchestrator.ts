@@ -234,17 +234,24 @@ async function reconcileHeld(
           chargedMicro: parseMoney(tx.amount.amount.slice(1)),
           transactionId: tx.id,
         });
+      } else if (tx && tx.ledgerState === "pending") {
+        // Still settling on Perflo's side; it may post after the report. Unknown is never free.
+        log.warn({ jobId, reservationId: row.id, transactionId: tx.id }, "transaction pending at report; settled at quote");
+        settleUnknown(tx.id);
       } else {
         guard.resolveHold(row.id, null);
       }
     } catch (err) {
-      // The lookup itself failed, so the charge is unknown. Unknown is never free: settle at the reserved
-      // quote so the cap holds even if Perflo posted the full authorization (live 2026-09-09, $0.05).
+      // The lookup itself failed, so the charge is unknown (live 2026-09-09: Perflo had posted the full $0.05).
       log.error({ jobId, reservationId: row.id, err }, "unreconciled held reservation");
-      guard.settle(row.id, BigInt(row.reserved_micro), row.transaction_id, "UNRECONCILED");
+      settleUnknown(row.transaction_id);
+    }
+
+    function settleUnknown(transactionId: string | null): void {
+      guard.settle(row.id, BigInt(row.reserved_micro), transactionId, "UNRECONCILED");
       warnings.push({
         code: "unreconciled",
-        message: "A held charge could not be looked up at report time; it is counted at its reserved quote.",
+        message: "A held charge could not be confirmed at report time; it is counted at its reserved quote.",
       });
     }
   }
