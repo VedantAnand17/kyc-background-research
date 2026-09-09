@@ -71,9 +71,11 @@ export function riskClassifyPrompt(primary: string, hits: string): string {
   return [
     `Primary candidate: ${primary}.`,
     "Classify each news or web hit.",
-    "Say whether it is about that primary candidate and assign severity low, medium, or high.",
+    "Say whether it is about that primary candidate and assign severity none, low, medium, or high.",
     "A hit that names a different city, employer, or country than the primary candidate is not about them.",
-    'JSON shape: {"hits":[{"sourceId":"...","aboutPrimary":true,"severity":"low","summary":"..."}]}.',
+    "Severity none means the hit is about them but makes no allegation against them: a witness, a quoted expert, an ordinary business or product story.",
+    "Low, medium, or high is only for an accusation, investigation, charge, penalty, or sanction aimed at them.",
+    'JSON shape: {"hits":[{"sourceId":"...","aboutPrimary":true,"severity":"none","summary":"..."}]}.',
     "Never invent hits that are not listed.",
     hits,
   ].join("\n");

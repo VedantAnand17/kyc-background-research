@@ -59,7 +59,8 @@ export interface RiskHit {
 export interface RiskClassification {
   readonly sourceId: string;
   readonly aboutPrimary: boolean;
-  readonly severity: "low" | "medium" | "high";
+  /** `none`: about the primary but carries no allegation against them (witness, quoted expert, ordinary business news). */
+  readonly severity: "none" | "low" | "medium" | "high";
   readonly summary: string;
   /** Headline used to attribute a news item to the primary candidate. */
   readonly title?: string;
@@ -127,7 +128,7 @@ const ClassificationSchema = z.object({
     z.object({
       sourceId: z.string(),
       aboutPrimary: z.boolean(),
-      severity: z.enum(["low", "medium", "high"]),
+      severity: z.enum(["none", "low", "medium", "high"]),
       summary: z.string(),
     }),
   ),

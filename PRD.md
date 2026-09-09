@@ -232,7 +232,8 @@ This phase does not depend on enrich results and MUST run concurrently with phas
 Two things always happen here regardless of tier:
 
 - `search_news` and, when allowed, `search_web` are called with adverse-media queries built by code from a fixed template list, for example `"<full name>" fraud OR scam OR arrested OR indicted OR lawsuit OR sanctions`.
-  The agent classifies each returned hit as about the primary candidate or not, and assigns a severity; code stores the classification with the source.
+  The agent classifies each returned hit as about the primary candidate or not, and assigns a severity of `none`, `low`, `medium`, or `high`; code stores the classification with the source.
+  `none` means the article is about the primary candidate but makes no allegation against them (a witness, a quoted expert, ordinary business news); it stays in `profile.news` and never becomes a reputational hit or moves `risk.overall`.
 - `screen_watchlist` runs `POST /v1/search` with the query `PEP sanctions watchlist screening` filtered to payable vendors.
   If a payable vendor is returned and its `maxChargePerCall` fits the remaining budget, the tool layer pays it once and maps the result to `pep` and `sanctions`.
   If none is returned, both statuses are `not_screened` and the corresponding warnings are added.
