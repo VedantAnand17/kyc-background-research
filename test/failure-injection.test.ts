@@ -259,6 +259,27 @@ describe("failure injection end to end", () => {
     expectValidCosts(report, "1.50");
   });
 
+  it("settles a hold at its reserved quote when the transaction is still pending at report time", async () => {
+    // A pending row may post after the report; treating it as free would let a late debit breach the cap.
+    const { server, db, deps } = await startResearchHarness({ timeoutMs: 250 });
+    dbs.push(db);
+    closers.push(() => server.close());
+    server.setScenario("apify-anchor-linkedin-profile-enrichment", "hang");
+    const client = {
+      ...deps.client,
+      listTransactions: async (opts?: { readonly limit?: number }) =>
+        (await deps.client.listTransactions(opts)).map((tx) => ({ ...tx, ledgerState: "pending" as const })),
+    };
+    const report = await runResearch(researchRequest("1.50"), { ...deps, client });
+    expect(warningCodes(report)).toContain("unreconciled");
+    const row = db
+      .prepare(`SELECT state, reserved_micro, charged_micro FROM ledger WHERE vendor = ?`)
+      .get("apify-anchor-linkedin-profile-enrichment") as { state: string; reserved_micro: string; charged_micro: string };
+    expect(row.state).toBe("settled");
+    expect(row.charged_micro).toBe(row.reserved_micro);
+    expectValidCosts(report, "1.50");
+  });
+
   it("stops spending on GUARDRAIL_DENIED and names that code in warnings", async () => {
     const { server, db, deps } = await startResearchHarness();
     dbs.push(db);
