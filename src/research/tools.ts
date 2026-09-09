@@ -274,6 +274,22 @@ async function selectVendor(
   return { status: sawPayable ? "unaffordable" : "none" };
 }
 
+/** Cheapest live Quote among the named tools. Null when none is payable. Does not pay. */
+export async function cheapestPayableQuote(
+  client: PerfloClient,
+  tools: readonly ToolName[],
+): Promise<Micro | null> {
+  const cache = new ContractCache(client);
+  let cheapest: Micro | null = null;
+  for (const name of tools) {
+    if (name === "finish") continue;
+    const pick = await selectVendor(name, {}, client, cache, 1n << 60n);
+    if (pick.status !== "selected") continue;
+    if (cheapest === null || pick.quote < cheapest) cheapest = pick.quote;
+  }
+  return cheapest;
+}
+
 export function createTools(ctx: ToolContext): ResearchTools {
   const cache = new ContractCache(ctx.client);
   const limit = new Limit(ctx.concurrency ?? 4);

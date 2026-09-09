@@ -10,7 +10,7 @@ Read this before touching code; use these words, not synonyms.
 - **Cap**: the caller's maximum budget for one request, in micro-dollars.
   Not "limit", which is Perflo's word for envelope windows.
 - **Tier**: `basic`, `standard`, or `deep`, derived from the Cap; decides which Tools are offered.
-- **Reserve**: the 10 percent of the Cap held back for disambiguation; unspent unless needed.
+- **Reserve**: one cheapest discriminator Quote held back from resolve so identity can still be separated; leftover is unlocked after that phase.
 - **Tool**: a capability the LLM can call, such as `find_people`.
   Tools are not vendors.
 - **Capability**: the abstract kind of lookup a Tool performs, and the key of the capability map.

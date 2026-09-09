@@ -167,24 +167,21 @@ describe("spend guard", () => {
     expect(reserve(g, 100_000n).ok).toBe(true);
   });
 
-  it("relocks unused reserve after a disambiguation spend", () => {
+  it("leaves leftover reserve in headroom after unlock so later phases can spend it", () => {
     const db = tracked();
     const g = guard(db, "job-1", CAP, 100_000n);
     const first = reserve(g, 700_000n);
     expect(first.ok).toBe(true);
     if (!first.ok) throw new Error("expected reservation");
     g.settle(first.id, 700_000n, "tx-1", "succeeded");
-    const before = g.snapshot().headroomMicro;
-    expect(before).toBe(200_000n);
+    expect(g.snapshot().headroomMicro).toBe(200_000n);
     g.unlockReserve();
     expect(g.snapshot().headroomMicro).toBe(300_000n);
     const disc = reserve(g, 150_000n);
     expect(disc.ok).toBe(true);
     if (!disc.ok) throw new Error("expected reservation");
     g.settle(disc.id, 150_000n, "tx-2", "succeeded");
-    g.relockAfterUnlock(150_000n, before);
-    expect(g.snapshot().headroomMicro).toBe(50_000n);
-    expect(reserve(g, 60_000n).ok).toBe(false);
-    expect(reserve(g, 50_000n).ok).toBe(true);
+    expect(g.snapshot().headroomMicro).toBe(150_000n);
+    expect(reserve(g, 150_000n).ok).toBe(true);
   });
 });

@@ -4,7 +4,7 @@ import { createEvidenceStore } from "../src/evidence/store.js";
 import { openDatabase, type Db } from "../src/db/sqlite.js";
 import { createPerfloClient } from "../src/perflo/client.js";
 import { CAPABILITIES, type ToolName } from "../src/research/capabilities.js";
-import { createTools, type ToolContext, type ToolOutcome } from "../src/research/tools.js";
+import { cheapestPayableQuote, createTools, type ToolContext, type ToolOutcome } from "../src/research/tools.js";
 import { startFakePerflo, type FakePerflo } from "./fake-perflo.js";
 
 const PAID_TOOLS = CAPABILITIES.map((c) => c.tool).filter((name): name is Exclude<ToolName, "finish"> => name !== "finish");
@@ -289,6 +289,24 @@ describe("tool layer", () => {
     if (!finish?.execute) throw new Error("missing finish");
     const result = await finish.execute({});
     expect(result.outcome).toBe("ok");
+    expect(server.payCalls).toHaveLength(0);
+  });
+
+  it("quotes the cheapest payable tool without paying", async () => {
+    const { server, ctx } = await harness();
+    server.setContract("stableenrich-serper-news", {
+      maxChargePerCall: { amount: "0.005000", currency: "USD" },
+    });
+    server.setContract("apify-apimaestro-linkedin-profile-detail", {
+      maxChargePerCall: { amount: "0.010000", currency: "USD" },
+    });
+    const quote = await cheapestPayableQuote(ctx.client, [
+      "get_professional_profile",
+      "search_news",
+      "find_people",
+      "finish",
+    ]);
+    expect(quote).toBe(5_000n);
     expect(server.payCalls).toHaveLength(0);
   });
 });

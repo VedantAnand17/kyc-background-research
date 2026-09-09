@@ -1,11 +1,43 @@
 import { describe, expect, it } from "vitest";
 import { parseMoney } from "../src/budget/money.js";
-import { defaultDeadlineMs, plan } from "../src/research/planner.js";
+import { defaultDeadlineMs, discriminatorTools, plan, reserveFromQuotes } from "../src/research/planner.js";
+
+describe("reserveFromQuotes", () => {
+  it("holds back the cheapest discriminator quote", () => {
+    expect(reserveFromQuotes(1_000_000n, 50_000n, 25_200n)).toBe(25_200n);
+  });
+
+  it("never holds so much that find_people cannot run", () => {
+    expect(reserveFromQuotes(80_000n, 50_000n, 50_000n)).toBe(30_000n);
+  });
+
+  it("holds nothing when find_people itself does not fit the cap", () => {
+    expect(reserveFromQuotes(40_000n, 50_000n, 25_200n)).toBe(0n);
+  });
+
+  it("holds nothing when no discriminator is payable", () => {
+    expect(reserveFromQuotes(1_000_000n, 50_000n, null)).toBe(0n);
+  });
+});
+
+describe("discriminatorTools", () => {
+  it("drops resolve, finish, and watchlist so the reserve is sized for a separator", () => {
+    expect(
+      discriminatorTools([
+        "find_people",
+        "get_professional_profile",
+        "search_news",
+        "screen_watchlist",
+        "finish",
+      ]),
+    ).toEqual(["get_professional_profile", "search_news"]);
+  });
+});
 
 describe("plan", () => {
-  it("maps a cap under $0.50 to basic tools and a 10 percent reserve", () => {
+  it("maps a cap under $0.50 to basic tools and the quote-sized reserve", () => {
     const cap = parseMoney("0.49");
-    const result = plan(cap, 45_000, 1_000);
+    const result = plan(cap, 45_000, 1_000, 25_200n);
     expect(result.tier).toBe("basic");
     expect(result.allowedTools).toEqual([
       "find_people",
@@ -15,7 +47,7 @@ describe("plan", () => {
       "finish",
     ]);
     expect(result.capMicro).toBe(cap);
-    expect(result.reserveMicro).toBe(49_000n);
+    expect(result.reserveMicro).toBe(25_200n);
     expect(result.deadlineAt).toBe(46_000);
   });
 
@@ -43,8 +75,8 @@ describe("plan", () => {
     expect(result.deadlineAt).toBe(8_100);
   });
 
-  it("ceils the reserve to the next micro-dollar", () => {
-    expect(plan(1_000_001n, 5_000, 0).reserveMicro).toBe(100_001n);
+  it("rejects a reserve larger than the cap", () => {
+    expect(() => plan(100n, 5_000, 0, 101n)).toThrow(RangeError);
   });
 
   it("defaults the deadline by tier: 90s basic, 120s standard and deep", () => {

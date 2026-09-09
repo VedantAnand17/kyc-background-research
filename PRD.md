@@ -196,8 +196,11 @@ Tier thresholds, from `maxBudget`:
 | `standard` | $0.50 to $2.00 inclusive | basic plus `enrich_person`, `get_social_profile`, `search_web` |
 | `deep` | more than $2.00 | standard plus `skip_trace`, `search_filings`, `fetch_page` |
 
-Reserve: 10 percent of the cap, rounded up to the nearest micro-dollar, held back from phases 1 to 3 and released for phase 2 disambiguation when the matcher reports two candidates within 0.15 of each other.
-Unused reserve is never spent.
+Reserve: the cheapest live Quote among allowed tools that can separate two candidates (`find_people`, `finish`, and `screen_watchlist` excluded), held back from resolve so that call cannot spend the discriminator.
+The hold is clamped so `find_people`'s own Quote still fits the cap.
+After resolve, leftover reserve is unlocked for disambiguation, enrich, and screen.
+A missing Quote means a zero reserve.
+Money still in the hold at the end of the request is never spent.
 
 ### 6.2 Phase 1: Resolve (agent)
 
@@ -211,7 +214,7 @@ Zero candidates after fallback yields `identity.status = "not_found"` and the ru
 The matcher scores every candidate (section 8).
 If the top candidate is `confirmed`, or is `probable` and leads the runner-up by 0.15 or more, it becomes the primary candidate.
 Otherwise the run is ambiguous.
-The agent is told the two closest candidates and asked to pick one allowed tool that would separate them; the reserve is unlocked for that one call.
+The agent is told the two closest candidates and asked to pick one allowed tool that would separate them; the reserve is already unlocked after resolve, so that call and any later phase can use leftover.
 After that call the matcher re-scores.
 If still ambiguous, `identity.status = "ambiguous"`, phases 3 and 4 run only adverse-media queries scoped to the name, and profile sections stay empty.
 
