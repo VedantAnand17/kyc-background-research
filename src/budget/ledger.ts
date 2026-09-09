@@ -37,10 +37,8 @@ export interface SpendGuard {
   hold(id: ReservationId, perfloCode: string, transactionId?: string | null): void;
   /** Resolve a held reservation once GET /v1/transactions answers. */
   resolveHold(id: ReservationId, outcome: { readonly chargedMicro: Micro; readonly transactionId: string } | null): void;
-  /** Release the planner's 10 percent disambiguation hold so later phases can spend it. */
+  /** Release the planner's disambiguation hold so later phases can spend leftover. */
   unlockReserve(): void;
-  /** After the one discriminator call, lock whatever reserve was not needed. */
-  relockAfterUnlock(spentWhileUnlocked: Micro, headroomBeforeUnlock: Micro): void;
   snapshot(): LedgerSnapshot;
 }
 
@@ -48,7 +46,7 @@ export interface LedgerOptions {
   readonly db: Db;
   readonly jobId: string;
   readonly capMicro: Micro;
-  /** Micro-dollars held back from phases 1-3; unlocked by the orchestrator for disambiguation. */
+  /** Micro-dollars held back from resolve; unlocked after that phase so leftover can fund later work. */
   readonly reserveMicro: Micro;
 }
 
@@ -185,11 +183,6 @@ export function createSpendGuard(opts: LedgerOptions): SpendGuard {
     },
     unlockReserve() {
       lockedReserve = 0n;
-    },
-    relockAfterUnlock(spentWhileUnlocked, headroomBeforeUnlock) {
-      const usedFromReserve =
-        spentWhileUnlocked > headroomBeforeUnlock ? spentWhileUnlocked - headroomBeforeUnlock : 0n;
-      lockedReserve = usedFromReserve >= opts.reserveMicro ? 0n : opts.reserveMicro - usedFromReserve;
     },
     snapshot() {
       return snapshotFrom(loadRows());

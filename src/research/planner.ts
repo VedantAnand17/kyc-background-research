@@ -1,5 +1,5 @@
 // Phase 0: budget -> tier, allowed tools, reserve, deadline. Pure code. PRD.md section 6.1.
-import { ceilFraction, type Micro } from "../budget/money.js";
+import type { Micro } from "../budget/money.js";
 import { toolsForTier, type Tier, type ToolName } from "./capabilities.js";
 
 export interface Plan {
@@ -33,14 +33,48 @@ export function defaultDeadlineMs(capMicro: Micro): number {
   return DEADLINE_MS[tierForCap(capMicro)];
 }
 
-export function plan(capMicro: Micro, deadlineMs: number, now: number = Date.now()): Plan {
+/** Tools that can separate two candidates. find_people already ran; watchlist is discovered at run time. */
+const NOT_DISCRIMINATORS: ReadonlySet<ToolName> = new Set(["finish", "find_people", "screen_watchlist"]);
+
+export function discriminatorTools(allowed: readonly ToolName[]): ToolName[] {
+  return allowed.filter((name) => !NOT_DISCRIMINATORS.has(name));
+}
+
+/**
+ * Hold back one discriminator Quote, but never so much that find_people cannot run.
+ * A missing quote is treated as zero: unused reserve is never invented.
+ */
+export function reserveFromQuotes(
+  capMicro: Micro,
+  findPeopleQuote: Micro | null,
+  discriminatorQuote: Micro | null,
+): Micro {
+  if (capMicro < 0n) throw new RangeError(`negative cap: ${capMicro}`);
+  const find = findPeopleQuote ?? 0n;
+  const disc = discriminatorQuote ?? 0n;
+  if (find < 0n) throw new RangeError(`negative find_people quote: ${find}`);
+  if (disc < 0n) throw new RangeError(`negative discriminator quote: ${disc}`);
+  const room = capMicro > find ? capMicro - find : 0n;
+  return disc < room ? disc : room;
+}
+
+export function plan(
+  capMicro: Micro,
+  deadlineMs: number,
+  now: number = Date.now(),
+  reserveMicro: Micro = 0n,
+): Plan {
   if (deadlineMs <= 0) throw new RangeError(`deadline must be positive: ${deadlineMs}`);
+  if (reserveMicro < 0n) throw new RangeError(`negative reserve: ${reserveMicro}`);
+  if (reserveMicro > capMicro) {
+    throw new RangeError(`reserve ${reserveMicro} exceeds cap ${capMicro}`);
+  }
   const tier = tierForCap(capMicro);
   return {
     tier,
     allowedTools: toolsForTier(tier).map((c) => c.tool),
     capMicro,
-    reserveMicro: ceilFraction(capMicro, 1n, 10n),
+    reserveMicro,
     deadlineAt: now + deadlineMs,
   };
 }

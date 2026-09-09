@@ -34,7 +34,7 @@ export function toMoney(micro: Micro): Money {
   return { amount: formatMoney(micro), currency: "USD" };
 }
 
-/** Ceil(micro * numerator / denominator). Used for the 10 percent reserve. */
+/** Ceil(micro * numerator / denominator). */
 export function ceilFraction(micro: Micro, numerator: bigint, denominator: bigint): Micro {
   const product = micro * numerator;
   return (product + denominator - 1n) / denominator;

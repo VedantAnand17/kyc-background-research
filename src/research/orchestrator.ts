@@ -17,10 +17,10 @@ import type { ResearchAgent, AgentContext, ClassificationResult, RiskClassificat
 import { assembleReport, type CostCall, type Warning } from "../evidence/report.js";
 import { PerfloError } from "../perflo/errors.js";
 import { candidatesFromSources } from "./candidates.js";
-import type { Tier } from "./capabilities.js";
-import { defaultDeadlineMs, plan } from "./planner.js";
+import { toolsForTier, type Tier } from "./capabilities.js";
+import { defaultDeadlineMs, discriminatorTools, plan, reserveFromQuotes, tierForCap } from "./planner.js";
 import { adverseMediaQuery, describeSubject } from "./prompts.js";
-import { createTools, debitedMicro, type ResearchTools, type ToolOutcome } from "./tools.js";
+import { cheapestPayableQuote, createTools, debitedMicro, type ResearchTools, type ToolOutcome } from "./tools.js";
 
 export class ResearchUnavailableError extends Error {
   constructor(
@@ -249,7 +249,12 @@ export async function runResearch(req: ResearchRequest, deps: OrchestratorDeps):
   const started = deps.now ?? Date.now();
   const capMicro = parseMoney(req.maxBudget.amount);
   const deadlineMs = req.options?.deadlineMs ?? deps.deadlineMs ?? defaultDeadlineMs(capMicro);
-  const planned = plan(capMicro, deadlineMs, started);
+  const allowed = toolsForTier(tierForCap(capMicro)).map((c) => c.tool);
+  const [findQuote, discQuote] = await Promise.all([
+    cheapestPayableQuote(deps.client, ["find_people"]),
+    cheapestPayableQuote(deps.client, discriminatorTools(allowed)),
+  ]);
+  const planned = plan(capMicro, deadlineMs, started, reserveFromQuotes(capMicro, findQuote, discQuote));
   const requestId = `req_${randomUUID()}`;
   const warnings: Warning[] = [];
   const phases: Record<string, number> = {};
@@ -358,6 +363,8 @@ export async function runResearch(req: ResearchRequest, deps: OrchestratorDeps):
   let adverseOnly = identity.status === "ambiguous";
   const skipResearch = identity.status === "not_found";
 
+  if (!skipResearch) guard.unlockReserve();
+
   if (!skipResearch && identity.status === "ambiguous" && !controller.signal.aborted) {
     await runPhase("disambiguate", async () => {
       const [lead, runner] = identity.candidates;
@@ -366,11 +373,7 @@ export async function runResearch(req: ResearchRequest, deps: OrchestratorDeps):
         const row = evidence.find((c) => c.id === scored.id);
         return row ? describeCandidate(row) : scored.id;
       };
-      const before = guard.snapshot();
-      guard.unlockReserve();
       await deps.agent.disambiguate(ctx({ lead: describe(lead), runner: describe(runner) }));
-      const after = guard.snapshot();
-      guard.relockAfterUnlock(after.spentMicro - before.spentMicro, before.headroomMicro);
       evidence = candidatesFromSources(store.forJob());
       identity = decideIdentity(subjectOf(req), evidence);
       adverseOnly = identity.status === "ambiguous";

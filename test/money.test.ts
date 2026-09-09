@@ -37,7 +37,7 @@ describe("money", () => {
     expect(toMoney(1_500_000n)).toEqual({ amount: "1.500000", currency: "USD" });
   });
 
-  it("ceils fractions for the reserve", () => {
+  it("ceils fractions", () => {
     expect(ceilFraction(1_500_000n, 1n, 10n)).toBe(150_000n);
     expect(ceilFraction(1n, 1n, 10n)).toBe(1n);
     expect(ceilFraction(0n, 1n, 10n)).toBe(0n);
