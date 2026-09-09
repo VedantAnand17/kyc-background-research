@@ -381,6 +381,7 @@ export async function runResearch(req: ResearchRequest, deps: OrchestratorDeps):
   }
 
   let classifications: RiskClassification[] = [];
+  let classificationFailed = false;
   let watchlistScreened = false;
   let watchlistHits = false;
 
@@ -429,6 +430,7 @@ export async function runResearch(req: ResearchRequest, deps: OrchestratorDeps):
     );
     if (classified.failed) {
       classifications = [];
+      classificationFailed = true;
       warnings.push({
         code: "unclassified",
         message:
@@ -549,6 +551,7 @@ export async function runResearch(req: ResearchRequest, deps: OrchestratorDeps):
     },
     narrative,
     classifications,
+    classificationFailed,
     watchlistScreened,
     watchlistHits,
     screenRan: phases.screen !== undefined,

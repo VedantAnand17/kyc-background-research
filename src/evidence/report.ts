@@ -44,6 +44,8 @@ export interface AssembleReportInput {
   readonly timing: { readonly totalMs: number; readonly deadlineHit: boolean; readonly phases: Record<string, number> };
   readonly narrative: NarrativeFields;
   readonly classifications: readonly RiskClassification[];
+  /** The adverse-media classifier did not finish, so nothing was ruled in or out. Never reported as clear. */
+  readonly classificationFailed?: boolean;
   readonly watchlistScreened: boolean;
   readonly watchlistHits: boolean;
   readonly screenRan: boolean;
@@ -218,8 +220,10 @@ export function assembleReport(input: AssembleReportInput): ResearchReport {
     );
   }
 
+  const adverseMediaScreened = input.screenRan && !input.classificationFailed;
+
   let overall: "low" | "medium" | "high" | "unknown" = "low";
-  if (!confirmed || !input.screenRan) overall = "unknown";
+  if (!confirmed || !adverseMediaScreened) overall = "unknown";
   else if (input.watchlistHits || reputationalHits.some((h) => h.severity === "high")) overall = "high";
   else if (reputationalHits.some((h) => h.severity === "medium")) overall = "medium";
 
@@ -258,7 +262,7 @@ export function assembleReport(input: AssembleReportInput): ResearchReport {
       pep: watch,
       sanctions: watch,
       fraud: emptyRisk("not_screened"),
-      reputational: input.screenRan
+      reputational: adverseMediaScreened
         ? {
             status: reputationalHits.length > 0 ? ("hits" as const) : ("clear" as const),
             hits: reputationalHits,

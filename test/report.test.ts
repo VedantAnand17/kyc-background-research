@@ -344,6 +344,23 @@ describe("report invariants", () => {
     expect(report.risk.reputational.status).toBe("clear");
   });
 
+  it("reports reputational not_screened and overall unknown when classification failed", () => {
+    // Articles came back but the classifier never ran to completion: nothing was ruled in or out,
+    // so "clear" would be a false negative. The `unclassified` warning already says why.
+    const report = assembleReport(
+      input({
+        classifications: [],
+        classificationFailed: true,
+        warnings: [{ code: "unclassified", message: "Risk classification failed." }],
+      }),
+    );
+    expect(report.risk.reputational.status).toBe("not_screened");
+    expect(report.risk.reputational.hits).toEqual([]);
+    expect(report.risk.fraud.status).toBe("not_screened");
+    expect(report.risk.overall.level).toBe("unknown");
+    expect(report.warnings.filter((w) => w.code === "unclassified")).toHaveLength(1);
+  });
+
   it("marks every risk category not_screened and overall unknown when the screen did not run", () => {
     const report = assembleReport(
       input({
