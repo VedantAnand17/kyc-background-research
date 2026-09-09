@@ -10,7 +10,7 @@ Cloudflare Workers AI is reachable now, exposes an OpenAI-compatible endpoint at
 
 The agent loop needs three things: correct tool calls, parallel tool calls in the enrich phase, and a clean stop when a tool reports `budget_exhausted`.
 The narrative pass needs valid structured JSON that does not invent facts, because the output is a compliance-adjacent report.
-The deadline is 45 seconds for the whole request, so a step should take well under 10 seconds.
+The default deadline is 90 seconds for basic and 120 seconds for standard and deep, while individual model steps should still complete well under 10 seconds.
 
 ## Evidence (live smoke tests on 2026-09-08)
 
@@ -27,7 +27,7 @@ glm-5.3 also stopped calling tools and said it was finishing when handed a `budg
 
 - Default provider: Cloudflare Workers AI via the AI SDK `@ai-sdk/openai-compatible` provider, `LLM_PROVIDER=cloudflare`, base URL derived from `CLOUDFLARE_ACCOUNT_ID`.
 - Default model for the tool loop, risk classification, and narrative: `@cf/zai-org/glm-5.3`.
-- Every glm-5.3 call sends `reasoning_effort: low`, including the tool loop; at the default effort a single loop turn took 15 to 20 seconds and blew the 45 second deadline.
+- Every glm-5.3 call sends `reasoning_effort: low`, including the tool loop; at the default effort a single loop turn took 15 to 20 seconds and consumed too much of the request deadline.
 - Each tool loop stops as soon as a turn's tool calls were all accepted by code (`toolCallsAccepted`), or on `finish`, or at its step cap; the trailing finish turn was pure latency.
   The enrich loop is capped at three steps; the narrative allowance is 15 seconds on basic and 25 or 30 on standard and deep, with each attempt capped at 15 seconds, because a single Workers AI request can stall without answering (PRD section 6.7).
   For the same reason every model request carries `LLM_REQUEST_TIMEOUT_MS` (default 30 seconds).

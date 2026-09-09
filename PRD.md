@@ -463,7 +463,7 @@ Never log the agent key, the LLM key, or raw vendor payloads at info level.
 - Every model call therefore sends `reasoning_effort: low`, and each tool loop stops as soon as a turn's tool calls are all accepted by code, so resolve and enrich are one model turn each when the model behaves.
 - Live p50 targets are basic under 30 seconds, standard under 45 seconds, deep under 45 seconds.
 - Five-run sample on 2026-09-08 (`pnpm test:perf`): p50 total 12.4 s basic, 12.3 s standard, 13.2 s deep; every run under 16 s, none hit the deadline.
-- The default wall-clock deadline is 45 seconds for every tier.
+- The default wall-clock deadline is 90 seconds for basic and 120 seconds for standard and deep.
 - Raise a target or the default deadline only after a measured sample says the p50 is higher.
 - Independent tool calls run concurrently; no phase serializes calls that do not depend on each other.
 - The deadline is honored within 5 seconds in every case.

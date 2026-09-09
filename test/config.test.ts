@@ -28,7 +28,7 @@ describe("loop model", () => {
     expect(loopModelName(config)).toBe("loop-model");
   });
 
-  it("defaults the operator deadline override to 45 seconds", () => {
+  it("defaults the operator deadline override to 90 seconds", () => {
     const config = loadConfig({
       ...base,
       LLM_PROVIDER: "openai-compatible",

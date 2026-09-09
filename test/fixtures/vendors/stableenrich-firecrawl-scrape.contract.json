@@ -1,0 +1,43 @@
+{
+  "slug": "stableenrich-firecrawl-scrape",
+  "name": "StableEnrich: Firecrawl Scrape",
+  "description": "Read a web page and return its clean content as text or markdown from a URL. Use it to extract an article, page, or document for analysis.",
+  "capability": "scrape",
+  "keywords": [
+    "scrape",
+    "web",
+    "page",
+    "content",
+    "extract",
+    "url",
+    "text",
+    "markdown",
+    "read",
+    "crawl"
+  ],
+  "price": {
+    "amount": "0.0126",
+    "currency": "USD"
+  },
+  "maxChargePerCall": {
+    "amount": "0.0126",
+    "currency": "USD"
+  },
+  "pricingUnit": "call",
+  "latencyMsP50": 78,
+  "payable": true,
+  "schemaConfidence": "high",
+  "input": {
+    "fields": [
+      {
+        "name": "url",
+        "in": "body",
+        "type": "string",
+        "required": true,
+        "description": "URL to scrape and extract content from"
+      }
+    ],
+    "example": null
+  },
+  "docsUrl": "https://stableenrich.dev"
+}
